@@ -1,5 +1,5 @@
 ---
-depends_on: [M001]
+depends_on: [M001, M003]
 ---
 
 # M002: Servet Yönetimi Evrimi — Context Draft
