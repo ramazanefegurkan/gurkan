@@ -81,17 +81,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Airbnb API erişimi olmadığı için veriler manuel girilecek.
 
-### R010 — Dosya yükleme (tapu, sözleşme, sigorta poliçesi vs.), mülke bağlama, kategorize etme, görüntüleme/indirme.
-- Class: core-capability
-- Status: active
-- Description: Dosya yükleme (tapu, sözleşme, sigorta poliçesi vs.), mülke bağlama, kategorize etme, görüntüleme/indirme.
-- Why it matters: Önemli belgelerin tek yerden erişilebilir olması.
-- Source: user
-- Primary owning slice: M001/S05
-- Supporting slices: none
-- Validation: T01 integration tests prove upload/list/download/delete API contract + access control. T02 browser verification proves end-to-end UI flow.
-- Notes: Basit dosya yükleme — OCR veya akıllı işleme yok.
-
 ### R011 — Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
 - Class: primary-user-loop
 - Status: active
@@ -204,6 +193,17 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: S04 integration tests (8/8 pass) + browser-verified CRUD: bill create/edit/delete with 5 types, due date tracking, mark-as-paid status transition, multi-currency (USD). Group access control tested.
 - Notes: Fatura türleri: su, elektrik, doğalgaz, internet, aidat.
 
+### R010 — Dosya yükleme (tapu, sözleşme, sigorta poliçesi vs.), mülke bağlama, kategorize etme, görüntüleme/indirme.
+- Class: core-capability
+- Status: validated
+- Description: Dosya yükleme (tapu, sözleşme, sigorta poliçesi vs.), mülke bağlama, kategorize etme, görüntüleme/indirme.
+- Why it matters: Önemli belgelerin tek yerden erişilebilir olması.
+- Source: user
+- Primary owning slice: M001/S05
+- Supporting slices: none
+- Validation: S05 integration tests (8/8 pass) prove upload/list/download/delete API contract + extension/content-type validation + cross-group access denial (403). Browser verification proves end-to-end UI flow: upload with category → document table with badges → download → delete with confirmation. Dökümanlar tab in PropertyLayout.
+- Notes: Basit dosya yükleme — OCR veya akıllı işleme yok.
+
 ## Deferred
 
 ### R016 — Mevcut Excel/Google Sheets verilerini uygulamaya import etme.
@@ -287,7 +287,7 @@ This file is the explicit capability and coverage contract for the project.
 | R007 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
 | R008 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: expense create/edit/delete with 6 categories, recurring support, multi-currency (EUR). Group access control tested. |
 | R009 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: bill create/edit/delete with 5 types, due date tracking, mark-as-paid status transition, multi-currency (USD). Group access control tested. |
-| R010 | core-capability | active | M001/S05 | none | T01 integration tests prove upload/list/download/delete API contract + access control. T02 browser verification proves end-to-end UI flow. |
+| R010 | core-capability | validated | M001/S05 | none | S05 integration tests (8/8 pass) prove upload/list/download/delete API contract + extension/content-type validation + cross-group access denial (403). Browser verification proves end-to-end UI flow: upload with category → document table with badges → download → delete with confirmation. Dökümanlar tab in PropertyLayout. |
 | R011 | primary-user-loop | active | M001/S06 | none | unmapped |
 | R012 | failure-visibility | active | M001/S06 | none | unmapped |
 | R013 | differentiator | active | M001/S06 | none | unmapped |
@@ -305,7 +305,7 @@ This file is the explicit capability and coverage contract for the project.
 
 ## Coverage Summary
 
-- Active requirements: 16
-- Mapped to slices: 16
-- Validated: 2 (R008, R009)
+- Active requirements: 15
+- Mapped to slices: 15
+- Validated: 3 (R008, R009, R010)
 - Unmapped active requirements: 0

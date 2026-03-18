@@ -13,7 +13,7 @@ Tüm mülklerin finansal durumunu tek bir dashboard'dan görmek — kira gelirle
 
 ## Current State
 
-S01–S04 tamamlandı. Backend: ASP.NET Core 10 Web API + PostgreSQL 16 (Docker, port 5434) + JWT auth + grup bazlı RBAC. 11 controller (Auth, Groups, Users, Properties, PropertyNotes, Tenants, RentPayments, ShortTermRentals, RentIncreases, Expenses, Bills), 49 endpoint, 53 integration test (18 S01 + 14 S02 + 13 S03 + 8 S04). Frontend: React + Vite + TypeScript (gurkan-ui/), JWT auth context, login sayfası, responsive sidebar layout, mülk listesi/detay/form sayfaları, not CRUD, kiracı yönetimi (CRUD, ödeme tablosu, kira artışı, sözleşme sonlandırma), kısa dönem kiralama (CRUD, platform takibi), gider yönetimi (CRUD, kategori badge'leri, tekrarlayan gider), fatura yönetimi (CRUD, durum badge'leri, ödendi işaretleme). PropertyLayout tab navigation pattern (Detaylar / Kiracılar / Kısa Dönem / Giderler / Faturalar). Multi-currency destekli, grup bazlı erişim kontrolü backend ve frontend'de çalışıyor. Aylık kira ödemeleri otomatik oluşuyor, gecikme query-time tespit ediliyor, kira artışı gelecek ödemelere yansıyor.
+S01–S05 tamamlandı. Backend: ASP.NET Core 10 Web API + PostgreSQL 16 (Docker, port 5434) + JWT auth + grup bazlı RBAC. 12 controller (Auth, Groups, Users, Properties, PropertyNotes, Tenants, RentPayments, ShortTermRentals, RentIncreases, Expenses, Bills, Documents), 53 endpoint, 61 integration test (18 S01 + 14 S02 + 13 S03 + 8 S04 + 8 S05). Frontend: React + Vite + TypeScript (gurkan-ui/), JWT auth context, login sayfası, responsive sidebar layout, mülk listesi/detay/form sayfaları, not CRUD, kiracı yönetimi (CRUD, ödeme tablosu, kira artışı, sözleşme sonlandırma), kısa dönem kiralama (CRUD, platform takibi), gider yönetimi (CRUD, kategori badge'leri, tekrarlayan gider), fatura yönetimi (CRUD, durum badge'leri, ödendi işaretleme), döküman yönetimi (multipart upload, kategori badge'leri, download, silme). PropertyLayout tab navigation pattern (Detaylar / Kiracılar / Kısa Dönem / Giderler / Faturalar / Dökümanlar). Multi-currency destekli, grup bazlı erişim kontrolü backend ve frontend'de çalışıyor. Aylık kira ödemeleri otomatik oluşuyor, gecikme query-time tespit ediliyor, kira artışı gelecek ödemelere yansıyor. Dosya yükleme/indirme/silme lokal filesystem üzerinde çalışıyor, extension + content-type whitelist ile korumalı.
 
 ## Architecture / Key Patterns
 
@@ -23,6 +23,7 @@ S01–S04 tamamlandı. Backend: ASP.NET Core 10 Web API + PostgreSQL 16 (Docker,
 - **Erişim modeli:** Superadmin → Gruplar → Mülkler. Kullanıcılar gruplara, mülkler gruplara atanır.
 - **Deploy:** Self-hosted VPS (Docker)
 - **Multi-currency:** TL + USD/EUR
+- **File storage:** Local filesystem with configurable base path
 
 ## Capability Contract
 

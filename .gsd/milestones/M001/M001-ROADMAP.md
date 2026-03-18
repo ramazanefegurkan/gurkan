@@ -69,7 +69,7 @@ This milestone is complete only when all are true:
 - [x] **S04: Gider & Fatura Takibi** `risk:low` `depends:[S02]`
   > After this: Mülk bazlı gider (bakım, vergi vs.) ve fatura (su, elektrik, doğalgaz, internet, aidat) kaydedilir. Son ödeme tarihi ve ödeme durumu takip edilir. Frontend'de gider ve fatura listeleri çalışır.
 
-- [ ] **S05: Döküman Yönetimi** `risk:low` `depends:[S02]`
+- [x] **S05: Döküman Yönetimi** `risk:low` `depends:[S02]`
   > After this: Dosya yüklenir (tapu, sözleşme, sigorta), mülke bağlanır, kategorize edilir. Dosya görüntüleme ve indirme çalışır. Frontend'de döküman listesi ve yükleme formu çalışır.
 
 - [ ] **S06: Dashboard, Bildirimler & Raporlama** `risk:medium` `depends:[S03,S04]`
