@@ -56,7 +56,7 @@
   - Verify: `dotnet test GurkanApi.Tests/ --filter "Category=S02"` — all tests pass
   - Done when: All S02 integration tests pass with 0 failures
 
-- [ ] **T03: Scaffold React frontend with auth context, API client, and login page** `est:40m`
+- [x] **T03: Scaffold React frontend with auth context, API client, and login page** `est:40m`
   - Why: No frontend exists yet. This creates the React + Vite + TypeScript project, sets up JWT auth context (token storage, login/logout, refresh), an API client with auth interceptor, routing with protected routes, and a functional login page. This is the frontend foundation all subsequent slices build on.
   - Files: `gurkan-ui/package.json`, `gurkan-ui/vite.config.ts`, `gurkan-ui/tsconfig.json`, `gurkan-ui/src/main.tsx`, `gurkan-ui/src/App.tsx`, `gurkan-ui/src/api/client.ts`, `gurkan-ui/src/contexts/AuthContext.tsx`, `gurkan-ui/src/pages/Login.tsx`, `gurkan-ui/src/components/Layout.tsx`, `gurkan-ui/src/types/index.ts`
   - Do: Run `npm create vite@latest gurkan-ui -- --template react-ts`. Install react-router-dom and axios. Create API client (`src/api/client.ts`) with axios instance pointing at `http://localhost:5000/api`, JWT interceptor that reads token from localStorage, and 401 response interceptor that clears auth. Create AuthContext (`src/contexts/AuthContext.tsx`) with login/logout/refresh, token persistence in localStorage, user state. Create Login page with email+password form. Create Layout component with nav header and logout button. Set up React Router in App.tsx with public route (/login) and protected routes (/ redirects to /properties). Relevant skill for executors: `~/.gsd/agent/skills/frontend-design/SKILL.md` — load for UI design guidance.

@@ -1,0 +1,105 @@
+/* ── Fonts ────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap');
+
+/* ── Design tokens ────────────────────────────────── */
+
+:root {
+  /* Typography */
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+
+  /* Accent — warm terracotta */
+  --accent: #c4653a;
+  --accent-hover: #b3562d;
+  --accent-warm: #d4845e;
+  --accent-subtle: #fdf2ee;
+  --accent-ring: rgba(196, 101, 58, 0.15);
+  --accent-shadow: rgba(196, 101, 58, 0.25);
+
+  /* Surfaces */
+  --bg-page: #faf9f7;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #f5f3f0;
+
+  /* Text */
+  --text-primary: #1a1714;
+  --text-secondary: #5c564e;
+  --text-tertiary: #9a9189;
+  --text-placeholder: #c4bdb4;
+
+  /* Borders */
+  --border-subtle: #eae6e1;
+  --border-input: #ddd8d1;
+
+  /* Danger / error */
+  --danger: #c43a3a;
+  --bg-danger-subtle: #fdf2f2;
+  --border-danger: #f5d5d5;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+/* ── Reset & base ─────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  line-height: 1.5;
+}
+
+/* ── Utility ──────────────────────────────────────── */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+/* ── Loading screen ───────────────────────────────── */
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-page);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

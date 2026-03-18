@@ -102,3 +102,12 @@ The backend API runs at `http://localhost:5000` with CORS already configured to 
 - `gurkan-ui/src/components/Layout.tsx` — app layout with nav and header
 - `gurkan-ui/src/types/index.ts` — TypeScript types for API responses
 - `gurkan-ui/src/App.tsx` — routing setup with protected routes
+
+## Observability Impact
+
+- **Browser console**: Auth failures log to console via axios 401 interceptor — visible in DevTools Network and Console tabs
+- **localStorage state**: `accessToken`, `refreshToken` keys in localStorage reflect current auth session — inspectable via DevTools Application tab
+- **Network tab**: All API calls include `Authorization: Bearer` header when authenticated — visible in request headers
+- **Login error display**: Invalid credentials show inline error message on the login form — no silent failures
+- **Route guard behavior**: Unauthenticated access to protected routes redirects to `/login` — observable via URL bar
+- **Future agent inspection**: `npm run build` exit code verifies TypeScript compilation; dev server at `:5173/login` verifies runtime rendering
