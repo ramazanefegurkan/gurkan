@@ -1,10 +1,9 @@
 # GSD State
 
 **Active Milestone:** M001: Gayrimenkul Portföy Yönetimi
-**Active Slice:** S05: Döküman Yönetimi
+**Active Slice:** S06: Dashboard, Bildirimler & Raporlama
 **Phase:** executing
-**Active Task:** T01
-**Requirements Status:** 16 active · 2 validated · 4 deferred · 2 out of scope
+**Requirements Status:** 15 active · 3 validated · 4 deferred · 2 out of scope
 
 ## Milestone Registry
 - 🔄 **M001:** Gayrimenkul Portföy Yönetimi
@@ -17,4 +16,4 @@
 - None
 
 ## Next Action
-Execute T01 of S05 — build document backend (entity, controller, migration, integration tests).
+Execute S06/T01 — Build Dashboard and Notifications API endpoints.
