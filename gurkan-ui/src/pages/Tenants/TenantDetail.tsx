@@ -17,7 +17,7 @@ import {
   type RentIncreaseResponse,
   type Currency,
 } from '../../types';
-import '../Properties/Properties.css';
+import '../../styles/shared.css';
 import './Tenants.css';
 
 // ── Helpers ──

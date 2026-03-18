@@ -7,6 +7,7 @@ import {
   Currency,
   type PropertyListResponse,
 } from '../../types';
+import '../../styles/shared.css';
 import './Properties.css';
 
 export default function PropertyList() {

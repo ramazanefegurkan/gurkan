@@ -7,8 +7,7 @@ import {
   type DocumentResponse,
   type DocumentCategoryType,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './Documents.css';
 
 function formatDate(iso: string): string {

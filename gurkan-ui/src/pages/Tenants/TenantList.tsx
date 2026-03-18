@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getTenants } from '../../api/client';
 import { type TenantListItem, type Currency } from '../../types';
-import '../Properties/Properties.css';
+import '../../styles/shared.css';
 import './Tenants.css';
 
 function formatDate(iso: string): string {

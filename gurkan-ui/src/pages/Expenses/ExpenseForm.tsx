@@ -11,8 +11,7 @@ import {
   Currency,
   CurrencyLabels,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './Expenses.css';
 
 const RecurrenceIntervals = ['Monthly', 'Quarterly', 'Yearly'] as const;

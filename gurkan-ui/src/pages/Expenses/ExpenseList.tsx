@@ -7,8 +7,7 @@ import {
   type Currency,
   type ExpenseCategory,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './Expenses.css';
 
 function formatDate(iso: string): string {

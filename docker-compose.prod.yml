@@ -1,0 +1,73 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gurkan}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    networks:
+      - gurkan-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-gurkan}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: ./GurkanApi
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB:-gurkan};Username=${POSTGRES_USER:-postgres};Password=${DB_PASSWORD}"
+      Jwt__Secret: ${JWT_SECRET:?JWT_SECRET is required}
+      Cors__AllowedOrigins__0: "https://${DOMAIN:-localhost}"
+    volumes:
+      - api_uploads:/app/uploads
+    networks:
+      - gurkan-net
+
+  web:
+    build:
+      context: ./gurkan-ui
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost/api}
+    restart: unless-stopped
+    networks:
+      - gurkan-net
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - gurkan-net
+
+networks:
+  gurkan-net:
+    driver: bridge
+
+volumes:
+  pgdata_prod:
+  api_uploads:
+  caddy_data:
+  caddy_config:

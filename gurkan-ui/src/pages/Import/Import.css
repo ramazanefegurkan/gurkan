@@ -1,0 +1,299 @@
+/* ══════════════════════════════════════════════════════
+   Import page — CSV upload, preview, confirm
+   ══════════════════════════════════════════════════════ */
+
+/* ── Tab switcher ─────────────────────────────────── */
+
+.import-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.import-tab {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.import-tab:hover {
+  color: var(--text-primary);
+}
+
+.import-tab--active {
+  color: var(--accent);
+}
+
+.import-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+.import-tab svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Upload area ──────────────────────────────────── */
+
+.import-upload-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.import-upload-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.import-upload-row .form-field {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 180px;
+}
+
+.import-file-input {
+  padding: 9px 12px;
+  border: 1px dashed var(--border-input);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: var(--font-body);
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.import-file-input:hover {
+  border-color: var(--accent);
+}
+
+.import-file-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.import-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+/* ── Summary card ─────────────────────────────────── */
+
+.import-summary {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.import-summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.import-summary-stat .stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.import-summary-stat .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.import-summary-stat--errors .stat-value {
+  color: var(--danger);
+}
+
+.import-summary-stat--warnings .stat-value {
+  color: #b7870a;
+}
+
+.import-summary-stat--success .stat-value {
+  color: #2e7d32;
+}
+
+.import-summary-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-subtle);
+}
+
+/* ── Preview row highlighting ─────────────────────── */
+
+.import-row--error {
+  background: #fdf2f2 !important;
+}
+
+.import-row--error:hover {
+  background: #fbe8e8 !important;
+}
+
+.import-row--warning {
+  background: #fef9e7 !important;
+}
+
+.import-row--warning:hover {
+  background: #fdf3d0 !important;
+}
+
+.import-row--success {
+  /* default — inherits table row style */
+}
+
+/* ── Status badges ────────────────────────────────── */
+
+.import-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.import-status--success {
+  background: #edf7ed;
+  color: #2e7d32;
+}
+
+.import-status--error {
+  background: var(--bg-danger-subtle);
+  color: var(--danger);
+}
+
+.import-status--warning {
+  background: #fef9e7;
+  color: #b7870a;
+}
+
+.import-status--duplicate {
+  background: #f2f1ef;
+  color: var(--text-tertiary);
+}
+
+/* ── Error/warning message in row ─────────────────── */
+
+.import-row-message {
+  font-size: 12px;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.import-row-message--error {
+  color: var(--danger);
+}
+
+.import-row-message--warning {
+  color: #b7870a;
+}
+
+/* ── Result banner ────────────────────────────────── */
+
+.import-result {
+  background: #edf7ed;
+  border: 1px solid #c3e6c3;
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.import-result svg {
+  width: 22px;
+  height: 22px;
+  color: #2e7d32;
+  flex-shrink: 0;
+}
+
+.import-result-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.import-result-text strong {
+  font-weight: 700;
+}
+
+.import-result-link {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.import-result-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Amount formatting in table ───────────────────── */
+
+.import-amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .import-upload-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .import-upload-row .form-field {
+    min-width: unset;
+  }
+
+  .import-summary {
+    gap: 16px;
+  }
+
+  .import-summary-divider {
+    display: none;
+  }
+}

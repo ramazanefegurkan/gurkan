@@ -10,8 +10,7 @@ import {
   type Currency,
   type RentalPlatform,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './ShortTermRentals.css';
 
 function formatDate(iso: string): string {

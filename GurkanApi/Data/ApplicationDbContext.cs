@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Bill> Bills => Set<Bill>();
     public DbSet<Document> Documents => Set<Document>();
+    public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -293,6 +294,22 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(d => d.UploadedBy)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---------- DeviceToken ----------
+        modelBuilder.Entity<DeviceToken>(entity =>
+        {
+            entity.HasKey(dt => dt.Id);
+            entity.HasIndex(dt => dt.ExpoPushToken).IsUnique();
+            entity.Property(dt => dt.ExpoPushToken).IsRequired().HasMaxLength(200);
+            entity.Property(dt => dt.Platform).IsRequired().HasMaxLength(20);
+            entity.Property(dt => dt.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(dt => dt.User)
+                  .WithMany()
+                  .HasForeignKey(dt => dt.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

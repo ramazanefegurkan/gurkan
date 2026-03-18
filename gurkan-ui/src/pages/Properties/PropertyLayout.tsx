@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation, Outlet } from 'react-router-dom';
 import { getProperty } from '../../api/client';
 import { type PropertyResponse } from '../../types';
+import '../../styles/shared.css';
 import './Properties.css';
-import '../Tenants/Tenants.css';
 
 export default function PropertyLayout() {
   const { id } = useParams<{ id: string }>();

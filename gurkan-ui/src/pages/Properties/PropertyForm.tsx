@@ -13,6 +13,7 @@ import {
   CurrencyLabels,
   type GroupResponse,
 } from '../../types';
+import '../../styles/shared.css';
 import './Properties.css';
 
 export default function PropertyForm() {

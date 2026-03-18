@@ -563,3 +563,50 @@ export interface GroupMemberResponse {
   email: string;
   role: string;
 }
+
+// ── Import ────────────────────────────────────────────
+
+export interface ImportSummary {
+  totalRows: number;
+  importedCount: number;
+  errorCount: number;
+  warningCount: number;
+  duplicateCount: number;
+}
+
+export interface AirbnbImportRow {
+  rowNumber: number;
+  status: string; // "Success" | "Error" | "Warning"
+  errorMessage?: string;
+  warningMessage?: string;
+  guestName?: string;
+  checkIn?: string;
+  checkOut?: string;
+  nightCount?: number;
+  nightlyRate?: number;
+  totalAmount?: number;
+  platformFee?: number;
+  netAmount?: number;
+}
+
+export interface RentPaymentImportRow {
+  rowNumber: number;
+  status: string; // "Success" | "Error" | "Warning"
+  errorMessage?: string;
+  warningMessage?: string;
+  propertyName?: string;
+  propertyId?: string;
+  tenantName?: string;
+  tenantId?: string;
+  amount?: number;
+  currency?: string;
+  dueDate?: string;
+  paidDate?: string;
+  paymentStatus?: string;
+  paymentMethod?: string;
+}
+
+export interface ImportPreviewResponse<TRow> {
+  summary: ImportSummary;
+  rows: TRow[];
+}

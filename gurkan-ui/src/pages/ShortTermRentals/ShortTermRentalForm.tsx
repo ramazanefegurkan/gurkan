@@ -11,8 +11,7 @@ import {
   RentalPlatform,
   RentalPlatformLabels,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './ShortTermRentals.css';
 
 function daysBetween(start: string, end: string): number {

@@ -6,6 +6,52 @@
   background: var(--bg-page);
 }
 
+/* ── Hamburger toggle ─────────────────────────────── */
+
+.hamburger-btn {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1100;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
+}
+
+.hamburger-btn:hover {
+  background: var(--bg-hover);
+}
+
+.hamburger-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Sidebar overlay (mobile) ─────────────────────── */
+
+.sidebar-overlay {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  animation: sidebarFadeIn 0.2s ease;
+}
+
+@keyframes sidebarFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* ── Sidebar ──────────────────────────────────────── */
 
 .sidebar {
@@ -15,6 +61,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  transition: width 0.2s ease, transform 0.2s ease;
 }
 
 .sidebar-brand {
@@ -166,36 +213,48 @@
 /* ── Responsive ───────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .sidebar {
-    width: 64px;
+  /* Show hamburger on mobile */
+  .hamburger-btn {
+    display: flex;
   }
 
-  .brand-text,
-  .user-info,
-  .nav-item span:not(.nav-icon) {
-    display: none;
+  /* Show overlay when sidebar is open */
+  .sidebar-overlay {
+    display: block;
+  }
+
+  /* Sidebar: hidden off-screen by default on mobile */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    z-index: 1000;
+    transform: translateX(-100%);
+    box-shadow: none;
+  }
+
+  /* Expanded sidebar on mobile */
+  .sidebar.sidebar--open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
   }
 
   .sidebar-brand {
-    justify-content: center;
-    padding: 20px 8px;
+    padding: 56px 16px 16px; /* room for hamburger button at top */
   }
 
   .nav-item {
-    justify-content: center;
-    padding: 12px;
+    padding: 10px 12px;
   }
 
   .sidebar-footer {
-    flex-direction: column;
-    padding: 12px 8px;
-  }
-
-  .user-badge {
-    justify-content: center;
+    padding: 12px;
   }
 
   .main-content {
     padding: 20px;
+    padding-top: 64px; /* room for hamburger */
   }
 }

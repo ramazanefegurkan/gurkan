@@ -18,6 +18,7 @@ import ExpenseForm from './pages/Expenses/ExpenseForm';
 import BillList from './pages/Bills/BillList';
 import BillForm from './pages/Bills/BillForm';
 import DocumentList from './pages/Documents/DocumentList';
+import ImportPage from './pages/Import/ImportPage';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -59,6 +60,7 @@ function AppRoutes() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/notifications" element={<NotificationList />} />
+        <Route path="/import" element={<ImportPage />} />
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/new" element={<PropertyForm />} />
         <Route path="/properties/:id/edit" element={<PropertyForm />} />

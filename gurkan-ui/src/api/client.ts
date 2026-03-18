@@ -28,12 +28,15 @@ import type {
   DashboardResponse,
   NotificationItem,
   ProfitLossReport,
+  ImportPreviewResponse,
+  AirbnbImportRow,
+  RentPaymentImportRow,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
 
 const api = axios.create({
-  baseURL: 'http://localhost:5039/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5039/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -47,22 +50,88 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Response interceptor: handle 401 ─────────────────
+// ── Token refresh state ──────────────────────────────
+
+let refreshPromise: Promise<TokenResponse> | null = null;
+
+// Callback for AuthContext to register so it can sync user state after
+// the interceptor silently refreshes tokens outside React.
+let onTokenRefreshCallback: ((tokens: TokenResponse) => void) | null = null;
+
+export function setOnTokenRefreshCallback(
+  cb: ((tokens: TokenResponse) => void) | null,
+): void {
+  onTokenRefreshCallback = cb;
+}
+
+// ── Response interceptor: handle 401 with refresh ────
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Don't redirect if we're already on the login page or this is a login request
-      const isLoginRequest = error.config?.url?.includes('/auth/login');
-      if (!isLoginRequest) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('expiresAt');
-        window.location.href = '/login';
-      }
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status !== 401) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    // Don't attempt refresh for auth endpoints — prevents infinite loops
+    const url = originalRequest?.url ?? '';
+    if (url.includes('/auth/login') || url.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+
+    // Don't retry a request that already went through refresh
+    if (originalRequest._retried) {
+      return Promise.reject(error);
+    }
+
+    const storedRefreshToken = localStorage.getItem('refreshToken');
+    if (!storedRefreshToken) {
+      // No refresh token available — clean logout
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('expiresAt');
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+
+    try {
+      // Share a single refresh promise across concurrent 401s
+      if (!refreshPromise) {
+        refreshPromise = refreshToken(storedRefreshToken);
+      }
+
+      const tokens = await refreshPromise;
+
+      // Update localStorage with new tokens
+      localStorage.setItem('accessToken', tokens.accessToken);
+      localStorage.setItem('refreshToken', tokens.refreshToken);
+      localStorage.setItem('expiresAt', tokens.expiresAt);
+
+      // Notify AuthContext so React state stays in sync
+      if (onTokenRefreshCallback) {
+        onTokenRefreshCallback(tokens);
+      }
+
+      console.debug('[auth] Token refreshed successfully, new expiresAt:', tokens.expiresAt);
+
+      // Retry the original request with the new access token
+      originalRequest._retried = true;
+      originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      console.warn('[auth] Token refresh failed:', refreshError);
+
+      // Refresh failed — clean logout
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('expiresAt');
+      window.location.href = '/login';
+      return Promise.reject(refreshError);
+    } finally {
+      refreshPromise = null;
+    }
   },
 );
 
@@ -551,6 +620,37 @@ export async function exportPdf(): Promise<void> {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// ── Import ───────────────────────────────────────────
+
+export async function importAirbnbCsv(
+  propertyId: string,
+  file: File,
+  dryRun: boolean = true,
+): Promise<ImportPreviewResponse<AirbnbImportRow>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await api.post<ImportPreviewResponse<AirbnbImportRow>>(
+    `/import/airbnb-csv?propertyId=${propertyId}&dryRun=${dryRun}`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return data;
+}
+
+export async function importRentPayments(
+  file: File,
+  dryRun: boolean = true,
+): Promise<ImportPreviewResponse<RentPaymentImportRow>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await api.post<ImportPreviewResponse<RentPaymentImportRow>>(
+    `/import/rent-payments?dryRun=${dryRun}`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return data;
 }
 
 export default api;

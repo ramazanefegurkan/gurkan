@@ -9,8 +9,7 @@ import {
   type BillType,
   type BillPaymentStatus,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './Bills.css';
 
 function formatDate(iso: string): string {

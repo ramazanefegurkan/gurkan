@@ -7,7 +7,7 @@ import {
   updateTenant,
 } from '../../api/client';
 import { Currency, CurrencyLabels } from '../../types';
-import '../Properties/Properties.css';
+import '../../styles/shared.css';
 import './Tenants.css';
 
 /** Convert date-only "YYYY-MM-DD" to UTC ISO string for backend compatibility */

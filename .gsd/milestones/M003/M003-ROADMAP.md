@@ -55,22 +55,22 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Production Deploy** `risk:high` `depends:[]`
+- [x] **S01: Production Deploy** `risk:high` `depends:[]`
   > After this: Backend + frontend Hetzner VPS'te Docker Compose ile çalışıyor, domain + HTTPS ile erişilebilir. PostgreSQL production'da ayakta.
 
-- [ ] **S02: Web Improvements** `risk:low` `depends:[S01]`
+- [x] **S02: Web Improvements** `risk:low` `depends:[S01]`
   > After this: Token refresh çalışıyor (session 15dk'da kopmuyor). Web UI polish geçilmiş (spacing, responsive, tutarlılık, loading state'ler, boş durum görselleri).
 
-- [ ] **S03: Data Import** `risk:medium` `depends:[S01]`
+- [x] **S03: Data Import** `risk:medium` `depends:[S01]`
   > After this: Airbnb CSV import ile kısa dönem kiralama kayıtları oluşuyor. Geçmiş uzun dönem kira ödemeleri toplu import edilebiliyor. Validation ve hata raporlaması çalışıyor.
 
-- [ ] **S04: Mobil App Foundation** `risk:high` `depends:[S01]`
+- [x] **S04: Mobil App Foundation** `risk:high` `depends:[S01]`
   > After this: Expo app'te login olunabiliyor (JWT + SecureStore), dashboard görüntülenebiliyor, mülk listesi ve detayı çalışıyor. Production backend'e bağlı.
 
-- [ ] **S05: Mobil App Full Features** `risk:medium` `depends:[S04]`
+- [x] **S05: Mobil App Full Features** `risk:medium` `depends:[S04]`
   > After this: Tüm property sub-pages (kiracılar, kısa dönem, giderler, faturalar, dökümanlar, bildirimler) mobilde çalışıyor. CRUD işlemleri ve form'lar mobilde functional.
 
-- [ ] **S06: Push Notifications** `risk:medium` `depends:[S04]`
+- [x] **S06: Push Notifications** `risk:medium` `depends:[S04]`
   > After this: Expo Push ile kira gecikme, fatura yaklaşma, sözleşme bitiş bildirimleri telefona geliyor. Backend'de device token kayıt + periyodik push trigger mekanizması çalışıyor.
 
 ## Boundary Map

@@ -11,8 +11,7 @@ import {
   Currency,
   CurrencyLabels,
 } from '../../types';
-import '../Properties/Properties.css';
-import '../Tenants/Tenants.css';
+import '../../styles/shared.css';
 import './Bills.css';
 
 /** Convert date-only "YYYY-MM-DD" to UTC ISO string for backend compatibility */

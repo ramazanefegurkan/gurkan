@@ -7,8 +7,8 @@ import {
   type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin } from '../api/client';
-import type { UserInfo } from '../types';
+import { login as apiLogin, setOnTokenRefreshCallback } from '../api/client';
+import type { UserInfo, TokenResponse } from '../types';
 
 // ── JWT claim keys (ASP.NET Core uses full XML namespace URIs) ──
 
@@ -90,6 +90,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     setIsLoading(false);
+
+    // Register callback so the 401 interceptor can notify us after token refresh
+    setOnTokenRefreshCallback((tokens: TokenResponse) => {
+      const userInfo = extractUserFromToken(tokens.accessToken);
+      if (userInfo) {
+        setUser(userInfo);
+      }
+    });
+
+    return () => {
+      setOnTokenRefreshCallback(null);
+    };
   }, []);
 
   const login = useCallback(

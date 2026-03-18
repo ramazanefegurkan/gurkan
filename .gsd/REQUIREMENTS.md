@@ -2,7 +2,22 @@
 
 This file is the explicit capability and coverage contract for the project.
 
+## Active
+
+(No active requirements — all validated or deferred)
+
 ## Validated
+
+### R017 — React Native/Expo ile iOS + Android mobil uygulama. Dashboard, mülk listesi/detay, kiracı, gider, fatura, döküman, bildirim sayfaları. JWT auth ile mevcut backend'e bağlanır.
+- Class: core-capability
+- Status: validated
+- Description: React Native/Expo ile iOS + Android mobil uygulama. Dashboard, mülk listesi/detay, kiracı, gider, fatura, döküman, bildirim sayfaları. JWT auth ile mevcut backend'e bağlanır.
+- Why it matters: Aile üyeleri telefonda mülk takibi yapabilmeli — masabaşına bağlı kalmadan.
+- Source: user
+- Primary owning slice: M003/S04
+- Supporting slices: M003/S05, M003/S06
+- Validation: S04: Expo managed-workflow project (SDK 54, TS, React 19) with SecureStore JWT auth, token refresh interceptor, 3-tab navigation, dashboard, property list/detail, notifications. S05: All property sub-pages (tenants, short-term rentals, expenses, bills, documents) with full CRUD. 47 API client functions. S06: Push notifications — expo-notifications installed, push permission + token registration on signIn, unregistration on signOut, foreground notification display, Android notification channel, notification tap routing. Backend push trigger endpoint. npx tsc --noEmit passes. npx expo export --platform android succeeds (1235 modules, 3.5 MB HBC). Physical device UAT pending.
+- Notes: Expo managed workflow. EAS Build ile iOS + Android. Mevcut REST API aynen kullanılır. All features build-verified. Physical device UAT pending.
 
 ### R001 — Mülk ekleme, düzenleme, silme, detay görüntüleme. Her mülk bir gruba atanır.
 - Class: core-capability
@@ -169,6 +184,28 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: S03 integration tests: tenant CRUD with all fields (name, phone, email, identity number, lease dates, deposit), active tenant enforcement (409 on duplicate), cross-group 403, active/inactive filtering. Frontend TenantList/TenantForm/TenantDetail browser-verified.
 - Notes: Uzun dönem kiracılar için zorunlu, kısa dönem için opsiyonel.
 
+### R016 — Airbnb CSV export dosyasını parse edip kısa dönem kiralama kayıtlarına dönüştürme + geçmiş uzun dönem kira ödemelerini Excel/CSV ile toplu import etme.
+- Class: operability
+- Status: validated
+- Description: Airbnb CSV export dosyasını parse edip kısa dönem kiralama kayıtlarına dönüştürme + geçmiş uzun dönem kira ödemelerini Excel/CSV ile toplu import etme.
+- Why it matters: 2 yıldır kirada olan evlerin geçmiş verilerini tek tek girmek pratik değil. Airbnb gelir raporu CSV olarak import edilebilmeli.
+- Source: user
+- Primary owning slice: M003/S03
+- Supporting slices: none
+- Validation: 22 integration tests pass (9 import-specific): Airbnb CSV dryRun preview, commit creates ShortTermRental records, malformed CSV returns row-level errors, duplicate detection warnings, invalid file extension rejection, rent payment CSV resolves property/tenant by name and creates RentPayment records, unknown tenant errors, cross-group 403. Frontend build clean. Import page with two-tab layout (Airbnb CSV + Rent Payments), file upload → dryRun preview → confirm → records created.
+- Notes: R016 kapsamı daraltıldı — sadece Airbnb CSV + geçmiş kira ödemeleri. Gider/fatura import'u şimdilik yok.
+
+### R019 — Expo Push Notifications ile mobil cihaza push bildirim gönderme. Mevcut query-time notification logic'i tetikleyen push akışı.
+- Class: failure-visibility
+- Status: validated
+- Description: Expo Push Notifications ile mobil cihaza push bildirim gönderme. Mevcut query-time notification logic'i tetikleyen push akışı.
+- Why it matters: Uygulamayı açmadan önemli tarihleri kaçırmamak.
+- Source: user
+- Primary owning slice: M003/S06
+- Supporting slices: none
+- Validation: S06/T01: DeviceToken entity with EF migration, POST/DELETE /api/device-tokens for register/unregister (upsert semantics, token format validation), INotificationComputeService extracted from NotificationsController (shared computation), PushNotificationService sends via Expo Push API (IHttpClientFactory, batch 100 tokens, error handling), POST /api/push/trigger computes notifications and sends consolidated push per type. 7 integration tests pass (DeviceTokenAndPushTests). S06/T02: expo-notifications + expo-device installed, registerForPushNotificationsAsync on signIn, unregisterDeviceToken on signOut, foreground notification handler (banner+list+sound), Android notification channel "Bildirimler", notification tap routing to property detail. TypeScript compiles clean, Android bundle exports successfully. Physical device UAT pending.
+- Notes: Backend'de device token kayıt + push gönderme servisi + trigger endpoint çalışıyor. Mobil tarafta push izni + token kaydı + foreground handler + signOut unregister wired. Expo Push servisi ücretsiz. EAS projectId gerekli (eas init + EXPO_PUBLIC_EAS_PROJECT_ID). Physical device UAT pending.
+
 ### R022 — Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
 - Class: failure-visibility
 - Status: validated
@@ -202,73 +239,38 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching.
 - Notes: TÜFE/ÜFE bağlantısı şimdilik yok, sadece manuel oran girişi.
 
-## Active
-
-### R016 — Airbnb CSV import + geçmiş uzun dönem kira ödemelerini toplu yükleme.
+### R025 — Backend API + frontend + PostgreSQL'in Hetzner VPS'te Docker Compose ile deploy edilmesi. Domain + Let's Encrypt HTTPS. Reverse proxy (Nginx veya Caddy).
 - Class: operability
-- Status: active
-- Description: Airbnb CSV export dosyasını parse edip kısa dönem kiralama kayıtlarına dönüştürme + geçmiş uzun dönem kira ödemelerini Excel/CSV ile toplu import etme.
-- Why it matters: 2 yıldır kirada olan evlerin geçmiş verilerini tek tek girmek pratik değil. Airbnb gelir raporu CSV olarak import edilebilmeli.
-- Source: user
-- Primary owning slice: M003/S03
-- Supporting slices: none
-- Validation: unmapped
-- Notes: R016 kapsamı daraltıldı — sadece Airbnb CSV + geçmiş kira ödemeleri. Gider/fatura import'u şimdilik yok.
-
-### R017 — React Native/Expo ile iOS + Android mobil uygulama. Mevcut backend API'yi kullanan native uygulama.
-- Class: core-capability
-- Status: active
-- Description: React Native/Expo ile iOS + Android mobil uygulama. Dashboard, mülk listesi/detay, kiracı, gider, fatura, döküman, bildirim sayfaları. JWT auth ile mevcut backend'e bağlanır.
-- Why it matters: Aile üyeleri telefonda mülk takibi yapabilmeli — masabaşına bağlı kalmadan.
-- Source: user
-- Primary owning slice: M003/S04
-- Supporting slices: M003/S05
-- Validation: unmapped
-- Notes: Expo managed workflow. EAS Build ile iOS + Android. Mevcut REST API aynen kullanılır.
-
-### R019 — Push notification — kira gecikme, fatura yaklaşma, sözleşme bitiş bildirimleri telefona gelsin.
-- Class: failure-visibility
-- Status: active
-- Description: Expo Push Notifications ile mobil cihaza push bildirim gönderme. Mevcut query-time notification logic'i tetikleyen push akışı.
-- Why it matters: Uygulamayı açmadan önemli tarihleri kaçırmamak.
-- Source: user
-- Primary owning slice: M003/S06
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Backend'de device token kayıt endpoint'i + push gönderme servisi gerekli. Expo Push servisi ücretsiz.
-
-### R025 — Production deploy — Hetzner VPS + domain + HTTPS + Docker Compose.
-- Class: operability
-- Status: active
+- Status: validated
 - Description: Backend API + frontend + PostgreSQL'in Hetzner VPS'te Docker Compose ile deploy edilmesi. Domain + Let's Encrypt HTTPS. Reverse proxy (Nginx veya Caddy).
 - Why it matters: Mobil uygulama için backend'in internetten erişilebilir olması şart. Localhost'ta kalmak mobil geliştirmeyi imkansız kılar.
 - Source: inferred
 - Primary owning slice: M003/S01
 - Supporting slices: none
-- Validation: unmapped
-- Notes: İlk slice olmalı — mobil uygulama ve import akışları erişilebilir backend gerektirir.
+- Validation: S01 verified: docker compose -f docker-compose.prod.yml build succeeds for all 4 services, docker compose up -d starts all services with PostgreSQL healthcheck gating API startup, curl http://localhost returns frontend HTML through Caddy, curl http://localhost/api/auth/login returns 400 through Caddy reverse proxy, SPA deep-links return 200 (not 404), deploy/verify.sh passes 4/4 checks. VPS deployment documented in deploy/README.md (human-executed). Caddy chosen as reverse proxy (D019) with automatic HTTPS via Let's Encrypt when SITE_ADDRESS set to FQDN.
+- Notes: İlk slice olmalı — mobil uygulama ve import akışları erişilebilir backend gerektirir. S01 completed 2026-03-18. Reverse proxy: Caddy 2 (not Nginx).
 
-### R026 — Token refresh mekanizması — frontend'de otomatik token yenileme, session kopmaması.
+### R026 — JWT access token expire olduğunda refresh token ile otomatik yenileme. Kullanıcı 15 dakikada login ekranına atılmasın.
 - Class: continuity
-- Status: active
+- Status: validated
 - Description: JWT access token expire olduğunda refresh token ile otomatik yenileme. Kullanıcı 15 dakikada login ekranına atılmasın.
 - Why it matters: Gerçek kullanımda 15dk session süresi kabul edilemez — veri girerken session kopması veri kaybına yol açar.
 - Source: inferred
 - Primary owning slice: M003/S02
 - Supporting slices: M003/S04
-- Validation: unmapped
-- Notes: Backend refresh endpoint zaten var (M001/S01). Frontend axios interceptor'da 401 → refresh → retry pattern'ı lazım. Mobil app'te de aynı pattern.
+- Validation: S02/T01: Web token refresh interceptor with concurrent-request queuing wired into client.ts. S04/T02: Mobile token refresh interceptor with same pattern adapted for async SecureStore — refreshPromise singleton deduplicates parallel 401s, auth URLs excluded, _retried flag prevents infinite retry. Mobile uses onTokenRefreshCallback for React state sync (instead of storage events — K021). Both web and mobile interceptors build-verified. Runtime verification requires backend with short TTL (manual UAT).
+- Notes: Backend refresh endpoint existed from M001/S01. Frontend interceptor now does 401 → refresh → retry. Mobil app (S04) will need the same pattern. Knowledge K021 documents the storage event limitation that drove the callback design.
 
-### R027 — Web UI polish — spacing tutarlılığı, responsive iyileştirme, genel görsel kalite artışı.
+### R027 — Mevcut web arayüzünün üstünden geçme — spacing, tipografi, renk tutarlılığı, responsive davranış, loading state'ler, boş durum görselleri.
 - Class: quality-attribute
-- Status: active
+- Status: validated
 - Description: Mevcut web arayüzünün üstünden geçme — spacing, tipografi, renk tutarlılığı, responsive davranış, loading state'ler, boş durum görselleri.
 - Why it matters: M001'de fonksiyon öncelikliydi, artık günlük kullanım için görsel kalite artırılmalı.
 - Source: user
 - Primary owning slice: M003/S02
 - Supporting slices: none
-- Validation: unmapped
-- Notes: Mevcut tasarım sistemi korunacak (terracotta accent, DM Sans, Playfair Display). Overhaul değil, polish.
+- Validation: S02/T02: Shared CSS extracted into styles/shared.css (13KB). Zero cross-page CSS imports remaining (grep verified). Mobile sidebar hamburger toggle added. Visual consistency verified at 1280px, 768px, 375px. Build passes, CSS bundle slightly smaller (38.82 KB gzip).
+- Notes: Design system preserved (terracotta accent, DM Sans, Playfair Display). Properties.css reduced to 408 lines, Tenants.css to 233 lines. All shared classes (buttons, forms, tables, tabs, badges, states, dialogs) centralized.
 
 ## Deferred
 
@@ -326,22 +328,22 @@ This file is the explicit capability and coverage contract for the project.
 | R013 | differentiator | validated | M001/S06 | none | S06 integration tests (9 ReportsTests): profit-loss JSON endpoint with year filtering, Excel export (.xlsx via ClosedXML with correct MIME type), PDF export (via QuestPDF with correct MIME type). Per-property ROI calculation (income - expenses / property value). Frontend export buttons with blob download. Group-based access control on all report endpoints. |
 | R014 | core-capability | validated | M001/S02 | M001/S03, M001/S04 | S02 integration test creates properties with TRY/USD/EUR — currency persists correctly. S03 tenant/payment entities carry currency. S04 expense/bill entities carry currency (EUR expense + USD bill tested). S06 dashboard aggregates by currency, no cross-currency summing. |
 | R015 | primary-user-loop | validated | M001/S03 | none | S03 integration tests: tenant CRUD with all fields (name, phone, email, identity number, lease dates, deposit), active tenant enforcement (409 on duplicate), cross-group 403, active/inactive filtering. Frontend TenantList/TenantForm/TenantDetail browser-verified. |
-| R016 | operability | active | M003/S03 | none | unmapped |
-| R017 | core-capability | active | M003/S04 | M003/S05 | unmapped |
+| R016 | operability | validated | M003/S03 | none | 22 integration tests pass (9 import-specific): Airbnb CSV dryRun preview, commit creates ShortTermRental records, malformed CSV returns row-level errors, duplicate detection warnings, invalid file extension rejection, rent payment CSV resolves property/tenant by name and creates RentPayment records, unknown tenant errors, cross-group 403. Frontend build clean. Import page with two-tab layout (Airbnb CSV + Rent Payments), file upload → dryRun preview → confirm → records created. |
+| R017 | core-capability | validated | M003/S04 | M003/S05, M003/S06 | S04: Expo managed-workflow project with SecureStore JWT auth, token refresh, 3-tab navigation, dashboard, properties, notifications. S05: All sub-pages with CRUD. S06: Push notifications. 1235 modules, 3.5 MB HBC. Physical device UAT pending. |
 | R018 | core-capability | deferred | none | none | unmapped |
-| R019 | failure-visibility | active | M003/S06 | none | unmapped |
+| R019 | failure-visibility | validated | M003/S06 | none | S06/T01: DeviceToken entity with EF migration, POST/DELETE /api/device-tokens for register/unregister (upsert semantics, token format validation), INotificationComputeService extracted from NotificationsController (shared computation), PushNotificationService sends via Expo Push API (IHttpClientFactory, batch 100 tokens, error handling), POST /api/push/trigger computes notifications and sends consolidated push per type. 7 integration tests pass (DeviceTokenAndPushTests). S06/T02: expo-notifications + expo-device installed, registerForPushNotificationsAsync on signIn, unregisterDeviceToken on signOut, foreground notification handler (banner+list+sound), Android notification channel "Bildirimler", notification tap routing to property detail. TypeScript compiles clean, Android bundle exports successfully. Physical device UAT pending. |
 | R020 | integration | out-of-scope | none | none | n/a |
 | R021 | differentiator | out-of-scope | none | none | n/a |
 | R022 | failure-visibility | validated | M001/S06 | M001/S03 | S06 integration test Notifications_IncludesLeaseExpiry proves lease expiry notification generated with tiered severity: ≤30 days = Critical, ≤60 days = Warning, ≤90 days = Info. Test uses 25-day-out lease end → Critical severity. Frontend shows severity-colored card. |
 | R023 | core-capability | validated | M001/S02 | none | S02 integration tests: note add 201, update 200, delete 204, list, cross-group denial 403. PropertyNotesController with creator-only edit/delete enforcement. Frontend inline note editing browser-verified on PropertyDetail page. |
 | R024 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching. |
-| R025 | operability | active | M003/S01 | none | unmapped |
-| R026 | continuity | active | M003/S02 | M003/S04 | unmapped |
-| R027 | quality-attribute | active | M003/S02 | none | unmapped |
+| R025 | operability | validated | M003/S01 | none | S01 verified: docker compose -f docker-compose.prod.yml build succeeds for all 4 services, docker compose up -d starts all services with PostgreSQL healthcheck gating API startup, curl http://localhost returns frontend HTML through Caddy, curl http://localhost/api/auth/login returns 400 through Caddy reverse proxy, SPA deep-links return 200 (not 404), deploy/verify.sh passes 4/4 checks. VPS deployment documented in deploy/README.md (human-executed). Caddy chosen as reverse proxy (D019) with automatic HTTPS via Let's Encrypt when SITE_ADDRESS set to FQDN. |
+| R026 | continuity | validated | M003/S02 | M003/S04 | S02/T01: Web token refresh interceptor with concurrent-request queuing wired into client.ts. S04/T02: Mobile token refresh interceptor with same pattern adapted for async SecureStore — refreshPromise singleton deduplicates parallel 401s, auth URLs excluded, _retried flag prevents infinite retry. Mobile uses onTokenRefreshCallback for React state sync (instead of storage events — K021). Both web and mobile interceptors build-verified. Runtime verification requires backend with short TTL (manual UAT). |
+| R027 | quality-attribute | validated | M003/S02 | none | S02/T02: Shared CSS extracted into styles/shared.css (13KB). Zero cross-page CSS imports remaining (grep verified). Mobile sidebar hamburger toggle added. Visual consistency verified at 1280px, 768px, 375px. Build passes, CSS bundle slightly smaller (38.82 KB gzip). |
 
 ## Coverage Summary
 
-- Active requirements: 6 (R016, R017, R019, R025, R026, R027)
-- Mapped to slices: 6
-- Validated: 18 (R001–R015, R022–R024)
+- Active requirements: 0
+- Mapped to slices: 0
+- Validated: 24 (R001, R002, R003, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013, R014, R015, R016, R017, R019, R022, R023, R024, R025, R026, R027)
 - Unmapped active requirements: 0

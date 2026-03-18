@@ -44,9 +44,19 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (origins != null && origins.Length > 0)
+        {
+            policy.WithOrigins(origins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+        else
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
     });
 });
 
@@ -59,6 +69,16 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 // ---------- Group access service ----------
 builder.Services.AddScoped<IGroupAccessService, GroupAccessService>();
+
+// ---------- Notification compute service ----------
+builder.Services.AddScoped<INotificationComputeService, NotificationComputeService>();
+
+// ---------- Push notification service ----------
+builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
+builder.Services.AddHttpClient("ExpoPush", client =>
+{
+    client.BaseAddress = new Uri("https://exp.host/--/api/v2/push/");
+});
 
 // ---------- JWT Authentication ----------
 var jwtSecret = builder.Configuration["Jwt:Secret"]!;

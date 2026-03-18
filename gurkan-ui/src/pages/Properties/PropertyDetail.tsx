@@ -15,6 +15,7 @@ import {
   type PropertyResponse,
   type PropertyNoteResponse,
 } from '../../types';
+import '../../styles/shared.css';
 import './Properties.css';
 
 // ── Helpers ──
