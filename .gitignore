@@ -38,3 +38,4 @@ vendor/
 coverage/
 .cache/
 tmp/
+manifest.json
