@@ -20,6 +20,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<RentPayment> RentPayments => Set<RentPayment>();
     public DbSet<ShortTermRental> ShortTermRentals => Set<ShortTermRental>();
     public DbSet<RentIncrease> RentIncreases => Set<RentIncrease>();
+    public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<Bill> Bills => Set<Bill>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -216,6 +218,53 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(r => r.Tenant)
                   .WithMany(t => t.RentIncreases)
                   .HasForeignKey(r => r.TenantId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- Expense ----------
+        modelBuilder.Entity<Expense>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Category)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(e => e.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(e => e.RecurrenceInterval).HasMaxLength(50);
+            entity.Property(e => e.Notes).HasMaxLength(2000);
+            entity.Property(e => e.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(e => e.Property)
+                  .WithMany()
+                  .HasForeignKey(e => e.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- Bill ----------
+        modelBuilder.Entity<Bill>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+            entity.Property(b => b.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(b => b.Type)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(b => b.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(b => b.Status)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(b => b.Notes).HasMaxLength(2000);
+            entity.Property(b => b.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(b => b.Property)
+                  .WithMany()
+                  .HasForeignKey(b => b.PropertyId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

@@ -96,7 +96,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         // Truncate all tables (the seed from Program.cs boot may have already inserted admin)
         await db.Database.ExecuteSqlRawAsync("""
-            TRUNCATE TABLE "RentIncreases", "RentPayments", "ShortTermRentals", "Tenants", "PropertyNotes", "RefreshTokens", "GroupMembers", "Properties", "Groups", "Users" CASCADE;
+            TRUNCATE TABLE "RentIncreases", "RentPayments", "ShortTermRentals", "Expenses", "Bills", "Tenants", "PropertyNotes", "RefreshTokens", "GroupMembers", "Properties", "Groups", "Users" CASCADE;
         """);
 
         // Seed superadmin

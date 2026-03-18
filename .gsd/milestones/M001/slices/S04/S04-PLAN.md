@@ -45,7 +45,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build Expense and Bill backend — entities, enums, DTOs, controllers, migration, and integration tests** `est:45m`
+- [x] **T01: Build Expense and Bill backend — entities, enums, DTOs, controllers, migration, and integration tests** `est:45m`
   - Why: Creates the entire backend surface for S04 — entities, database schema, API endpoints, and tests. This is the foundation that unblocks frontend work.
   - Files: `GurkanApi/Entities/Expense.cs`, `GurkanApi/Entities/Bill.cs`, `GurkanApi/Entities/Enums.cs`, `GurkanApi/Data/ApplicationDbContext.cs`, `GurkanApi/Controllers/ExpensesController.cs`, `GurkanApi/Controllers/BillsController.cs`, `GurkanApi/DTOs/Expenses/*.cs`, `GurkanApi/DTOs/Bills/*.cs`, `GurkanApi.Tests/IntegrationTests/ExpenseAndBillTests.cs`, `GurkanApi.Tests/IntegrationTests/TestFixture.cs`
   - Do: Add 3 new enums (ExpenseCategory, BillType, BillPaymentStatus) to Enums.cs. Create Expense and Bill entities. Add DbSets and Fluent API config to ApplicationDbContext. Create DTOs (Create/Update/Response for each). Build ExpensesController and BillsController following ShortTermRentalsController pattern. Generate EF migration. Add "Expenses", "Bills" to TestFixture TRUNCATE (before "Properties"). Write integration tests with `[Trait("Category", "S04")]`.

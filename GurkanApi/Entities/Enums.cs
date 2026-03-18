@@ -50,3 +50,29 @@ public enum RentalPlatform
     Booking,
     Direct
 }
+
+public enum ExpenseCategory
+{
+    Maintenance,
+    Repair,
+    Tax,
+    Insurance,
+    Management,
+    Other
+}
+
+public enum BillType
+{
+    Water,
+    Electric,
+    Gas,
+    Internet,
+    Dues
+}
+
+public enum BillPaymentStatus
+{
+    Pending,
+    Paid,
+    Overdue
+}
