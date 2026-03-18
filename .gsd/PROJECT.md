@@ -13,7 +13,7 @@ Tüm mülklerin finansal durumunu tek bir dashboard'dan görmek — kira gelirle
 
 ## Current State
 
-S01 tamamlandı: ASP.NET Core 10 Web API + PostgreSQL 16 (Docker, port 5434) + JWT auth + grup bazlı RBAC. Seed admin (admin@gurkan.com), 3 controller (Auth, Groups, Users), 15 endpoint, 18 integration test. Backend çalışır durumda, frontend henüz yok.
+S01–S02 tamamlandı. Backend: ASP.NET Core 10 Web API + PostgreSQL 16 (Docker, port 5434) + JWT auth + grup bazlı RBAC. 5 controller (Auth, Groups, Users, Properties, PropertyNotes), 24 endpoint, 32 integration test (18 S01 + 14 S02). Frontend: React + Vite + TypeScript (gurkan-ui/), JWT auth context, login sayfası, responsive sidebar layout, mülk listesi/detay/form sayfaları, not CRUD. Mülk yönetimi multi-currency (TRY/USD/EUR) destekli, grup bazlı erişim kontrolü backend ve frontend'de çalışıyor.
 
 ## Architecture / Key Patterns
 
