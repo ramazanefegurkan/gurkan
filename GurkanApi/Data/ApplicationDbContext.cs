@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<RentIncrease> RentIncreases => Set<RentIncrease>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Bill> Bills => Set<Bill>();
+    public DbSet<Document> Documents => Set<Document>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -266,6 +267,32 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(b => b.PropertyId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- Document ----------
+        modelBuilder.Entity<Document>(entity =>
+        {
+            entity.ToTable("Documents");
+            entity.HasKey(d => d.Id);
+            entity.Property(d => d.FileName).IsRequired().HasMaxLength(500);
+            entity.Property(d => d.OriginalFileName).IsRequired().HasMaxLength(255);
+            entity.Property(d => d.ContentType).IsRequired().HasMaxLength(100);
+            entity.Property(d => d.FilePath).IsRequired().HasMaxLength(1000);
+            entity.Property(d => d.Category)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(d => d.UploadedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(d => d.Property)
+                  .WithMany()
+                  .HasForeignKey(d => d.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.Uploader)
+                  .WithMany()
+                  .HasForeignKey(d => d.UploadedBy)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

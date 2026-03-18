@@ -44,7 +44,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build document backend — entity, controller, migration, and integration tests** `est:45m`
+- [x] **T01: Build document backend — entity, controller, migration, and integration tests** `est:45m`
   - Why: This is the core backend work and the only novel element (multipart file upload). Proves file upload/download works with access control.
   - Files: `GurkanApi/Entities/Document.cs`, `GurkanApi/Entities/Enums.cs`, `GurkanApi/Data/ApplicationDbContext.cs`, `GurkanApi/Controllers/DocumentsController.cs`, `GurkanApi/DTOs/Documents/DocumentResponse.cs`, `GurkanApi/Program.cs`, `GurkanApi/appsettings.json`, `GurkanApi.Tests/IntegrationTests/DocumentTests.cs`, `GurkanApi.Tests/IntegrationTests/TestFixture.cs`
   - Do: (1) Add `DocumentCategory` enum to Enums.cs. (2) Create `Document` entity with Id, PropertyId, FileName (stored name), OriginalFileName, Category, ContentType, FileSize, FilePath, UploadedBy, UploadedAt. (3) Add `DbSet<Document>` and Fluent API config in ApplicationDbContext. (4) Generate EF migration. (5) Build `DocumentsController` with 4 endpoints using `[FromForm]` for upload, `FileStreamResult` for download. Enforce property access via `IGroupAccessService`. Validate file extension and size. Create upload directory if missing. (6) Add `FileStorage:BasePath` to appsettings.json (default `uploads`). (7) Configure Kestrel `MaxRequestBodySize` 25MB via `[RequestSizeLimit]` on upload endpoint. (8) Add `"Documents"` to TRUNCATE list in TestFixture.cs. (9) Write integration tests: upload multipart file, list documents, download and verify content, delete, cross-group 403, invalid file type 400.

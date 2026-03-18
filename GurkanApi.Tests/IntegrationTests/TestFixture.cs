@@ -32,6 +32,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.UseEnvironment("Testing");
 
+        builder.UseSetting("FileStorage:BasePath", Path.Combine(Path.GetTempPath(), "gurkan-test-uploads"));
+
         builder.ConfigureServices(services =>
         {
             // Remove existing DbContext registration
@@ -96,8 +98,15 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         // Truncate all tables (the seed from Program.cs boot may have already inserted admin)
         await db.Database.ExecuteSqlRawAsync("""
-            TRUNCATE TABLE "RentIncreases", "RentPayments", "ShortTermRentals", "Expenses", "Bills", "Tenants", "PropertyNotes", "RefreshTokens", "GroupMembers", "Properties", "Groups", "Users" CASCADE;
+            TRUNCATE TABLE "RentIncreases", "RentPayments", "ShortTermRentals", "Expenses", "Bills", "Documents", "Tenants", "PropertyNotes", "RefreshTokens", "GroupMembers", "Properties", "Groups", "Users" CASCADE;
         """);
+
+        // Clean up test upload directory
+        var testUploadPath = Path.Combine(Path.GetTempPath(), "gurkan-test-uploads");
+        if (Directory.Exists(testUploadPath))
+        {
+            Directory.Delete(testUploadPath, recursive: true);
+        }
 
         // Seed superadmin
         var hasher = new PasswordHasher<User>();

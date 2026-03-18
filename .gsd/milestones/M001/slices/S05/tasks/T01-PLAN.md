@@ -140,3 +140,11 @@ Create the complete backend for document management: entity, enum, controller wi
 - `GurkanApi/Migrations/*_AddDocuments.cs` — new migration
 - `GurkanApi.Tests/IntegrationTests/DocumentTests.cs` — new test file with 8 tests
 - `GurkanApi.Tests/IntegrationTests/TestFixture.cs` — modified TRUNCATE list + test upload path config
+
+## Observability Impact
+
+- **New structured logs:** `"Document uploaded: DocumentId={DocumentId}, PropertyId={PropertyId}, FileName={FileName}, Size={Size}, By={UserId}"`, `"Document downloaded: DocumentId={DocumentId}, By={UserId}"`, `"Document deleted: DocumentId={DocumentId}, PropertyId={PropertyId}, By={UserId}"` — emitted from `DocumentsController` at Info level on every upload, download, and delete.
+- **Access denial logs:** `"Property access denied: UserId={UserId}, PropertyId={PropertyId}"` — emitted when a user attempts to access documents on a property outside their group.
+- **Inspection surfaces:** Swagger UI at `/swagger/index.html` shows 4 new document endpoints under `api/properties/{propertyId}/documents`. The `uploads/documents/{propertyId}/` directory on the filesystem holds actual uploaded files.
+- **Error responses:** 400 with `{ error: "invalid_file_type", message }` for disallowed extensions; 400 with `{ error: "invalid_content_type", message }` for disallowed MIME types; 403 for cross-group access; 404 for missing document or missing file on disk.
+- **Future agent inspection:** Run `dotnet test GurkanApi.Tests/ --filter "Category=S05"` to verify all 8 document integration tests pass. Check structured logs for document operations in application output.

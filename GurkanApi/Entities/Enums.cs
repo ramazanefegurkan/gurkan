@@ -76,3 +76,13 @@ public enum BillPaymentStatus
     Paid,
     Overdue
 }
+
+public enum DocumentCategory
+{
+    TitleDeed,
+    Contract,
+    Insurance,
+    Invoice,
+    Photo,
+    Other
+}
