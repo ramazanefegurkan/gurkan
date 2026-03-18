@@ -105,6 +105,12 @@ Write integration tests proving dashboard aggregation correctness, notification 
 - `GurkanApi/DTOs/Notifications/NotificationResponse.cs` (from T01) — notification DTO structure
 - `GurkanApi/DTOs/Reports/ReportResponse.cs` (from T02) — report DTO structure
 
+## Observability Impact
+
+- **Test signals:** `dotnet test --filter "Category=S06"` runs all S06 integration tests (DashboardAndNotificationTests + ReportsTests). A passing suite confirms dashboard aggregation, notification generation, cross-group access control, and Excel/PDF export all function correctly end-to-end.
+- **Inspection:** Test output includes structured log lines from DashboardController ("Dashboard requested"), NotificationsController ("Notifications requested"), and ReportsController ("Report exported") — visible in `--verbosity normal` output for tracing request flow through the test host.
+- **Failure visibility:** xUnit failure messages include expected vs. actual values for aggregation amounts, notification types/severities, content types, and response codes. Test names encode the behavior under test (e.g., `Notifications_IncludesLateRent`, `Dashboard_CrossGroupAccess_ReturnsEmpty`).
+
 ## Expected Output
 
 - `GurkanApi.Tests/IntegrationTests/DashboardAndNotificationTests.cs` — ~7 integration tests tagged S06, all passing alongside 53 existing tests

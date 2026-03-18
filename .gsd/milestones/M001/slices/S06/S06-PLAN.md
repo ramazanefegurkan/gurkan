@@ -60,7 +60,7 @@
   - Verify: `dotnet build GurkanApi/` compiles, Swagger shows report endpoints, download files via Swagger
   - Done when: GET /api/reports/export/excel returns valid .xlsx file; GET /api/reports/export/pdf returns valid .pdf file; both contain correct per-property financial data with ROI
 
-- [ ] **T03: Write S06 integration tests for Dashboard, Notifications, and Reports** `est:40m`
+- [x] **T03: Write S06 integration tests for Dashboard, Notifications, and Reports** `est:40m`
   - Why: Prove aggregation correctness, notification triggers, cross-group access denial, and export file generation with automated tests. This is the verification backbone.
   - Files: `GurkanApi.Tests/IntegrationTests/DashboardAndNotificationTests.cs`
   - Do: Create test class tagged `[Trait("Category", "S06")]` using existing `CustomWebApplicationFactory` fixture. Setup: create group, users, property, tenant with rent payments (including overdue), short-term rental, expenses, bills (including upcoming due date). Tests: (1) dashboard returns correct income/expense/profit aggregation per currency, (2) notifications include late rent alert, (3) notifications include upcoming bill alert, (4) notifications include lease expiry alert, (5) cross-group user gets empty dashboard (no data from other groups), (6) Excel export returns valid file with content-type application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, (7) PDF export returns valid file with content-type application/pdf. Run full regression to ensure no conflicts with 53 existing tests.
