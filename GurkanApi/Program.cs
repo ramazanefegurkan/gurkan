@@ -44,6 +44,9 @@ builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// ---------- Group access service ----------
+builder.Services.AddScoped<IGroupAccessService, GroupAccessService>();
+
 // ---------- JWT Authentication ----------
 var jwtSecret = builder.Configuration["Jwt:Secret"]!;
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
