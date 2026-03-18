@@ -59,7 +59,7 @@
   - Verify: `cd gurkan-ui && npm run build` — TypeScript compiles with zero errors
   - Done when: `npm run build` succeeds, new types/API functions/routes/tabs are in place
 
-- [ ] **T03: Build expense and bill frontend pages with browser verification** `est:40m`
+- [x] **T03: Build expense and bill frontend pages with browser verification** `est:40m`
   - Why: Delivers the user-facing UI for expense and bill management — the final piece that makes S04's demo true.
   - Files: `gurkan-ui/src/pages/Expenses/ExpenseList.tsx`, `gurkan-ui/src/pages/Expenses/ExpenseForm.tsx`, `gurkan-ui/src/pages/Expenses/Expenses.css`, `gurkan-ui/src/pages/Bills/BillList.tsx`, `gurkan-ui/src/pages/Bills/BillForm.tsx`, `gurkan-ui/src/pages/Bills/Bills.css`
   - Do: Build ExpenseList (table with category badges, delete confirmation) and ExpenseForm (create/edit dual mode with category dropdown, currency, date, recurring toggle). Build BillList (table with status badges, "Ödendi" action button) and BillForm (create/edit with bill type dropdown, currency, due date). Follow ShortTermRentalList/Form patterns. Use toUtcIso() for all date fields. Reuse existing CSS classes (.data-table, .status-badge, .section-header). Browser-verify all CRUD flows.

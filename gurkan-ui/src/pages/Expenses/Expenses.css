@@ -1,0 +1,122 @@
+/* ── Expense Pages ────────────────────────────────── */
+
+/* ── Category Badges ──────────────────────────────── */
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.category-badge--maintenance {
+  background: #e8f0fe;
+  color: #1a56db;
+}
+
+.category-badge--repair {
+  background: #fef0e6;
+  color: #c2571a;
+}
+
+.category-badge--tax {
+  background: #fff3e0;
+  color: #b87514;
+}
+
+.category-badge--insurance {
+  background: #f0e8fe;
+  color: #6b21a8;
+}
+
+.category-badge--management {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.category-badge--other {
+  background: #f2f1ef;
+  color: var(--text-tertiary);
+}
+
+/* ── Recurring indicator ──────────────────────────── */
+
+.recurring-yes {
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.recurring-no {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+/* ── Expense summary ──────────────────────────────── */
+
+.expense-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.expense-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.expense-summary-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.expense-summary-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Recurring toggle in form ─────────────────────── */
+
+.form-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.form-checkbox-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.form-checkbox-row label {
+  font-size: 14px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .expense-summary {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}

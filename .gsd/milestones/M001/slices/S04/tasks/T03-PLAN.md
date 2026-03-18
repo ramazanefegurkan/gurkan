@@ -119,3 +119,12 @@ Build the four user-facing React pages (ExpenseList, ExpenseForm, BillList, Bill
 - `gurkan-ui/src/pages/Bills/BillForm.tsx` — create/edit form
 - `gurkan-ui/src/pages/Bills/Bills.css` — minimal bill-specific styles
 - `gurkan-ui/src/App.tsx` — route imports active (if T02 left placeholders)
+
+## Observability Impact
+
+- **Browser DevTools → Network**: Expense and bill CRUD operations issue visible XHR requests to `/api/properties/{id}/expenses` and `/api/properties/{id}/bills`. Mark-bill-paid issues a PATCH to `/api/properties/{id}/bills/{billId}/pay`.
+- **UI state signals**: Empty states display "Henüz gider kaydı yok" / "Henüz fatura kaydı yok" — confirms zero records. Summary cards show TOPLAM GİDER / TOPLAM FATURA totals and BEKLEYEN count for quick status.
+- **Status badges**: Bill status uses `.status-badge--pending` (yellow), `.status-badge--paid` (green), `.status-badge--overdue` (red) — inspect CSS class names to verify correct status rendering.
+- **Category badges**: Expense categories use `.category-badge--{category}` CSS classes — inspect to verify correct category classification.
+- **Form validation**: HTML `required` attributes on mandatory fields. Network errors surface via error banner with descriptive Turkish messages.
+- **Error path**: API errors (403/404) are caught and shown in `.error-banner` elements. Delete actions prompt `window.confirm` before executing.
