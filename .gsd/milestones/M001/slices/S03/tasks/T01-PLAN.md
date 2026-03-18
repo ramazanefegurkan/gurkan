@@ -68,6 +68,13 @@ Key design decisions from research + context:
 - `dotnet ef database update --project GurkanApi/` — migration applies without errors
 - Verify migration file contains correct table definitions (Tenants, RentPayments, ShortTermRentals, RentIncreases) with expected columns and FK constraints
 
+## Observability Impact
+
+- **New database tables**: Tenants, RentPayments, ShortTermRentals, RentIncreases — inspectable via `dotnet ef dbcontext info --project GurkanApi/` and direct SQL queries
+- **Migration history**: `__EFMigrationsHistory` table records migration name and timestamp — a future agent can verify schema state with `dotnet ef migrations list --project GurkanApi/`
+- **Failure visibility**: Migration failures surface as EF Core exceptions with table/column context; FK constraint violations on Tenant→Property (Restrict) will raise clear `DbUpdateException` messages identifying the conflicting relationship
+- **Schema inspection**: `dotnet ef dbcontext script --project GurkanApi/` generates full SQL DDL for verification
+
 ## Inputs
 
 - `GurkanApi/Entities/Property.cs` — follow entity conventions (Guid Id, DateTime timestamps)

@@ -28,3 +28,25 @@ public enum Currency
     USD,
     EUR
 }
+
+public enum RentPaymentStatus
+{
+    Pending,
+    Paid,
+    Late,
+    Cancelled
+}
+
+public enum PaymentMethod
+{
+    Cash,
+    BankTransfer,
+    Check
+}
+
+public enum RentalPlatform
+{
+    Airbnb,
+    Booking,
+    Direct
+}

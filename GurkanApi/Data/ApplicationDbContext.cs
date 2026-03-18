@@ -16,6 +16,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<PropertyNote> PropertyNotes => Set<PropertyNote>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<RentPayment> RentPayments => Set<RentPayment>();
+    public DbSet<ShortTermRental> ShortTermRentals => Set<ShortTermRental>();
+    public DbSet<RentIncrease> RentIncreases => Set<RentIncrease>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -124,6 +128,94 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(rt => rt.User)
                   .WithMany(u => u.RefreshTokens)
                   .HasForeignKey(rt => rt.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- Tenant ----------
+        modelBuilder.Entity<Tenant>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+            entity.Property(t => t.FullName).IsRequired().HasMaxLength(200);
+            entity.Property(t => t.Phone).HasMaxLength(30);
+            entity.Property(t => t.Email).HasMaxLength(256);
+            entity.Property(t => t.IdentityNumber).HasMaxLength(20);
+            entity.Property(t => t.MonthlyRent).HasColumnType("decimal(18,2)");
+            entity.Property(t => t.Deposit).HasColumnType("decimal(18,2)");
+            entity.Property(t => t.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(t => t.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(t => t.Property)
+                  .WithMany()
+                  .HasForeignKey(t => t.PropertyId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---------- RentPayment ----------
+        modelBuilder.Entity<RentPayment>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(r => r.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(r => r.Status)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(r => r.PaymentMethod)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(r => r.Notes).HasMaxLength(2000);
+            entity.Property(r => r.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(r => r.Tenant)
+                  .WithMany(t => t.RentPayments)
+                  .HasForeignKey(r => r.TenantId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- ShortTermRental ----------
+        modelBuilder.Entity<ShortTermRental>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.Property(s => s.GuestName).HasMaxLength(200);
+            entity.Property(s => s.NightlyRate).HasColumnType("decimal(18,2)");
+            entity.Property(s => s.TotalAmount).HasColumnType("decimal(18,2)");
+            entity.Property(s => s.PlatformFee).HasColumnType("decimal(18,2)");
+            entity.Property(s => s.NetAmount).HasColumnType("decimal(18,2)");
+            entity.Property(s => s.Platform)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(s => s.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(s => s.Notes).HasMaxLength(2000);
+            entity.Property(s => s.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(s => s.Property)
+                  .WithMany()
+                  .HasForeignKey(s => s.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- RentIncrease ----------
+        modelBuilder.Entity<RentIncrease>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.PreviousAmount).HasColumnType("decimal(18,2)");
+            entity.Property(r => r.NewAmount).HasColumnType("decimal(18,2)");
+            entity.Property(r => r.IncreaseRate).HasColumnType("decimal(18,2)");
+            entity.Property(r => r.Notes).HasMaxLength(2000);
+            entity.Property(r => r.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(r => r.Tenant)
+                  .WithMany(t => t.RentIncreases)
+                  .HasForeignKey(r => r.TenantId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

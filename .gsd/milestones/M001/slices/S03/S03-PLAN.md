@@ -47,7 +47,7 @@
 
 ## Tasks
 
-- [ ] **T01: Define entities, enums, DbContext configuration, and EF Core migration** `est:45m`
+- [x] **T01: Define entities, enums, DbContext configuration, and EF Core migration** `est:45m`
   - Why: All controllers, tests, and frontend depend on the data model. Entities define the schema, Fluent API ensures correct decimal precision and cascade behavior, migration creates the tables.
   - Files: `GurkanApi/Entities/Tenant.cs`, `GurkanApi/Entities/RentPayment.cs`, `GurkanApi/Entities/ShortTermRental.cs`, `GurkanApi/Entities/RentIncrease.cs`, `GurkanApi/Entities/Enums.cs`, `GurkanApi/Data/ApplicationDbContext.cs`
   - Do: Create 4 entity classes matching research spec. Add `RentPaymentStatus` (Pending, Paid, Late, Cancelled) and `PaymentMethod` (Cash, BankTransfer, Check) and `RentalPlatform` (Airbnb, Booking, Direct) enums to Enums.cs. Configure Fluent API: decimal(18,2) for all money fields, DeleteBehavior.Restrict on Tenant→Property FK, Cascade on RentPayment→Tenant, Cascade on RentIncrease→Tenant, Cascade on ShortTermRental→Property. Add 4 DbSets. Generate EF Core migration. Apply migration to verify it runs.
