@@ -15,6 +15,7 @@ import ExpenseList from './pages/Expenses/ExpenseList';
 import ExpenseForm from './pages/Expenses/ExpenseForm';
 import BillList from './pages/Bills/BillList';
 import BillForm from './pages/Bills/BillForm';
+import DocumentList from './pages/Documents/DocumentList';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -74,6 +75,7 @@ function AppRoutes() {
           <Route path="bills" element={<BillList />} />
           <Route path="bills/new" element={<BillForm />} />
           <Route path="bills/:billId/edit" element={<BillForm />} />
+          <Route path="documents" element={<DocumentList />} />
         </Route>
       </Route>
 

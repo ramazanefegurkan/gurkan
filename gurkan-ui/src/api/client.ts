@@ -24,6 +24,7 @@ import type {
   BillResponse,
   CreateBillRequest,
   UpdateBillRequest,
+  DocumentResponse,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -439,6 +440,66 @@ export async function markBillPaid(
     `/properties/${propertyId}/bills/${id}/pay`,
   );
   return data;
+}
+
+// ── Documents ────────────────────────────────────────
+
+export async function getDocuments(
+  propertyId: string,
+  category?: string,
+): Promise<DocumentResponse[]> {
+  const params = category ? { category } : {};
+  const { data } = await api.get<DocumentResponse[]>(
+    `/properties/${propertyId}/documents`,
+    { params },
+  );
+  return data;
+}
+
+export async function uploadDocument(
+  propertyId: string,
+  file: File,
+  category: string,
+): Promise<DocumentResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('category', category);
+  const { data } = await api.post<DocumentResponse>(
+    `/properties/${propertyId}/documents`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return data;
+}
+
+export async function downloadDocument(
+  propertyId: string,
+  documentId: string,
+): Promise<void> {
+  const { data, headers } = await api.get(
+    `/properties/${propertyId}/documents/${documentId}/download`,
+    { responseType: 'blob' },
+  );
+  const blob = new Blob([data]);
+  const url = URL.createObjectURL(blob);
+  const contentDisposition = headers['content-disposition'] || '';
+  // Extract filename from content-disposition or fall back to documentId
+  const filenameMatch = contentDisposition.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]+)/i);
+  const filename = filenameMatch ? decodeURIComponent(filenameMatch[1]) : `document-${documentId}`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+export async function deleteDocument(
+  propertyId: string,
+  documentId: string,
+): Promise<void> {
+  await api.delete(`/properties/${propertyId}/documents/${documentId}`);
 }
 
 export default api;

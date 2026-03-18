@@ -51,7 +51,7 @@
   - Verify: `dotnet test GurkanApi.Tests/ --filter "Category=S05"` passes; `dotnet test GurkanApi.Tests/` passes (regression)
   - Done when: All document integration tests pass, migration applies cleanly, upload/download/list/delete endpoints work correctly with group access control
 
-- [ ] **T02: Build document frontend and verify end-to-end in browser** `est:40m`
+- [x] **T02: Build document frontend and verify end-to-end in browser** `est:40m`
   - Why: Completes the user-facing feature — upload form, document list, download/delete actions, tab navigation. Proves the full integration path works.
   - Files: `gurkan-ui/src/types/index.ts`, `gurkan-ui/src/api/client.ts`, `gurkan-ui/src/App.tsx`, `gurkan-ui/src/pages/Properties/PropertyLayout.tsx`, `gurkan-ui/src/pages/Documents/DocumentList.tsx`, `gurkan-ui/src/pages/Documents/Documents.css`
   - Do: (1) Add `DocumentCategory` const + labels + `DocumentResponse` interface to types/index.ts. (2) Add document API functions to client.ts — upload uses `FormData` and must NOT set Content-Type header (let browser set multipart boundary), list, download (returns blob), delete. (3) Add "Dökümanlar" tab to PropertyLayout. (4) Add document route in App.tsx under PropertyLayout. (5) Create DocumentList page: inline upload form (file input + category dropdown + submit button), document table with filename, category, size, date, download link, delete button. Follow BillList patterns. (6) Add Documents.css for upload form and document table styles. (7) Browser verify: start backend + frontend, login, navigate to property, click Dökümanlar tab, upload a file, see in list, download, delete.

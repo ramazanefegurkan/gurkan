@@ -417,6 +417,41 @@ export interface CreateBillRequest {
 
 export interface UpdateBillRequest extends CreateBillRequest {}
 
+// ── Document Categories ──────────────────────────────
+
+export const DocumentCategory = {
+  TitleDeed: 'TitleDeed',
+  Contract: 'Contract',
+  Insurance: 'Insurance',
+  Invoice: 'Invoice',
+  Photo: 'Photo',
+  Other: 'Other',
+} as const;
+
+export type DocumentCategoryType = (typeof DocumentCategory)[keyof typeof DocumentCategory];
+
+export const DocumentCategoryLabels: Record<DocumentCategoryType, string> = {
+  [DocumentCategory.TitleDeed]: 'Tapu',
+  [DocumentCategory.Contract]: 'Sözleşme',
+  [DocumentCategory.Insurance]: 'Sigorta',
+  [DocumentCategory.Invoice]: 'Fatura',
+  [DocumentCategory.Photo]: 'Fotoğraf',
+  [DocumentCategory.Other]: 'Diğer',
+};
+
+// ── Documents ────────────────────────────────────────
+
+export interface DocumentResponse {
+  id: string;
+  propertyId: string;
+  originalFileName: string;
+  category: DocumentCategoryType;
+  contentType: string;
+  fileSize: number;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
 // ── Groups ───────────────────────────────────────────
 
 export interface GroupResponse {

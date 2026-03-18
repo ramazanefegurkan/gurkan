@@ -109,3 +109,10 @@ The frontend patterns follow BillList/ExpenseList exactly (same tab navigation, 
 - `gurkan-ui/src/pages/Properties/PropertyLayout.tsx` — modified with Dökümanlar tab
 - `gurkan-ui/src/pages/Documents/DocumentList.tsx` — new document list page
 - `gurkan-ui/src/pages/Documents/Documents.css` — new styles
+
+## Observability Impact
+
+- **New UI signals:** Document upload errors displayed inline via `.doc-upload-error` element; upload success adds document to table immediately
+- **Network inspection:** All document API calls route through `/api/properties/{propertyId}/documents` — visible in browser DevTools
+- **State inspection:** Document count shown in section subtitle ("N döküman"); empty state message when no documents exist
+- **Failure visibility:** Upload failures surface backend error messages (invalid_file_type, invalid_content_type) in the UI; download/delete failures set error banner

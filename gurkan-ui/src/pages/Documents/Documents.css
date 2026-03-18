@@ -1,0 +1,172 @@
+/* ── Document Upload Form ─────────────────────────── */
+
+.doc-upload-form {
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.doc-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.doc-file-input {
+  flex: 1;
+  min-width: 200px;
+  font-size: 13px;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+  color: var(--text-primary);
+}
+
+.doc-file-input::file-selector-button {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.15s ease;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+}
+
+.doc-file-input::file-selector-button:hover {
+  background: var(--border-subtle);
+}
+
+.doc-category-select {
+  padding: 7px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  cursor: pointer;
+  min-width: 120px;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+}
+
+.doc-category-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 183, 101, 71), 0.15);
+}
+
+.doc-upload-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+/* ── Document Category Badges ─────────────────────── */
+
+.doc-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.doc-cat-badge--titledeed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.doc-cat-badge--contract {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.doc-cat-badge--insurance {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.doc-cat-badge--invoice {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.doc-cat-badge--photo {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.doc-cat-badge--other {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+/* ── Download button ──────────────────────────────── */
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+}
+
+.btn-download:hover {
+  background: #bbdefb;
+  color: #0d47a1;
+}
+
+/* ── Document table specifics ─────────────────────── */
+
+.doc-filename {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.doc-filesize {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .doc-upload-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .doc-file-input {
+    min-width: unset;
+  }
+
+  .doc-filename {
+    max-width: 160px;
+  }
+}
