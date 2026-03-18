@@ -196,12 +196,6 @@ export default function PropertyDetail() {
   if (error && !property) {
     return (
       <div>
-        <Link to="/properties" className="back-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Mülklere Dön
-        </Link>
         <div className="error-banner">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
@@ -230,14 +224,7 @@ export default function PropertyDetail() {
   }
 
   return (
-    <div className="detail-container">
-      <Link to="/properties" className="back-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-        Mülklere Dön
-      </Link>
-
+    <div>
       {error && (
         <div className="error-banner">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

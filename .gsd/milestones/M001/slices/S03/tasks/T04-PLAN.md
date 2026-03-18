@@ -103,3 +103,10 @@ Build all frontend pages for tenant management, rent payments, and short-term re
 - `gurkan-ui/src/pages/ShortTermRentals/ShortTermRentalList.tsx` — new
 - `gurkan-ui/src/pages/ShortTermRentals/ShortTermRentalForm.tsx` — new
 - `gurkan-ui/src/pages/ShortTermRentals/ShortTermRentals.css` — new
+
+## Observability Impact
+
+- **Browser console**: No JS errors during tenant/payment/rental CRUD flows. Network errors surface as inline error banners with descriptive messages from backend.
+- **API error surfaces**: 409 Conflict (active tenant exists), 400 (validation), 403 (access denied) all render as user-visible error banners on forms.
+- **Status badges**: Payment status (Pending=yellow, Paid=green, Late=red, Cancelled=gray) and platform badges (Airbnb=coral, Booking=blue, Direct=terracotta) provide visual diagnostic signal.
+- **Future agent inspection**: Navigate to any property → Kiracılar tab to see tenant state; Kısa Dönem tab for rental records. Browser DevTools Network tab shows all API calls to `/api/properties/{id}/tenants/*` and `/api/properties/{id}/short-term-rentals/*`.

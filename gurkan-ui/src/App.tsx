@@ -5,6 +5,12 @@ import Login from './pages/Login';
 import PropertyList from './pages/Properties/PropertyList';
 import PropertyForm from './pages/Properties/PropertyForm';
 import PropertyDetail from './pages/Properties/PropertyDetail';
+import PropertyLayout from './pages/Properties/PropertyLayout';
+import TenantList from './pages/Tenants/TenantList';
+import TenantForm from './pages/Tenants/TenantForm';
+import TenantDetail from './pages/Tenants/TenantDetail';
+import ShortTermRentalList from './pages/ShortTermRentals/ShortTermRentalList';
+import ShortTermRentalForm from './pages/ShortTermRentals/ShortTermRentalForm';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -46,8 +52,19 @@ function AppRoutes() {
         <Route index element={<Navigate to="/properties" replace />} />
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/new" element={<PropertyForm />} />
-        <Route path="/properties/:id" element={<PropertyDetail />} />
         <Route path="/properties/:id/edit" element={<PropertyForm />} />
+
+        {/* Property sub-pages with shared tab layout */}
+        <Route path="/properties/:id" element={<PropertyLayout />}>
+          <Route index element={<PropertyDetail />} />
+          <Route path="tenants" element={<TenantList />} />
+          <Route path="tenants/new" element={<TenantForm />} />
+          <Route path="tenants/:tenantId" element={<TenantDetail />} />
+          <Route path="tenants/:tenantId/edit" element={<TenantForm />} />
+          <Route path="short-term-rentals" element={<ShortTermRentalList />} />
+          <Route path="short-term-rentals/new" element={<ShortTermRentalForm />} />
+          <Route path="short-term-rentals/:rentalId/edit" element={<ShortTermRentalForm />} />
+        </Route>
       </Route>
 
       {/* Catch-all */}

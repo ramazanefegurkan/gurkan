@@ -1,0 +1,463 @@
+/* ── Tenant Pages ─────────────────────────────────── */
+
+/* ── Tab Navigation ───────────────────────────────── */
+
+.property-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.property-tab {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--text-tertiary);
+  text-decoration: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease;
+}
+
+.property-tab:hover {
+  color: var(--text-primary);
+}
+
+.property-tab--active {
+  color: var(--accent);
+}
+
+.property-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* ── Tenant Card ──────────────────────────────────── */
+
+.tenant-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tenant-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+.tenant-card--inactive::before {
+  background: var(--text-placeholder);
+}
+
+.tenant-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tenant-card-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tenant-card-contact {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.tenant-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.tenant-card-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.tenant-card-field-value {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tenant-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ── Status Badges ────────────────────────────────── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-badge--pending {
+  background: #fef9e7;
+  color: #b7870a;
+}
+
+.status-badge--paid {
+  background: #edf7ed;
+  color: #2e7d32;
+}
+
+.status-badge--late {
+  background: var(--bg-danger-subtle);
+  color: var(--danger);
+}
+
+.status-badge--cancelled {
+  background: #f2f1ef;
+  color: var(--text-tertiary);
+}
+
+.status-badge--active {
+  background: #edf7ed;
+  color: #2e7d32;
+}
+
+.status-badge--inactive {
+  background: #f2f1ef;
+  color: var(--text-tertiary);
+}
+
+/* ── Platform Badges ──────────────────────────────── */
+
+.platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.platform-badge--airbnb {
+  background: #fff0ec;
+  color: #e0564b;
+}
+
+.platform-badge--booking {
+  background: #eaf0fa;
+  color: #003580;
+}
+
+.platform-badge--direct {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+/* ── Data Table ───────────────────────────────────── */
+
+.data-table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.data-table .amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table .date {
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+/* ── Section Headers ──────────────────────────────── */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* ── Tenant List Past Items ───────────────────────── */
+
+.past-tenant-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+  gap: 16px;
+}
+
+.past-tenant-item:hover {
+  border-color: var(--accent-warm);
+  background: var(--bg-hover);
+}
+
+.past-tenant-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.past-tenant-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.past-tenant-dates {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.past-tenant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Payment Modal ────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+.modal-dialog {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  max-width: 440px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: dialogIn 0.2s ease-out;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 20px;
+}
+
+/* ── Detail Info Card ─────────────────────────────── */
+
+.tenant-info-section {
+  margin-bottom: 24px;
+}
+
+.tenant-info-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.tenant-info-topbar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+}
+
+.tenant-info-header {
+  padding: 24px 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tenant-info-body {
+  padding: 24px 28px;
+}
+
+.tenant-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* ── Payments Section ─────────────────────────────── */
+
+.payments-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.payments-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.payments-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Rent Increase Table ──────────────────────────── */
+
+.increase-rate {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .tenant-card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tenant-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .past-tenant-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .past-tenant-info {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .property-tabs {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .tenant-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tenant-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tenant-info-header {
+    flex-direction: column;
+    padding: 16px 20px;
+  }
+
+  .tenant-info-body {
+    padding: 16px 20px;
+  }
+}

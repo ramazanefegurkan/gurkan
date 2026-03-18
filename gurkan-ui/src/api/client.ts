@@ -7,6 +7,17 @@ import type {
   GroupResponse,
   CreatePropertyRequest,
   UpdatePropertyRequest,
+  TenantListItem,
+  TenantResponse,
+  CreateTenantRequest,
+  UpdateTenantRequest,
+  RentPaymentResponse,
+  MarkPaymentPaidRequest,
+  ShortTermRentalResponse,
+  CreateShortTermRentalRequest,
+  UpdateShortTermRentalRequest,
+  RentIncreaseResponse,
+  CreateRentIncreaseRequest,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -146,6 +157,163 @@ export async function deletePropertyNote(
 
 export async function getGroups(): Promise<GroupResponse[]> {
   const { data } = await api.get<GroupResponse[]>('/groups');
+  return data;
+}
+
+// ── Tenants ──────────────────────────────────────────
+
+export async function getTenants(
+  propertyId: string,
+  active?: boolean,
+): Promise<TenantListItem[]> {
+  const params = active !== undefined ? { active } : {};
+  const { data } = await api.get<TenantListItem[]>(
+    `/properties/${propertyId}/tenants`,
+    { params },
+  );
+  return data;
+}
+
+export async function getTenant(
+  propertyId: string,
+  tenantId: string,
+): Promise<TenantResponse> {
+  const { data } = await api.get<TenantResponse>(
+    `/properties/${propertyId}/tenants/${tenantId}`,
+  );
+  return data;
+}
+
+export async function createTenant(
+  propertyId: string,
+  payload: CreateTenantRequest,
+): Promise<TenantResponse> {
+  const { data } = await api.post<TenantResponse>(
+    `/properties/${propertyId}/tenants`,
+    payload,
+  );
+  return data;
+}
+
+export async function updateTenant(
+  propertyId: string,
+  tenantId: string,
+  payload: UpdateTenantRequest,
+): Promise<TenantResponse> {
+  const { data } = await api.put<TenantResponse>(
+    `/properties/${propertyId}/tenants/${tenantId}`,
+    payload,
+  );
+  return data;
+}
+
+export async function terminateTenant(
+  propertyId: string,
+  tenantId: string,
+): Promise<void> {
+  await api.post(`/properties/${propertyId}/tenants/${tenantId}/terminate`);
+}
+
+// ── Rent Payments ────────────────────────────────────
+
+export async function getRentPayments(
+  propertyId: string,
+  tenantId: string,
+  status?: string,
+): Promise<RentPaymentResponse[]> {
+  const params = status ? { status } : {};
+  const { data } = await api.get<RentPaymentResponse[]>(
+    `/properties/${propertyId}/tenants/${tenantId}/rent-payments`,
+    { params },
+  );
+  return data;
+}
+
+export async function markPaymentPaid(
+  propertyId: string,
+  tenantId: string,
+  paymentId: string,
+  payload: MarkPaymentPaidRequest,
+): Promise<RentPaymentResponse> {
+  const { data } = await api.patch<RentPaymentResponse>(
+    `/properties/${propertyId}/tenants/${tenantId}/rent-payments/${paymentId}/pay`,
+    payload,
+  );
+  return data;
+}
+
+// ── Short-Term Rentals ───────────────────────────────
+
+export async function getShortTermRentals(
+  propertyId: string,
+): Promise<ShortTermRentalResponse[]> {
+  const { data } = await api.get<ShortTermRentalResponse[]>(
+    `/properties/${propertyId}/short-term-rentals`,
+  );
+  return data;
+}
+
+export async function getShortTermRental(
+  propertyId: string,
+  rentalId: string,
+): Promise<ShortTermRentalResponse> {
+  const { data } = await api.get<ShortTermRentalResponse>(
+    `/properties/${propertyId}/short-term-rentals/${rentalId}`,
+  );
+  return data;
+}
+
+export async function createShortTermRental(
+  propertyId: string,
+  payload: CreateShortTermRentalRequest,
+): Promise<ShortTermRentalResponse> {
+  const { data } = await api.post<ShortTermRentalResponse>(
+    `/properties/${propertyId}/short-term-rentals`,
+    payload,
+  );
+  return data;
+}
+
+export async function updateShortTermRental(
+  propertyId: string,
+  rentalId: string,
+  payload: UpdateShortTermRentalRequest,
+): Promise<ShortTermRentalResponse> {
+  const { data } = await api.put<ShortTermRentalResponse>(
+    `/properties/${propertyId}/short-term-rentals/${rentalId}`,
+    payload,
+  );
+  return data;
+}
+
+export async function deleteShortTermRental(
+  propertyId: string,
+  rentalId: string,
+): Promise<void> {
+  await api.delete(`/properties/${propertyId}/short-term-rentals/${rentalId}`);
+}
+
+// ── Rent Increases ───────────────────────────────────
+
+export async function getRentIncreases(
+  propertyId: string,
+  tenantId: string,
+): Promise<RentIncreaseResponse[]> {
+  const { data } = await api.get<RentIncreaseResponse[]>(
+    `/properties/${propertyId}/tenants/${tenantId}/rent-increases`,
+  );
+  return data;
+}
+
+export async function createRentIncrease(
+  propertyId: string,
+  tenantId: string,
+  payload: CreateRentIncreaseRequest,
+): Promise<RentIncreaseResponse> {
+  const { data } = await api.post<RentIncreaseResponse>(
+    `/properties/${propertyId}/tenants/${tenantId}/rent-increases`,
+    payload,
+  );
   return data;
 }
 
