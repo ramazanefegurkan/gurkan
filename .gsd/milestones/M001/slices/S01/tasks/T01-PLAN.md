@@ -95,6 +95,13 @@ Greenfield proje — solution, ASP.NET Core Web API projesi, Docker Compose (Pos
 - `dotnet run --project GurkanApi/` — API başlar, Swagger UI erişilebilir (https://localhost:5001/swagger veya http://localhost:5000/swagger)
 - DB'de seed admin kontrolü: `dotnet ef dbcontext script --project GurkanApi/` ile SQL çıktısı veya runtime'da startup log'unda "Seed admin created/exists" mesajı
 
+## Observability Impact
+
+- **Startup seed log:** Program.cs logs `"Seed admin created"` or `"Seed admin already exists"` at startup — confirms seed ran without DB query.
+- **EF Core logging:** Standard EF Core SQL logging via ASP.NET Core `ILogger` — visible in console output during development.
+- **Health signal:** API starts successfully and responds on configured port — verified via Swagger UI availability.
+- **Future agent inspection:** `dotnet ef dbcontext script --project GurkanApi/` generates full SQL schema for offline review. `docker exec` into PostgreSQL to query seed data directly.
+
 ## Inputs
 
 - `docker-compose.yml` — PostgreSQL 16 container

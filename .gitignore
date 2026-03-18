@@ -39,3 +39,11 @@ coverage/
 .cache/
 tmp/
 manifest.json
+
+# ── .NET ──
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docuser

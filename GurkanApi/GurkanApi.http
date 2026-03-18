@@ -1,0 +1,6 @@
+@GurkanApi_HostAddress = http://localhost:5039
+
+GET {{GurkanApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
