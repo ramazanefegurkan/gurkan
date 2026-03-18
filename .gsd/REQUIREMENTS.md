@@ -2,11 +2,9 @@
 
 This file is the explicit capability and coverage contract for the project.
 
-Use it to track what is actively in scope, what has been validated by completed work, what is intentionally deferred, and what is explicitly out of scope.
-
 ## Active
 
-### R001 — Mülk kayıt ve yönetimi
+### R001 — Mülk ekleme, düzenleme, silme, detay görüntüleme. Her mülk bir gruba atanır.
 - Class: core-capability
 - Status: active
 - Description: Mülk ekleme, düzenleme, silme, detay görüntüleme. Her mülk bir gruba atanır.
@@ -17,7 +15,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Mülk tipi (daire, ev, dükkan vs.), konum, metrekare gibi temel bilgiler.
 
-### R002 — Grup bazlı erişim kontrolü
+### R002 — Mülkler gruplara atanır, kullanıcılar gruplara eklenir. Kullanıcı sadece kendi gruplarındaki mülkleri görür. Bir kullanıcı birden fazla grupta olabilir.
 - Class: core-capability
 - Status: active
 - Description: Mülkler gruplara atanır, kullanıcılar gruplara eklenir. Kullanıcı sadece kendi gruplarındaki mülkleri görür. Bir kullanıcı birden fazla grupta olabilir.
@@ -28,7 +26,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Grup örnekleri: "Aile" (ben + babam), "Geniş Aile" (ben + babam + kuzenim).
 
-### R003 — Superadmin tüm mülkleri görür ve yönetir
+### R003 — Superadmin rolü tüm mülkleri, tüm grupları, tüm kullanıcıları görür ve yönetir.
 - Class: core-capability
 - Status: active
 - Description: Superadmin rolü tüm mülkleri, tüm grupları, tüm kullanıcıları görür ve yönetir.
@@ -39,7 +37,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: İlk kullanıcı otomatik superadmin olur.
 
-### R004 — Grup admini delegasyonu
+### R004 — Superadmin başka bir kullanıcıyı grup admini yapabilir. Grup admini kendi grubuna kullanıcı ekleyebilir ve mülk atayabilir.
 - Class: core-capability
 - Status: active
 - Description: Superadmin başka bir kullanıcıyı grup admini yapabilir. Grup admini kendi grubuna kullanıcı ekleyebilir ve mülk atayabilir.
@@ -50,7 +48,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Superadmin > Grup Admin > Üye hiyerarşisi. Grup içi herkes eşit erişime sahip.
 
-### R005 — Email + şifre authentication (JWT)
+### R005 — Email ve şifre ile login. JWT token tabanlı API authentication.
 - Class: core-capability
 - Status: active
 - Description: Email ve şifre ile login. JWT token tabanlı API authentication.
@@ -61,7 +59,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Refresh token mekanizması dahil.
 
-### R006 — Uzun dönem kira takibi
+### R006 — Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
 - Class: primary-user-loop
 - Status: active
 - Description: Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
@@ -72,7 +70,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Gecikme otomatik hesaplanır (ödeme tarihi geçtiğinde).
 
-### R007 — Kısa dönem kira takibi (Airbnb-style)
+### R007 — Rezervasyon bazlı gelir kaydı (giriş-çıkış tarihi, gecelik/toplam tutar, platform komisyonu). Manuel giriş.
 - Class: primary-user-loop
 - Status: active
 - Description: Rezervasyon bazlı gelir kaydı (giriş-çıkış tarihi, gecelik/toplam tutar, platform komisyonu). Manuel giriş.
@@ -83,29 +81,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Airbnb API erişimi olmadığı için veriler manuel girilecek.
 
-### R008 — Gider takibi
-- Class: primary-user-loop
-- Status: active
-- Description: Mülk bazlı gider kaydı — bakım, tamir, vergi, sigorta, yönetim ücreti vs. Kategori, tutar, tarih.
-- Why it matters: Kâr/zarar hesabı için giderlerin takibi şart.
-- Source: user
-- Primary owning slice: M001/S04
-- Supporting slices: M001/S06
-- Validation: unmapped
-- Notes: Tekrarlayan giderler (aylık/yıllık) ve tek seferlik giderler.
-
-### R009 — Fatura takibi
-- Class: primary-user-loop
-- Status: active
-- Description: Su, elektrik, doğalgaz faturaları — mülk bazlı. Tutar, son ödeme tarihi, ödeme durumu.
-- Why it matters: Fatura son ödeme tarihlerini kaçırmamak.
-- Source: user
-- Primary owning slice: M001/S04
-- Supporting slices: M001/S06
-- Validation: unmapped
-- Notes: Fatura türleri: su, elektrik, doğalgaz, internet, aidat.
-
-### R010 — Döküman yönetimi
+### R010 — Dosya yükleme (tapu, sözleşme, sigorta poliçesi vs.), mülke bağlama, kategorize etme, görüntüleme/indirme.
 - Class: core-capability
 - Status: active
 - Description: Dosya yükleme (tapu, sözleşme, sigorta poliçesi vs.), mülke bağlama, kategorize etme, görüntüleme/indirme.
@@ -116,7 +92,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Basit dosya yükleme — OCR veya akıllı işleme yok.
 
-### R011 — Finansal dashboard
+### R011 — Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
 - Class: primary-user-loop
 - Status: active
 - Description: Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
@@ -127,7 +103,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Kullanıcı sadece kendi erişebildiği mülklerin özetini görür.
 
-### R012 — Bildirim/hatırlatma sistemi
+### R012 — Kira gecikme, fatura son ödeme yaklaşması, sözleşme bitiş tarihi yaklaşması için in-app bildirimler.
 - Class: failure-visibility
 - Status: active
 - Description: Kira gecikme, fatura son ödeme yaklaşması, sözleşme bitiş tarihi yaklaşması için in-app bildirimler.
@@ -138,7 +114,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Şimdilik sadece in-app. Email/push bildirimler deferred (R019).
 
-### R013 — Gelişmiş raporlama
+### R013 — Excel/PDF export, vergi raporu, mülk bazlı ROI hesaplama, dönemsel (aylık/yıllık) gelir-gider özeti.
 - Class: differentiator
 - Status: active
 - Description: Excel/PDF export, vergi raporu, mülk bazlı ROI hesaplama, dönemsel (aylık/yıllık) gelir-gider özeti.
@@ -149,7 +125,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Mülkler arası karşılaştırma da dahil.
 
-### R014 — Multi-currency desteği
+### R014 — TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
 - Class: core-capability
 - Status: active
 - Description: TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
@@ -160,7 +136,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Kur dönüşümü şimdilik scope dışı — raporlarda her para birimi ayrı gösterilir.
 
-### R015 — Kiracı yönetimi
+### R015 — Kiracı bilgileri (isim, telefon, email, TC kimlik), sözleşme başlangıç-bitiş tarihi, depozito bilgisi. Kiracı mülke bağlanır.
 - Class: primary-user-loop
 - Status: active
 - Description: Kiracı bilgileri (isim, telefon, email, TC kimlik), sözleşme başlangıç-bitiş tarihi, depozito bilgisi. Kiracı mülke bağlanır.
@@ -171,7 +147,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Uzun dönem kiracılar için zorunlu, kısa dönem için opsiyonel.
 
-### R022 — Sözleşme yenileme hatırlatması
+### R022 — Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
 - Class: failure-visibility
 - Status: active
 - Description: Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
@@ -182,7 +158,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: R012 bildirim sistemi ile entegre çalışır.
 
-### R023 — Mülk bazlı not/yorum sistemi
+### R023 — Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
 - Class: core-capability
 - Status: active
 - Description: Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
@@ -193,7 +169,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Kronolojik sıralı, tarih damgalı notlar.
 
-### R024 — Kira artış takibi
+### R024 — Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
 - Class: primary-user-loop
 - Status: active
 - Description: Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
@@ -206,11 +182,31 @@ Use it to track what is actively in scope, what has been validated by completed 
 
 ## Validated
 
-(None yet — no slices completed)
+### R008 — Mülk bazlı gider kaydı — bakım, tamir, vergi, sigorta, yönetim ücreti vs. Kategori, tutar, tarih.
+- Class: primary-user-loop
+- Status: validated
+- Description: Mülk bazlı gider kaydı — bakım, tamir, vergi, sigorta, yönetim ücreti vs. Kategori, tutar, tarih.
+- Why it matters: Kâr/zarar hesabı için giderlerin takibi şart.
+- Source: user
+- Primary owning slice: M001/S04
+- Supporting slices: M001/S06
+- Validation: S04 integration tests (8/8 pass) + browser-verified CRUD: expense create/edit/delete with 6 categories, recurring support, multi-currency (EUR). Group access control tested.
+- Notes: Tekrarlayan giderler (aylık/yıllık) ve tek seferlik giderler.
+
+### R009 — Su, elektrik, doğalgaz faturaları — mülk bazlı. Tutar, son ödeme tarihi, ödeme durumu.
+- Class: primary-user-loop
+- Status: validated
+- Description: Su, elektrik, doğalgaz faturaları — mülk bazlı. Tutar, son ödeme tarihi, ödeme durumu.
+- Why it matters: Fatura son ödeme tarihlerini kaçırmamak.
+- Source: user
+- Primary owning slice: M001/S04
+- Supporting slices: M001/S06
+- Validation: S04 integration tests (8/8 pass) + browser-verified CRUD: bill create/edit/delete with 5 types, due date tracking, mark-as-paid status transition, multi-currency (USD). Group access control tested.
+- Notes: Fatura türleri: su, elektrik, doğalgaz, internet, aidat.
 
 ## Deferred
 
-### R016 — Spreadsheet'ten veri import etme
+### R016 — Mevcut Excel/Google Sheets verilerini uygulamaya import etme.
 - Class: operability
 - Status: deferred
 - Description: Mevcut Excel/Google Sheets verilerini uygulamaya import etme.
@@ -221,7 +217,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: M001 tamamlandıktan sonra değerlendirilecek.
 
-### R017 — Mobil uygulama
+### R017 — Native iOS/Android uygulama. Ayrı frontend + backend API mimarisi bunu kolaylaştırır.
 - Class: core-capability
 - Status: deferred
 - Description: Native iOS/Android uygulama. Ayrı frontend + backend API mimarisi bunu kolaylaştırır.
@@ -232,7 +228,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Web app öncelikli. Mobil ilerde.
 
-### R018 — SaaS'a dönüşüm
+### R018 — Multi-tenant mimari, ödeme planları, onboarding akışı.
 - Class: core-capability
 - Status: deferred
 - Description: Multi-tenant mimari, ödeme planları, onboarding akışı.
@@ -243,7 +239,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: unmapped
 - Notes: Çok ileri — M001 ve M002'den sonra.
 
-### R019 — Email/push bildirimler
+### R019 — In-app bildirimlerin yanı sıra email ve/veya push notification.
 - Class: failure-visibility
 - Status: deferred
 - Description: In-app bildirimlerin yanı sıra email ve/veya push notification.
@@ -256,7 +252,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 
 ## Out of Scope
 
-### R020 — Airbnb API entegrasyonu
+### R020 — Airbnb API'si ile otomatik rezervasyon/gelir çekme.
 - Class: integration
 - Status: out-of-scope
 - Description: Airbnb API'si ile otomatik rezervasyon/gelir çekme.
@@ -267,7 +263,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 - Validation: n/a
 - Notes: Kısa dönem kira verileri manuel girilecek (R007).
 
-### R021 — Akıllı döküman işleme (OCR)
+### R021 — Yüklenen belgelerden otomatik bilgi çıkarma (tapu no, sözleşme tarihi vs.)
 - Class: differentiator
 - Status: out-of-scope
 - Description: Yüklenen belgelerden otomatik bilgi çıkarma (tapu no, sözleşme tarihi vs.)
@@ -289,8 +285,8 @@ Use it to track what is actively in scope, what has been validated by completed 
 | R005 | core-capability | active | M001/S01 | none | unmapped |
 | R006 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
 | R007 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
-| R008 | primary-user-loop | active | M001/S04 | M001/S06 | unmapped |
-| R009 | primary-user-loop | active | M001/S04 | M001/S06 | unmapped |
+| R008 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: expense create/edit/delete with 6 categories, recurring support, multi-currency (EUR). Group access control tested. |
+| R009 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: bill create/edit/delete with 5 types, due date tracking, mark-as-paid status transition, multi-currency (USD). Group access control tested. |
 | R010 | core-capability | active | M001/S05 | none | unmapped |
 | R011 | primary-user-loop | active | M001/S06 | none | unmapped |
 | R012 | failure-visibility | active | M001/S06 | none | unmapped |
@@ -309,7 +305,7 @@ Use it to track what is actively in scope, what has been validated by completed 
 
 ## Coverage Summary
 
-- Active requirements: 18
-- Mapped to slices: 18
-- Validated: 0
+- Active requirements: 16
+- Mapped to slices: 16
+- Validated: 2 (R008, R009)
 - Unmapped active requirements: 0

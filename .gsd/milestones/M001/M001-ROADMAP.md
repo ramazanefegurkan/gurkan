@@ -66,7 +66,7 @@ This milestone is complete only when all are true:
 - [x] **S03: Kira & Kiracı Takibi** `risk:high` `depends:[S02]`
   > After this: Uzun dönem kiracı kaydedilir, aylık kira ödeme takibi yapılır, gecikme otomatik algılanır. Kısa dönem rezervasyon kaydedilir. Kira artış takibi çalışır. Frontend'de kira listesi, ödeme durumu ve kiracı bilgileri görünür.
 
-- [ ] **S04: Gider & Fatura Takibi** `risk:low` `depends:[S02]`
+- [x] **S04: Gider & Fatura Takibi** `risk:low` `depends:[S02]`
   > After this: Mülk bazlı gider (bakım, vergi vs.) ve fatura (su, elektrik, doğalgaz, internet, aidat) kaydedilir. Son ödeme tarihi ve ödeme durumu takip edilir. Frontend'de gider ve fatura listeleri çalışır.
 
 - [ ] **S05: Döküman Yönetimi** `risk:low` `depends:[S02]`
