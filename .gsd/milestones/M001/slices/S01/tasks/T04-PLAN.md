@@ -91,3 +91,11 @@ xUnit test projesi oluşturulur ve S01'in tüm demo senaryosu integration test'l
 - `GurkanApi.Tests/IntegrationTests/AuthTests.cs` — 7+ auth test'i
 - `GurkanApi.Tests/IntegrationTests/GroupAccessTests.cs` — 11+ erişim kontrolü test'i
 - Olası bug fix'leri: test'ler kırmızı çıkarsa GurkanApi/ altındaki ilgili dosyalarda düzeltmeler
+
+## Observability Impact
+
+- **New signal:** `dotnet test GurkanApi.Tests/ --filter "Category=S01"` provides a single-command verification of the entire auth + group access control contract (18 tests)
+- **Inspection:** Test output includes structured API log lines (auth succeeded/failed, group access granted/denied) from the in-process test server
+- **Failure visibility:** Any broken auth or access control contract surfaces as a red test with assertion details — no need to manually curl endpoints
+- **Test DB:** `gurkan_test` database on port 5434 is created/dropped per test run; inspect with `docker exec gurkan-postgres psql -U postgres -d gurkan_test`
+
