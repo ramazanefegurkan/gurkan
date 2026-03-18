@@ -50,7 +50,8 @@ public class DocumentsController : ControllerBase
     /// </summary>
     [HttpPost]
     [RequestSizeLimit(25 * 1024 * 1024)]
-    public async Task<IActionResult> Upload(Guid propertyId, [FromForm] IFormFile file, [FromForm] DocumentCategory category)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Upload(Guid propertyId, IFormFile file, [FromForm] DocumentCategory category)
     {
         var userId = User.GetUserId();
         var (allowed, errorResult) = await CheckPropertyAccess(propertyId);

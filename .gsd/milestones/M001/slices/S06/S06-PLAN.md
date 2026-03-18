@@ -46,7 +46,7 @@
 
 ## Tasks
 
-- [ ] **T01: Build Dashboard and Notifications API endpoints** `est:45m`
+- [x] **T01: Build Dashboard and Notifications API endpoints** `est:45m`
   - Why: Core backend — aggregation queries across Tenant→RentPayment, ShortTermRental, Expense, Bill entities with multi-currency grouping and group-based access control. Notification generation logic (late rent, upcoming bills, lease expiry, rent increase) computed at query time. This is the riskiest work in S06.
   - Files: `GurkanApi/Controllers/DashboardController.cs`, `GurkanApi/Controllers/NotificationsController.cs`, `GurkanApi/DTOs/Dashboard/DashboardResponse.cs`, `GurkanApi/DTOs/Notifications/NotificationResponse.cs`
   - Do: Create DTOs for dashboard (portfolio summary per currency + per-property breakdown) and notifications (type, message, severity, propertyId, relatedEntityId). Implement DashboardController GET /api/dashboard with group-filtered property query, aggregate rent payments (join through Tenant), short-term rental income (direct PropertyId), expenses, bills — all grouped by currency. Implement NotificationsController GET /api/notifications with query-time notification generation matching S03's DueDate+5 late detection pattern. Both controllers use `IGroupAccessService.GetUserGroupIdsAsync()` for access control.
