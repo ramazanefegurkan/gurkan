@@ -1,6 +1,8 @@
-namespace GurkanApi.Entities;
+using GurkanApi.Entities;
 
-public class Property
+namespace GurkanApi.DTOs.Properties;
+
+public class PropertyResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -15,11 +17,8 @@ public class Property
     public int? BuildYear { get; set; }
     public Currency Currency { get; set; }
     public string? Description { get; set; }
+    public Guid? GroupId { get; set; }
+    public string? GroupName { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-
-    public Guid? GroupId { get; set; }
-    public Group? Group { get; set; }
-
-    public ICollection<PropertyNote> Notes { get; set; } = new List<PropertyNote>();
 }

@@ -11,3 +11,20 @@ public enum GroupMemberRole
     Admin,
     Member
 }
+
+public enum PropertyType
+{
+    Apartment,
+    House,
+    Shop,
+    Land,
+    Office,
+    Other
+}
+
+public enum Currency
+{
+    TRY,
+    USD,
+    EUR
+}

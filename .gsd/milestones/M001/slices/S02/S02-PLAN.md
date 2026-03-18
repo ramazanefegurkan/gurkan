@@ -42,7 +42,7 @@
 
 ## Tasks
 
-- [ ] **T01: Expand Property entity, add PropertyNote, create controllers and DTOs** `est:45m`
+- [x] **T01: Expand Property entity, add PropertyNote, create controllers and DTOs** `est:45m`
   - Why: Builds the complete property management backend — entity expansion, new PropertyNote entity, Currency/PropertyType enums, EF migration, PropertiesController (5 endpoints) and PropertyNotesController (4 endpoints) with full group-based access control. This is the foundation all downstream slices depend on.
   - Files: `GurkanApi/Entities/Property.cs`, `GurkanApi/Entities/PropertyNote.cs`, `GurkanApi/Entities/Enums.cs`, `GurkanApi/Data/ApplicationDbContext.cs`, `GurkanApi/Controllers/PropertiesController.cs`, `GurkanApi/Controllers/PropertyNotesController.cs`, `GurkanApi/DTOs/Properties/*.cs` (6 DTO files), migration file
   - Do: Expand Property entity with Type, Address, City, District, Area, RoomCount, Floor, TotalFloors, BuildYear, Currency, Description, CreatedAt, UpdatedAt. Add PropertyType and Currency enums to Enums.cs. Create PropertyNote entity. Add DbSet<PropertyNote> and Fluent API config for both expanded Property and PropertyNote in ApplicationDbContext. Run `dotnet ef migrations add AddPropertyFieldsAndNotes`. Build PropertiesController (GET list with group filtering, GET/{id}, POST, PUT/{id}, DELETE/{id}) and PropertyNotesController (GET, POST, PUT/{noteId}, DELETE/{noteId}) following GroupsController patterns. Create all DTO classes. Ensure `dotnet build` passes.

@@ -14,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Group> Groups => Set<Group>();
     public DbSet<GroupMember> GroupMembers => Set<GroupMember>();
     public DbSet<Property> Properties => Set<Property>();
+    public DbSet<PropertyNote> PropertyNotes => Set<PropertyNote>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,11 +73,43 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(p => p.Id);
             entity.Property(p => p.Name).IsRequired().HasMaxLength(300);
+            entity.Property(p => p.Type)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(p => p.Address).IsRequired().HasMaxLength(500);
+            entity.Property(p => p.City).IsRequired().HasMaxLength(100);
+            entity.Property(p => p.District).IsRequired().HasMaxLength(100);
+            entity.Property(p => p.Area).HasColumnType("decimal(18,2)");
+            entity.Property(p => p.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(p => p.Description).HasMaxLength(2000);
+            entity.Property(p => p.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
 
             entity.HasOne(p => p.Group)
                   .WithMany(g => g.Properties)
                   .HasForeignKey(p => p.GroupId)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ---------- PropertyNote ----------
+        modelBuilder.Entity<PropertyNote>(entity =>
+        {
+            entity.HasKey(pn => pn.Id);
+            entity.Property(pn => pn.Content).IsRequired().HasMaxLength(5000);
+            entity.Property(pn => pn.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(pn => pn.Property)
+                  .WithMany(p => p.Notes)
+                  .HasForeignKey(pn => pn.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pn => pn.CreatedByUser)
+                  .WithMany()
+                  .HasForeignKey(pn => pn.CreatedBy)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         // ---------- RefreshToken ----------
