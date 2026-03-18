@@ -71,6 +71,12 @@ Follow existing test patterns from AuthTests.cs and GroupAccessTests.cs: `[Trait
 - `GurkanApi.Tests/IntegrationTests/GroupAccessTests.cs` — pattern reference for group setup and access control testing
 - T01 output: PropertiesController, PropertyNotesController, all DTOs, migration applied
 
+## Observability Impact
+
+- **Test-time signals:** `dotnet test --filter "Category=S02"` outputs per-test pass/fail with names like `PropertyTests.SuperadminCreatesProperty_Returns201`, making failures immediately attributable to a specific API contract.
+- **Inspection surface:** Test output includes EF Core SQL logs showing the exact queries executed (INSERT, SELECT, DELETE on Properties/PropertyNotes tables), useful for diagnosing data-layer issues.
+- **Failure visibility:** A failing test names the exact endpoint + expected status code (e.g., "expected 201, got 403"), making it clear whether the issue is access control, routing, or data.
+
 ## Expected Output
 
 - `GurkanApi.Tests/IntegrationTests/TestFixture.cs` — TRUNCATE list updated

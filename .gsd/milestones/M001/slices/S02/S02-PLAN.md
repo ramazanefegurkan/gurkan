@@ -49,7 +49,7 @@
   - Verify: `dotnet build GurkanApi/` succeeds; Swagger UI shows new endpoints
   - Done when: Both controllers compile, migration is generated, all 9 new endpoints are registered
 
-- [ ] **T02: Integration tests for property and notes API** `est:30m`
+- [x] **T02: Integration tests for property and notes API** `est:30m`
   - Why: Proves the backend contract — CRUD works, group filtering enforces access control, multi-currency persists correctly, notes attach to properties. This is the objective verification that S02 backend is correct before building the frontend.
   - Files: `GurkanApi.Tests/IntegrationTests/PropertyTests.cs`, `GurkanApi.Tests/IntegrationTests/TestFixture.cs`
   - Do: Add `"PropertyNotes"` to TRUNCATE list in TestFixture.cs (before "Properties" for FK ordering). Create PropertyTests.cs with `[Trait("Category", "S02")]` covering: superadmin creates property → 201; group admin creates property in own group → 201; member lists properties → sees only own group; member cannot access other group's property → 403; property update → 200; property delete → 204; create properties with TRY/USD/EUR → correct currency in response; note CRUD on a property; member cannot add note to other group's property → 403. Follow existing test patterns from AuthTests.cs and GroupAccessTests.cs (IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime, LoginAsAsync, ApiJsonOptions).

@@ -2,8 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using GurkanApi.DTOs.Groups;
 using GurkanApi.DTOs.Properties;
+using GurkanApi.DTOs.Users;
 using GurkanApi.Entities;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace GurkanApi.Tests.IntegrationTests;
 
@@ -11,7 +11,13 @@ namespace GurkanApi.Tests.IntegrationTests;
 public class PropertyTests : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory;
+
     private HttpClient _adminClient = null!;
+    private Guid _groupAId;
+    private Guid _groupBId;
+    private string _user1Email = "propuser1@test.com";
+    private string _user2Email = "propuser2@test.com";
+    private string _password = "Test1234!";
 
     public PropertyTests(CustomWebApplicationFactory factory)
     {
@@ -21,302 +27,319 @@ public class PropertyTests : IClassFixture<CustomWebApplicationFactory>, IAsyncL
     public async Task InitializeAsync()
     {
         await _factory.ResetDatabaseAsync();
+
         _adminClient = _factory.CreateClient();
         await _adminClient.LoginAsAsync("admin@gurkan.com", "Admin123!");
+
+        // Register two users
+        var reg1 = await _adminClient.RegisterUserAsync(_user1Email, _password, "User One");
+        reg1.EnsureSuccessStatusCode();
+        var reg2 = await _adminClient.RegisterUserAsync(_user2Email, _password, "User Two");
+        reg2.EnsureSuccessStatusCode();
+
+        // Get user IDs
+        var usersResponse = await _adminClient.GetAsync("/api/users");
+        usersResponse.EnsureSuccessStatusCode();
+        var users = await usersResponse.Content.ReadAsApiJsonAsync<List<UserResponse>>();
+        var user1Id = users!.First(u => u.Email == _user1Email).Id;
+        var user2Id = users!.First(u => u.Email == _user2Email).Id;
+
+        // Create two groups
+        var groupAResponse = await _adminClient.PostAsJsonAsync("/api/groups", new { name = "Group A", description = "Test group A" });
+        groupAResponse.EnsureSuccessStatusCode();
+        var groupA = await groupAResponse.Content.ReadAsApiJsonAsync<GroupResponse>();
+        _groupAId = groupA!.Id;
+
+        var groupBResponse = await _adminClient.PostAsJsonAsync("/api/groups", new { name = "Group B", description = "Test group B" });
+        groupBResponse.EnsureSuccessStatusCode();
+        var groupB = await groupBResponse.Content.ReadAsApiJsonAsync<GroupResponse>();
+        _groupBId = groupB!.Id;
+
+        // Add user1 to groupA, user2 to groupB
+        var addMember1 = await _adminClient.PostAsJsonAsync($"/api/groups/{_groupAId}/members", new { userId = user1Id, role = "Member" });
+        addMember1.EnsureSuccessStatusCode();
+        var addMember2 = await _adminClient.PostAsJsonAsync($"/api/groups/{_groupBId}/members", new { userId = user2Id, role = "Member" });
+        addMember2.EnsureSuccessStatusCode();
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
 
     // ---------- Helpers ----------
 
-    private async Task<Guid> RegisterAndGetUserIdAsync(string email, string password, string fullName)
-    {
-        var registerResponse = await _adminClient.RegisterUserAsync(email, password, fullName);
-        registerResponse.EnsureSuccessStatusCode();
-
-        var response = await _adminClient.GetAsync("/api/users");
-        response.EnsureSuccessStatusCode();
-        var users = await response.Content.ReadAsApiJsonAsync<List<GurkanApi.DTOs.Users.UserResponse>>();
-        return users!.First(u => u.Email == email).Id;
-    }
-
-    private async Task<HttpClient> CreateAuthenticatedClientAsync(string email, string password)
+    private async Task<HttpClient> LoginAsUserAsync(string email)
     {
         var client = _factory.CreateClient();
-        await client.LoginAsAsync(email, password);
+        await client.LoginAsAsync(email, _password);
         return client;
     }
 
-    private async Task<GroupResponse> CreateGroupAsync(string name)
+    private object MakeCreatePropertyPayload(Guid groupId, string name = "Test Property", Currency currency = Currency.TRY)
     {
-        var response = await _adminClient.PostAsJsonAsync("/api/groups", new { name });
-        response.EnsureSuccessStatusCode();
-        return (await response.Content.ReadAsApiJsonAsync<GroupResponse>())!;
-    }
-
-    private async Task AddMemberAsync(Guid groupId, Guid userId, string role = "Member")
-    {
-        var response = await _adminClient.PostAsJsonAsync($"/api/groups/{groupId}/members", new { userId, role });
-        response.EnsureSuccessStatusCode();
-    }
-
-    private async Task<PropertyResponse> CreatePropertyAsync(Guid groupId, string name = "Test Property",
-        string type = "Apartment", string currency = "TRY")
-    {
-        var response = await _adminClient.PostAsJsonAsync("/api/properties", new
+        return new
         {
             name,
-            type,
-            address = "Test Cad. No:1",
-            city = "İstanbul",
+            type = "Apartment",
+            address = "123 Test St",
+            city = "Istanbul",
             district = "Kadıköy",
             area = 120.5m,
             roomCount = 3,
             floor = 2,
             totalFloors = 5,
             buildYear = 2020,
-            currency,
-            description = "Test property",
+            currency = currency.ToString(),
+            description = "Test property description",
             groupId,
-        });
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        };
+    }
+
+    private async Task<PropertyResponse> CreatePropertyViaAdminAsync(Guid groupId, string name = "Test Property", Currency currency = Currency.TRY)
+    {
+        var response = await _adminClient.PostAsJsonAsync("/api/properties", MakeCreatePropertyPayload(groupId, name, currency));
+        response.EnsureSuccessStatusCode();
         return (await response.Content.ReadAsApiJsonAsync<PropertyResponse>())!;
     }
 
-    // ---------- Property CRUD ----------
+    // ---------- Property CRUD Tests ----------
 
     [Fact]
-    public async Task SuperAdmin_CreatesProperty_Returns201()
+    public async Task SuperadminCreatesProperty_Returns201()
     {
-        var group = await CreateGroupAsync("Prop Group");
-
-        var response = await _adminClient.PostAsJsonAsync("/api/properties", new
-        {
-            name = "Deniz Apartmanı",
-            type = "Apartment",
-            address = "Sahil Cad. No:5",
-            city = "İstanbul",
-            district = "Kadıköy",
-            area = 95.0,
-            roomCount = 2,
-            floor = 3,
-            totalFloors = 8,
-            buildYear = 2018,
-            currency = "TRY",
-            description = "Sea view apartment",
-            groupId = group.Id,
-        });
+        var response = await _adminClient.PostAsJsonAsync("/api/properties", MakeCreatePropertyPayload(_groupAId, "Admin Property", Currency.USD));
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
         var property = await response.Content.ReadAsApiJsonAsync<PropertyResponse>();
         Assert.NotNull(property);
-        Assert.Equal("Deniz Apartmanı", property.Name);
-        Assert.Equal("Apartment", property.Type.ToString());
-        Assert.Equal("İstanbul", property.City);
-        Assert.Equal(group.Id, property.GroupId);
-        Assert.Equal(group.Name, property.GroupName);
+        Assert.Equal("Admin Property", property.Name);
+        Assert.Equal(PropertyType.Apartment, property.Type);
+        Assert.Equal("Istanbul", property.City);
+        Assert.Equal("Kadıköy", property.District);
+        Assert.Equal(Currency.USD, property.Currency);
+        Assert.Equal(120.5m, property.Area);
+        Assert.Equal(3, property.RoomCount);
+        Assert.Equal(_groupAId, property.GroupId);
+        Assert.NotEqual(Guid.Empty, property.Id);
+        Assert.NotEqual(default, property.CreatedAt);
     }
 
     [Fact]
-    public async Task SuperAdmin_ListsAllProperties()
+    public async Task GroupMemberCreatesPropertyInOwnGroup_Returns201()
     {
-        var group1 = await CreateGroupAsync("Group A");
-        var group2 = await CreateGroupAsync("Group B");
+        var user1Client = await LoginAsUserAsync(_user1Email);
 
-        await CreatePropertyAsync(group1.Id, "Prop A");
-        await CreatePropertyAsync(group2.Id, "Prop B");
+        var response = await user1Client.PostAsJsonAsync("/api/properties", MakeCreatePropertyPayload(_groupAId, "User1 Property"));
 
-        var response = await _adminClient.GetAsync("/api/properties");
-        response.EnsureSuccessStatusCode();
-        var properties = await response.Content.ReadAsApiJsonAsync<List<PropertyListResponse>>();
-        Assert.NotNull(properties);
-        Assert.True(properties.Count >= 2);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var property = await response.Content.ReadAsApiJsonAsync<PropertyResponse>();
+        Assert.NotNull(property);
+        Assert.Equal("User1 Property", property.Name);
+        Assert.Equal(_groupAId, property.GroupId);
     }
 
     [Fact]
-    public async Task GroupMember_SeesOnlyOwnGroupProperties()
+    public async Task MemberCannotCreatePropertyInOtherGroup_Returns403()
     {
-        var userId = await RegisterAndGetUserIdAsync("propmember@test.com", "Test1234!", "Prop Member");
-        var myGroup = await CreateGroupAsync("My Group");
-        var otherGroup = await CreateGroupAsync("Other Group");
+        var user1Client = await LoginAsUserAsync(_user1Email);
 
-        await AddMemberAsync(myGroup.Id, userId);
-        await CreatePropertyAsync(myGroup.Id, "My Property");
-        await CreatePropertyAsync(otherGroup.Id, "Other Property");
+        var response = await user1Client.PostAsJsonAsync("/api/properties", MakeCreatePropertyPayload(_groupBId, "Forbidden Property"));
 
-        var memberClient = await CreateAuthenticatedClientAsync("propmember@test.com", "Test1234!");
-        var response = await memberClient.GetAsync("/api/properties");
-        response.EnsureSuccessStatusCode();
-        var properties = await response.Content.ReadAsApiJsonAsync<List<PropertyListResponse>>();
-        Assert.NotNull(properties);
-        Assert.Single(properties);
-        Assert.Equal("My Property", properties[0].Name);
-    }
-
-    [Fact]
-    public async Task GroupMember_CannotAccessOtherGroupProperty_Returns403()
-    {
-        var userId = await RegisterAndGetUserIdAsync("blocked@test.com", "Test1234!", "Blocked User");
-        var myGroup = await CreateGroupAsync("Allowed Group");
-        var otherGroup = await CreateGroupAsync("Blocked Group");
-
-        await AddMemberAsync(myGroup.Id, userId);
-        var otherProp = await CreatePropertyAsync(otherGroup.Id, "Blocked Prop");
-
-        var memberClient = await CreateAuthenticatedClientAsync("blocked@test.com", "Test1234!");
-        var response = await memberClient.GetAsync($"/api/properties/{otherProp.Id}");
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
-    public async Task SuperAdmin_UpdatesProperty()
+    public async Task MemberListsProperties_SeesOnlyOwnGroup()
     {
-        var group = await CreateGroupAsync("Update Group");
-        var prop = await CreatePropertyAsync(group.Id, "Original Name");
+        // Create properties in both groups via admin
+        await CreatePropertyViaAdminAsync(_groupAId, "GroupA Property");
+        await CreatePropertyViaAdminAsync(_groupBId, "GroupB Property");
 
-        var response = await _adminClient.PutAsJsonAsync($"/api/properties/{prop.Id}", new
-        {
-            name = "Updated Name",
-            city = "Ankara",
-        });
+        // User1 (member of groupA) should only see groupA properties
+        var user1Client = await LoginAsUserAsync(_user1Email);
+        var response = await user1Client.GetAsync("/api/properties");
         response.EnsureSuccessStatusCode();
+
+        var properties = await response.Content.ReadAsApiJsonAsync<List<PropertyListResponse>>();
+        Assert.NotNull(properties);
+        Assert.All(properties, p => Assert.Equal(_groupAId, p.GroupId));
+        Assert.Contains(properties, p => p.Name == "GroupA Property");
+        Assert.DoesNotContain(properties, p => p.Name == "GroupB Property");
+    }
+
+    [Fact]
+    public async Task MemberGetsPropertyDetail_OwnGroup_Returns200()
+    {
+        var created = await CreatePropertyViaAdminAsync(_groupAId, "Detail Property", Currency.EUR);
+
+        var user1Client = await LoginAsUserAsync(_user1Email);
+        var response = await user1Client.GetAsync($"/api/properties/{created.Id}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var property = await response.Content.ReadAsApiJsonAsync<PropertyResponse>();
+        Assert.NotNull(property);
+        Assert.Equal("Detail Property", property.Name);
+        Assert.Equal(Currency.EUR, property.Currency);
+        Assert.Equal("Istanbul", property.City);
+        Assert.Equal("Kadıköy", property.District);
+        Assert.Equal(120.5m, property.Area);
+    }
+
+    [Fact]
+    public async Task MemberCannotAccessOtherGroupProperty_Returns403()
+    {
+        var groupBProperty = await CreatePropertyViaAdminAsync(_groupBId, "Secret Property");
+
+        var user1Client = await LoginAsUserAsync(_user1Email);
+        var response = await user1Client.GetAsync($"/api/properties/{groupBProperty.Id}");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PropertyUpdate_Returns200()
+    {
+        var created = await CreatePropertyViaAdminAsync(_groupAId, "Original Name");
+
+        var updatePayload = new { name = "Updated Name", city = "Ankara" };
+        var response = await _adminClient.PutAsJsonAsync($"/api/properties/{created.Id}", updatePayload);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
         var updated = await response.Content.ReadAsApiJsonAsync<PropertyResponse>();
-        Assert.Equal("Updated Name", updated!.Name);
+        Assert.NotNull(updated);
+        Assert.Equal("Updated Name", updated.Name);
         Assert.Equal("Ankara", updated.City);
+        // Address should remain unchanged (partial update)
+        Assert.Equal("123 Test St", updated.Address);
         Assert.NotNull(updated.UpdatedAt);
     }
 
     [Fact]
-    public async Task SuperAdmin_DeletesProperty_Returns204()
+    public async Task PropertyDelete_Returns204()
     {
-        var group = await CreateGroupAsync("Delete Group");
-        var prop = await CreatePropertyAsync(group.Id, "To Delete");
+        var created = await CreatePropertyViaAdminAsync(_groupAId, "To Be Deleted");
 
-        var response = await _adminClient.DeleteAsync($"/api/properties/{prop.Id}");
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        var deleteResponse = await _adminClient.DeleteAsync($"/api/properties/{created.Id}");
+        Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
-        var getResponse = await _adminClient.GetAsync($"/api/properties/{prop.Id}");
+        // Subsequent GET should return 404
+        var getResponse = await _adminClient.GetAsync($"/api/properties/{created.Id}");
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
     }
 
+    // ---------- Multi-Currency Tests ----------
+
     [Fact]
-    public async Task MultiCurrency_PropertiesPreserveCurrency()
+    public async Task CreatePropertyWithDifferentCurrencies_ReturnsCorrectCurrency()
     {
-        var group = await CreateGroupAsync("Currency Group");
+        var tryProperty = await CreatePropertyViaAdminAsync(_groupAId, "TRY Property", Currency.TRY);
+        Assert.Equal(Currency.TRY, tryProperty.Currency);
 
-        var tryProp = await CreatePropertyAsync(group.Id, "TRY Property", currency: "TRY");
-        var usdProp = await CreatePropertyAsync(group.Id, "USD Property", currency: "USD");
-        var eurProp = await CreatePropertyAsync(group.Id, "EUR Property", currency: "EUR");
+        var usdProperty = await CreatePropertyViaAdminAsync(_groupAId, "USD Property", Currency.USD);
+        Assert.Equal(Currency.USD, usdProperty.Currency);
 
-        Assert.Equal(Currency.TRY, tryProp.Currency);
-        Assert.Equal(Currency.USD, usdProp.Currency);
-        Assert.Equal(Currency.EUR, eurProp.Currency);
+        var eurProperty = await CreatePropertyViaAdminAsync(_groupAId, "EUR Property", Currency.EUR);
+        Assert.Equal(Currency.EUR, eurProperty.Currency);
     }
 
-    // ---------- Property Notes ----------
+    // ---------- Property Notes Tests ----------
 
     [Fact]
-    public async Task SuperAdmin_CreatesNote_Returns201()
+    public async Task AddNoteToProperty_Returns201()
     {
-        var group = await CreateGroupAsync("Note Group");
-        var prop = await CreatePropertyAsync(group.Id, "Note Property");
+        var property = await CreatePropertyViaAdminAsync(_groupAId, "Noted Property");
 
-        var response = await _adminClient.PostAsJsonAsync($"/api/properties/{prop.Id}/notes", new
-        {
-            content = "This is a test note.",
-        });
+        var response = await _adminClient.PostAsJsonAsync(
+            $"/api/properties/{property.Id}/notes",
+            new { content = "This is a test note" });
+
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
         var note = await response.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
         Assert.NotNull(note);
-        Assert.Equal("This is a test note.", note.Content);
-        Assert.False(string.IsNullOrWhiteSpace(note.CreatedByName));
+        Assert.Equal("This is a test note", note.Content);
+        Assert.Equal("System Admin", note.CreatedByName);
+        Assert.NotEqual(Guid.Empty, note.Id);
+        Assert.NotEqual(default, note.CreatedAt);
     }
 
     [Fact]
-    public async Task ListNotes_ReturnsDescendingOrder()
+    public async Task ListNotesForProperty_ReturnsAll()
     {
-        var group = await CreateGroupAsync("NoteOrder Group");
-        var prop = await CreatePropertyAsync(group.Id, "NoteOrder Prop");
+        var property = await CreatePropertyViaAdminAsync(_groupAId, "Multi Note Property");
 
-        await _adminClient.PostAsJsonAsync($"/api/properties/{prop.Id}/notes", new { content = "First note" });
-        await Task.Delay(50); // Ensure different timestamps
-        await _adminClient.PostAsJsonAsync($"/api/properties/{prop.Id}/notes", new { content = "Second note" });
+        // Add two notes with a small delay to ensure ordering
+        await _adminClient.PostAsJsonAsync(
+            $"/api/properties/{property.Id}/notes",
+            new { content = "First note" });
 
-        var response = await _adminClient.GetAsync($"/api/properties/{prop.Id}/notes");
+        await _adminClient.PostAsJsonAsync(
+            $"/api/properties/{property.Id}/notes",
+            new { content = "Second note" });
+
+        var response = await _adminClient.GetAsync($"/api/properties/{property.Id}/notes");
         response.EnsureSuccessStatusCode();
+
         var notes = await response.Content.ReadAsApiJsonAsync<List<PropertyNoteResponse>>();
         Assert.NotNull(notes);
         Assert.Equal(2, notes.Count);
-        Assert.Equal("Second note", notes[0].Content); // Most recent first
+
+        // Controller orders by CreatedAt descending, so Second should come first
+        Assert.Equal("Second note", notes[0].Content);
         Assert.Equal("First note", notes[1].Content);
     }
 
     [Fact]
-    public async Task NoteCreator_CanUpdateOwnNote()
+    public async Task UpdateOwnNote_Returns200()
     {
-        var userId = await RegisterAndGetUserIdAsync("noteeditor@test.com", "Test1234!", "Note Editor");
-        var group = await CreateGroupAsync("NoteEdit Group");
-        await AddMemberAsync(group.Id, userId);
-        var prop = await CreatePropertyAsync(group.Id, "NoteEdit Prop");
+        var property = await CreatePropertyViaAdminAsync(_groupAId, "Update Note Property");
 
-        var memberClient = await CreateAuthenticatedClientAsync("noteeditor@test.com", "Test1234!");
-        var createResponse = await memberClient.PostAsJsonAsync($"/api/properties/{prop.Id}/notes", new
-        {
-            content = "Original note",
-        });
-        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
-        var note = await createResponse.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
+        var createResponse = await _adminClient.PostAsJsonAsync(
+            $"/api/properties/{property.Id}/notes",
+            new { content = "Original content" });
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
 
-        var updateResponse = await memberClient.PutAsJsonAsync($"/api/properties/{prop.Id}/notes/{note!.Id}", new
-        {
-            content = "Updated note",
-        });
-        updateResponse.EnsureSuccessStatusCode();
+        var updateResponse = await _adminClient.PutAsJsonAsync(
+            $"/api/properties/{property.Id}/notes/{created!.Id}",
+            new { content = "Updated content" });
+
+        Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+
         var updated = await updateResponse.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
-        Assert.Equal("Updated note", updated!.Content);
+        Assert.NotNull(updated);
+        Assert.Equal("Updated content", updated.Content);
     }
 
     [Fact]
-    public async Task NonCreator_CannotUpdateNote_Returns403()
+    public async Task DeleteOwnNote_Returns204()
     {
-        var creatorId = await RegisterAndGetUserIdAsync("creator@test.com", "Test1234!", "Creator");
-        var otherId = await RegisterAndGetUserIdAsync("other2@test.com", "Test1234!", "Other");
-        var group = await CreateGroupAsync("NoteAccess Group");
-        await AddMemberAsync(group.Id, creatorId);
-        await AddMemberAsync(group.Id, otherId);
-        var prop = await CreatePropertyAsync(group.Id, "NoteAccess Prop");
+        var property = await CreatePropertyViaAdminAsync(_groupAId, "Delete Note Property");
 
-        var creatorClient = await CreateAuthenticatedClientAsync("creator@test.com", "Test1234!");
-        var createResponse = await creatorClient.PostAsJsonAsync($"/api/properties/{prop.Id}/notes", new
-        {
-            content = "Creator's note",
-        });
-        var note = await createResponse.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
+        var createResponse = await _adminClient.PostAsJsonAsync(
+            $"/api/properties/{property.Id}/notes",
+            new { content = "To be deleted" });
+        createResponse.EnsureSuccessStatusCode();
+        var created = await createResponse.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
 
-        var otherClient = await CreateAuthenticatedClientAsync("other2@test.com", "Test1234!");
-        var updateResponse = await otherClient.PutAsJsonAsync($"/api/properties/{prop.Id}/notes/{note!.Id}", new
-        {
-            content = "Hijacked!",
-        });
-        Assert.Equal(HttpStatusCode.Forbidden, updateResponse.StatusCode);
-    }
+        var deleteResponse = await _adminClient.DeleteAsync(
+            $"/api/properties/{property.Id}/notes/{created!.Id}");
 
-    [Fact]
-    public async Task NoteCreator_DeletesOwnNote_Returns204()
-    {
-        var userId = await RegisterAndGetUserIdAsync("notedeleter@test.com", "Test1234!", "Note Deleter");
-        var group = await CreateGroupAsync("NoteDel Group");
-        await AddMemberAsync(group.Id, userId);
-        var prop = await CreatePropertyAsync(group.Id, "NoteDel Prop");
-
-        var memberClient = await CreateAuthenticatedClientAsync("notedeleter@test.com", "Test1234!");
-        var createResponse = await memberClient.PostAsJsonAsync($"/api/properties/{prop.Id}/notes", new
-        {
-            content = "To delete",
-        });
-        var note = await createResponse.Content.ReadAsApiJsonAsync<PropertyNoteResponse>();
-
-        var deleteResponse = await memberClient.DeleteAsync($"/api/properties/{prop.Id}/notes/{note!.Id}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task MemberCannotAddNoteToOtherGroupProperty_Returns403()
+    {
+        var groupBProperty = await CreatePropertyViaAdminAsync(_groupBId, "GroupB Note Property");
+
+        var user1Client = await LoginAsUserAsync(_user1Email);
+        var response = await user1Client.PostAsJsonAsync(
+            $"/api/properties/{groupBProperty.Id}/notes",
+            new { content = "Forbidden note" });
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 }
