@@ -54,7 +54,7 @@
   - Verify: `dotnet build GurkanApi/` compiles without errors. `dotnet ef database update --project GurkanApi/` applies migration successfully.
   - Done when: All 4 tables exist in DB with correct columns, FKs, and constraints. `dotnet build` clean.
 
-- [ ] **T02: Build all controllers and DTOs with business logic** `est:1h30m`
+- [x] **T02: Build all controllers and DTOs with business logic** `est:1h30m`
   - Why: The API surface — 4 controllers with ~16 endpoints covering tenant lifecycle, payment management, short-term rentals, and rent increases. Includes the core business logic: automatic payment generation, active tenant enforcement, late detection at query time, termination with payment cancellation, rent increase propagation.
   - Files: `GurkanApi/Controllers/TenantsController.cs`, `GurkanApi/Controllers/RentPaymentsController.cs`, `GurkanApi/Controllers/ShortTermRentalsController.cs`, `GurkanApi/Controllers/RentIncreasesController.cs`, `GurkanApi/DTOs/Tenants/`, `GurkanApi/DTOs/RentPayments/`, `GurkanApi/DTOs/ShortTermRentals/`, `GurkanApi/DTOs/RentIncreases/`
   - Do: TenantsController — CRUD + active tenant enforcement + auto-generate monthly RentPayment records on create + POST terminate endpoint (sets IsActive=false, marks future Pending payments as Cancelled). RentPaymentsController — list with computed late status (Pending + DueDate+5days < now → Late in response), PATCH pay action (set PaidDate + PaymentMethod + Status=Paid). ShortTermRentalsController — straightforward CRUD with date overlap validation. RentIncreasesController — POST creates increase record + updates future Pending payment amounts. All controllers follow PropertyNotesController nested route pattern, check property access first via IGroupAccessService.
