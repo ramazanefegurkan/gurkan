@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import Dashboard from './pages/Dashboard/Dashboard';
+import NotificationList from './pages/Notifications/NotificationList';
 import PropertyList from './pages/Properties/PropertyList';
 import PropertyForm from './pages/Properties/PropertyForm';
 import PropertyDetail from './pages/Properties/PropertyDetail';
@@ -54,7 +56,9 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/properties" replace />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/notifications" element={<NotificationList />} />
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/new" element={<PropertyForm />} />
         <Route path="/properties/:id/edit" element={<PropertyForm />} />
@@ -80,7 +84,7 @@ function AppRoutes() {
       </Route>
 
       {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/properties" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }

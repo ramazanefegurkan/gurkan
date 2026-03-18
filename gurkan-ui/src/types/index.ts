@@ -452,6 +452,100 @@ export interface DocumentResponse {
   uploadedAt: string;
 }
 
+// ── Dashboard ──────────────────────────────────────
+
+export interface CurrencyAmount {
+  currency: Currency;
+  amount: number;
+}
+
+export interface CurrencySummary {
+  currency: Currency;
+  totalIncome: number;
+  totalExpenses: number;
+  totalProfit: number;
+  unpaidRentCount: number;
+  upcomingBillCount: number;
+}
+
+export interface PropertyFinancials {
+  propertyId: string;
+  propertyName: string;
+  propertyType: PropertyType;
+  currency: Currency;
+  income: CurrencyAmount[];
+  expenses: CurrencyAmount[];
+  profit: CurrencyAmount[];
+  unpaidRentCount: number;
+  upcomingBillCount: number;
+}
+
+export interface DashboardResponse {
+  summary: CurrencySummary[];
+  properties: PropertyFinancials[];
+}
+
+// ── Notifications ─────────────────────────────────
+
+export const NotificationType = {
+  LateRent: 'LateRent',
+  UpcomingBill: 'UpcomingBill',
+  LeaseExpiry: 'LeaseExpiry',
+  RentIncrease: 'RentIncrease',
+} as const;
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
+
+export const NotificationTypeLabels: Record<NotificationType, string> = {
+  [NotificationType.LateRent]: 'Kira Gecikmesi',
+  [NotificationType.UpcomingBill]: 'Fatura Hatırlatması',
+  [NotificationType.LeaseExpiry]: 'Sözleşme Bitişi',
+  [NotificationType.RentIncrease]: 'Kira Artışı',
+};
+
+export const NotificationSeverity = {
+  Critical: 'Critical',
+  Warning: 'Warning',
+  Info: 'Info',
+} as const;
+
+export type NotificationSeverity = (typeof NotificationSeverity)[keyof typeof NotificationSeverity];
+
+export interface NotificationItem {
+  type: NotificationType;
+  severity: NotificationSeverity;
+  message: string;
+  propertyId: string;
+  propertyName: string;
+  relatedEntityId: string | null;
+  date: string;
+}
+
+// ── Reports ───────────────────────────────────────
+
+export interface PropertyReport {
+  propertyId: string;
+  propertyName: string;
+  propertyType: PropertyType;
+  city: string;
+  currency: Currency;
+  rentIncome: number;
+  shortTermIncome: number;
+  totalIncome: number;
+  expenseTotal: number;
+  billTotal: number;
+  totalExpenses: number;
+  profit: number;
+  roi: number | null;
+}
+
+export interface ProfitLossReport {
+  generatedAt: string;
+  period: string;
+  summary: { currency: Currency; totalIncome: number; totalExpenses: number; totalProfit: number }[];
+  properties: PropertyReport[];
+}
+
 // ── Groups ───────────────────────────────────────────
 
 export interface GroupResponse {

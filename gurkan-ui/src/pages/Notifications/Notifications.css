@@ -1,0 +1,136 @@
+/* ── Notifications Page ────────────────────────────── */
+
+.notifications-page {
+  max-width: 800px;
+}
+
+/* ── Notification list ────────────────────────────── */
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Notification card ────────────────────────────── */
+
+.notification-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  border-left: 4px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.15s ease;
+}
+
+.notification-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.notification-card--critical {
+  border-left-color: var(--danger);
+}
+
+.notification-card--warning {
+  border-left-color: #c48c2a;
+}
+
+.notification-card--info {
+  border-left-color: #3a6fa5;
+}
+
+/* ── Card top row ─────────────────────────────────── */
+
+.notification-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.severity-badge--Critical {
+  background: #fdf2f2;
+  color: var(--danger);
+}
+
+.severity-badge--Warning {
+  background: #fef8f0;
+  color: #9a6c20;
+}
+
+.severity-badge--Info {
+  background: #f0f4fa;
+  color: #3a6fa5;
+}
+
+.notification-type {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ── Message ──────────────────────────────────────── */
+
+.notification-message {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ── Meta row ─────────────────────────────────────── */
+
+.notification-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.notification-property-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.notification-property-link:hover {
+  color: var(--accent);
+}
+
+.notification-date {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+
+@media (max-width: 480px) {
+  .notification-card {
+    padding: 16px 18px;
+  }
+
+  .notification-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}

@@ -25,6 +25,9 @@ import type {
   CreateBillRequest,
   UpdateBillRequest,
   DocumentResponse,
+  DashboardResponse,
+  NotificationItem,
+  ProfitLossReport,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -500,6 +503,54 @@ export async function deleteDocument(
   documentId: string,
 ): Promise<void> {
   await api.delete(`/properties/${propertyId}/documents/${documentId}`);
+}
+
+// ── Dashboard ────────────────────────────────────────
+
+export async function getDashboard(): Promise<DashboardResponse> {
+  const { data } = await api.get<DashboardResponse>('/dashboard');
+  return data;
+}
+
+// ── Notifications ────────────────────────────────────
+
+export async function getNotifications(): Promise<NotificationItem[]> {
+  const { data } = await api.get<NotificationItem[]>('/notifications');
+  return data;
+}
+
+// ── Reports ──────────────────────────────────────────
+
+export async function getProfitLossReport(year?: number): Promise<ProfitLossReport> {
+  const params = year ? { year } : {};
+  const { data } = await api.get<ProfitLossReport>('/reports/profit-loss', { params });
+  return data;
+}
+
+export async function exportExcel(): Promise<void> {
+  const { data } = await api.get('/reports/export/excel', { responseType: 'blob' });
+  const blob = new Blob([data]);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'portfoy-raporu.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+export async function exportPdf(): Promise<void> {
+  const { data } = await api.get('/reports/export/pdf', { responseType: 'blob' });
+  const blob = new Blob([data]);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'portfoy-raporu.pdf';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 export default api;

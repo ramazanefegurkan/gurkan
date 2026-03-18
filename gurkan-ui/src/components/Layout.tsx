@@ -16,6 +16,26 @@ export default function Layout() {
 
         <nav className="sidebar-nav">
           <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? 'nav-item--active' : ''}`
+            }
+          >
+            <svg
+              className="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="4" rx="1" />
+              <rect x="14" y="11" width="7" height="10" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Dashboard
+          </NavLink>
+          <NavLink
             to="/properties"
             className={({ isActive }) =>
               `nav-item ${isActive ? 'nav-item--active' : ''}`
@@ -32,6 +52,24 @@ export default function Layout() {
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
             Mülkler
+          </NavLink>
+          <NavLink
+            to="/notifications"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? 'nav-item--active' : ''}`
+            }
+          >
+            <svg
+              className="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 01-3.46 0" />
+            </svg>
+            Bildirimler
           </NavLink>
         </nav>
 

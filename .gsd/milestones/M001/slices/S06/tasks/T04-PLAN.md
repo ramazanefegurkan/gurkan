@@ -298,3 +298,11 @@ Build the complete frontend for S06: TypeScript interfaces for dashboard/notific
 - `gurkan-ui/src/pages/Dashboard/Dashboard.css` — new, ~150 lines
 - `gurkan-ui/src/pages/Notifications/NotificationList.tsx` — new, ~120 lines
 - `gurkan-ui/src/pages/Notifications/Notifications.css` — new, ~80 lines
+
+## Observability Impact
+
+- **Frontend network requests:** Browser DevTools Network tab shows requests to `/api/dashboard`, `/api/notifications`, `/api/reports/export/excel`, `/api/reports/export/pdf` — inspect HTTP status codes, payloads, and timing
+- **Inspection surfaces:** Dashboard page renders live aggregated data from backend APIs, so all backend structured logs from T01/T02 apply (Dashboard/Notifications/Reports controller logging)
+- **Failure visibility:** API errors surface as error banner in UI ("Dashboard verileri yüklenirken bir hata oluştu"), export failures show browser alert dialog with format name
+- **Export state:** Export buttons show spinner during download, disabled state prevents double-clicks — inspect `exporting` state in React DevTools
+- **Navigation:** Default authenticated route changed from `/properties` to `/dashboard` — visible in URL bar after login
