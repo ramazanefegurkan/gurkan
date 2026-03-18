@@ -53,7 +53,7 @@
   - Verify: `dotnet build GurkanApi/` compiles, Swagger shows both endpoints with correct response schemas
   - Done when: GET /api/dashboard returns per-property financial summary grouped by currency; GET /api/notifications returns computed notification list with correct triggers
 
-- [ ] **T02: Build Reports API with Excel and PDF export** `est:45m`
+- [x] **T02: Build Reports API with Excel and PDF export** `est:45m`
   - Why: Report export (Excel/PDF) with profit/loss and ROI is a key requirement (R013). Adds ClosedXML and QuestPDF NuGet packages. Reuses dashboard aggregation pattern for data.
   - Files: `GurkanApi/Controllers/ReportsController.cs`, `GurkanApi/DTOs/Reports/ReportResponse.cs`, `GurkanApi/GurkanApi.csproj`, `GurkanApi/Program.cs`
   - Do: Add ClosedXML and QuestPDF NuGet packages. Set `QuestPDF.Settings.License = LicenseType.Community` in Program.cs. Create ReportsController with GET /api/reports/profit-loss (JSON response), GET /api/reports/export/excel (file download), GET /api/reports/export/pdf (file download). Profit/loss logic reuses dashboard aggregation pattern. Excel: workbook with per-property rows (income, expenses, profit, ROI). PDF: formatted report with summary table and per-property breakdown. Both respect group-based access control.

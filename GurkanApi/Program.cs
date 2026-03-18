@@ -8,6 +8,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+// QuestPDF Community license — required before any QuestPDF usage.
+// Wrapped in try-catch: native Skia dependency may fail to load in certain hosts (e.g. AnyCPU test runner).
+try
+{
+    QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+}
+catch (Exception ex) when (ex is TypeInitializationException or DllNotFoundException)
+{
+    // QuestPDF native library not available — PDF export will fail gracefully at runtime.
+    // This happens in test hosts or environments without the native Skia binary.
+    Console.WriteLine($"QuestPDF native library unavailable: {ex.GetBaseException().Message}");
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Database ----------
