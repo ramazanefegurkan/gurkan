@@ -2,97 +2,62 @@
 
 This file is the explicit capability and coverage contract for the project.
 
-## Active
+## Validated
 
 ### R001 — Mülk ekleme, düzenleme, silme, detay görüntüleme. Her mülk bir gruba atanır.
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Mülk ekleme, düzenleme, silme, detay görüntüleme. Her mülk bir gruba atanır.
 - Why it matters: Sistemin temel veri birimi — her şey mülk etrafında dönüyor.
 - Source: user
 - Primary owning slice: M001/S02
 - Supporting slices: none
-- Validation: unmapped
+- Validation: S02 integration tests (14/14 pass): property create 201, update 200, delete 204, list with group filter, detail. PropertiesController 5 endpoints with group-based access control. Frontend property list/form/detail pages browser-verified.
 - Notes: Mülk tipi (daire, ev, dükkan vs.), konum, metrekare gibi temel bilgiler.
 
 ### R002 — Mülkler gruplara atanır, kullanıcılar gruplara eklenir. Kullanıcı sadece kendi gruplarındaki mülkleri görür. Bir kullanıcı birden fazla grupta olabilir.
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Mülkler gruplara atanır, kullanıcılar gruplara eklenir. Kullanıcı sadece kendi gruplarındaki mülkleri görür. Bir kullanıcı birden fazla grupta olabilir.
 - Why it matters: Aile içi kullanımda herkes sadece ilgili mülkleri görmeli.
 - Source: user
 - Primary owning slice: M001/S01
 - Supporting slices: M001/S02
-- Validation: unmapped
+- Validation: S01 GroupAccessTests (11 tests): cross-group access denial 403, member sees only own groups. S02 PropertyTests (14 tests): group-filtered property listing, cross-group property access 403. GroupAccessService enforces membership on all downstream controllers (S03-S06).
 - Notes: Grup örnekleri: "Aile" (ben + babam), "Geniş Aile" (ben + babam + kuzenim).
 
 ### R003 — Superadmin rolü tüm mülkleri, tüm grupları, tüm kullanıcıları görür ve yönetir.
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Superadmin rolü tüm mülkleri, tüm grupları, tüm kullanıcıları görür ve yönetir.
 - Why it matters: Tek bir kişinin (mal sahibi) tam kontrol sahibi olması.
 - Source: user
 - Primary owning slice: M001/S01
 - Supporting slices: none
-- Validation: unmapped
+- Validation: S01 integration tests prove superadmin creates groups, sees all groups/users, manages roles, assigns properties, delegates group admin. Superadmin bypass in GroupAccessService confirmed across all 15 controllers.
 - Notes: İlk kullanıcı otomatik superadmin olur.
 
 ### R004 — Superadmin başka bir kullanıcıyı grup admini yapabilir. Grup admini kendi grubuna kullanıcı ekleyebilir ve mülk atayabilir.
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Superadmin başka bir kullanıcıyı grup admini yapabilir. Grup admini kendi grubuna kullanıcı ekleyebilir ve mülk atayabilir.
 - Why it matters: Baban gibi güvenilen biri kendi grubunu yönetebilmeli.
 - Source: user
 - Primary owning slice: M001/S01
 - Supporting slices: none
-- Validation: unmapped
+- Validation: S01 integration tests prove superadmin delegates group admin role, group admin adds members to own group (201), group admin blocked from other groups (403). Role hierarchy enforced in GroupAccessService.
 - Notes: Superadmin > Grup Admin > Üye hiyerarşisi. Grup içi herkes eşit erişime sahip.
 
 ### R005 — Email ve şifre ile login. JWT token tabanlı API authentication.
 - Class: core-capability
-- Status: active
+- Status: validated
 - Description: Email ve şifre ile login. JWT token tabanlı API authentication.
 - Why it matters: Kullanıcı kimlik doğrulaması — erişim kontrolünün temeli.
 - Source: user
 - Primary owning slice: M001/S01
 - Supporting slices: none
-- Validation: unmapped
+- Validation: S01 AuthTests (7 tests): login returns JWT, register creates user, refresh token rotation (old rejected), change password works, invalid credentials 401, unauthenticated 401, non-superadmin register 403.
 - Notes: Refresh token mekanizması dahil.
-
-### R014 — TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
-- Class: core-capability
-- Status: active
-- Description: TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
-- Why it matters: Bazı mülklerde kira dolar veya euro cinsinden alınıyor.
-- Source: user
-- Primary owning slice: M001/S02
-- Supporting slices: M001/S03, M001/S04
-- Validation: unmapped
-- Notes: Kur dönüşümü şimdilik scope dışı — raporlarda her para birimi ayrı gösterilir.
-
-### R015 — Kiracı bilgileri (isim, telefon, email, TC kimlik), sözleşme başlangıç-bitiş tarihi, depozito bilgisi. Kiracı mülke bağlanır.
-- Class: primary-user-loop
-- Status: active
-- Description: Kiracı bilgileri (isim, telefon, email, TC kimlik), sözleşme başlangıç-bitiş tarihi, depozito bilgisi. Kiracı mülke bağlanır.
-- Why it matters: Kira takibi kiracı bilgisi olmadan eksik kalır.
-- Source: inferred
-- Primary owning slice: M001/S03
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Uzun dönem kiracılar için zorunlu, kısa dönem için opsiyonel.
-
-### R023 — Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
-- Class: core-capability
-- Status: active
-- Description: Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
-- Why it matters: Bir mülk hakkında bilinen ama başka bir modüle sığmayan bilgilerin kaydı.
-- Source: research
-- Primary owning slice: M001/S02
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Kronolojik sıralı, tarih damgalı notlar.
-
-## Validated
 
 ### R006 — Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
 - Class: primary-user-loop
@@ -182,6 +147,28 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: S06 integration tests (9 ReportsTests): profit-loss JSON endpoint with year filtering, Excel export (.xlsx via ClosedXML with correct MIME type), PDF export (via QuestPDF with correct MIME type). Per-property ROI calculation (income - expenses / property value). Frontend export buttons with blob download. Group-based access control on all report endpoints.
 - Notes: Mülkler arası karşılaştırma da dahil.
 
+### R014 — TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
+- Class: core-capability
+- Status: validated
+- Description: TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
+- Why it matters: Bazı mülklerde kira dolar veya euro cinsinden alınıyor.
+- Source: user
+- Primary owning slice: M001/S02
+- Supporting slices: M001/S03, M001/S04
+- Validation: S02 integration test creates properties with TRY/USD/EUR — currency persists correctly. S03 tenant/payment entities carry currency. S04 expense/bill entities carry currency (EUR expense + USD bill tested). S06 dashboard aggregates by currency, no cross-currency summing.
+- Notes: Kur dönüşümü şimdilik scope dışı — raporlarda her para birimi ayrı gösterilir.
+
+### R015 — Kiracı bilgileri (isim, telefon, email, TC kimlik), sözleşme başlangıç-bitiş tarihi, depozito bilgisi. Kiracı mülke bağlanır.
+- Class: primary-user-loop
+- Status: validated
+- Description: Kiracı bilgileri (isim, telefon, email, TC kimlik), sözleşme başlangıç-bitiş tarihi, depozito bilgisi. Kiracı mülke bağlanır.
+- Why it matters: Kira takibi kiracı bilgisi olmadan eksik kalır.
+- Source: inferred
+- Primary owning slice: M001/S03
+- Supporting slices: none
+- Validation: S03 integration tests: tenant CRUD with all fields (name, phone, email, identity number, lease dates, deposit), active tenant enforcement (409 on duplicate), cross-group 403, active/inactive filtering. Frontend TenantList/TenantForm/TenantDetail browser-verified.
+- Notes: Uzun dönem kiracılar için zorunlu, kısa dönem için opsiyonel.
+
 ### R022 — Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
 - Class: failure-visibility
 - Status: validated
@@ -192,6 +179,17 @@ This file is the explicit capability and coverage contract for the project.
 - Supporting slices: M001/S03
 - Validation: S06 integration test Notifications_IncludesLeaseExpiry proves lease expiry notification generated with tiered severity: ≤30 days = Critical, ≤60 days = Warning, ≤90 days = Info. Test uses 25-day-out lease end → Critical severity. Frontend shows severity-colored card.
 - Notes: R012 bildirim sistemi ile entegre çalışır.
+
+### R023 — Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
+- Class: core-capability
+- Status: validated
+- Description: Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
+- Why it matters: Bir mülk hakkında bilinen ama başka bir modüle sığmayan bilgilerin kaydı.
+- Source: research
+- Primary owning slice: M001/S02
+- Supporting slices: none
+- Validation: S02 integration tests: note add 201, update 200, delete 204, list, cross-group denial 403. PropertyNotesController with creator-only edit/delete enforcement. Frontend inline note editing browser-verified on PropertyDetail page.
+- Notes: Kronolojik sıralı, tarih damgalı notlar.
 
 ### R024 — Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
 - Class: primary-user-loop
@@ -278,11 +276,11 @@ This file is the explicit capability and coverage contract for the project.
 
 | ID | Class | Status | Primary owner | Supporting | Proof |
 |---|---|---|---|---|---|
-| R001 | core-capability | active | M001/S02 | none | unmapped |
-| R002 | core-capability | active | M001/S01 | M001/S02 | unmapped |
-| R003 | core-capability | active | M001/S01 | none | unmapped |
-| R004 | core-capability | active | M001/S01 | none | unmapped |
-| R005 | core-capability | active | M001/S01 | none | unmapped |
+| R001 | core-capability | validated | M001/S02 | none | S02 integration tests (14/14 pass): property create 201, update 200, delete 204, list with group filter, detail. PropertiesController 5 endpoints with group-based access control. Frontend property list/form/detail pages browser-verified. |
+| R002 | core-capability | validated | M001/S01 | M001/S02 | S01 GroupAccessTests (11 tests): cross-group access denial 403, member sees only own groups. S02 PropertyTests (14 tests): group-filtered property listing, cross-group property access 403. GroupAccessService enforces membership on all downstream controllers (S03-S06). |
+| R003 | core-capability | validated | M001/S01 | none | S01 integration tests prove superadmin creates groups, sees all groups/users, manages roles, assigns properties, delegates group admin. Superadmin bypass in GroupAccessService confirmed across all 15 controllers. |
+| R004 | core-capability | validated | M001/S01 | none | S01 integration tests prove superadmin delegates group admin role, group admin adds members to own group (201), group admin blocked from other groups (403). Role hierarchy enforced in GroupAccessService. |
+| R005 | core-capability | validated | M001/S01 | none | S01 AuthTests (7 tests): login returns JWT, register creates user, refresh token rotation (old rejected), change password works, invalid credentials 401, unauthenticated 401, non-superadmin register 403. |
 | R006 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests (13/13 pass) prove rent payment CRUD, auto-generation, late detection (DueDate+5). S06 integration tests prove dashboard aggregates rent payments into income, counts unpaid rent, generates LateRent notifications. Full lifecycle: create tenant → auto-generate payments → mark paid/overdue → see in dashboard + notifications. |
 | R007 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests prove short-term rental CRUD with platform fee, net amount calculation. S06 dashboard integration test proves short-term rental net income aggregated into property financials. Full lifecycle: create reservation → track income → see aggregated in dashboard. |
 | R008 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: expense create/edit/delete with 6 categories, recurring support, multi-currency (EUR). Group access control tested. |
@@ -291,8 +289,8 @@ This file is the explicit capability and coverage contract for the project.
 | R011 | primary-user-loop | validated | M001/S06 | none | S06 integration tests (16/16 pass): DashboardAndNotificationTests prove per-property income/expense/profit aggregation by currency, unpaid rent count, upcoming bill count, cross-group access denial (empty response for non-member). Frontend Dashboard page with summary cards per currency + per-property breakdown table. Default route after login is /dashboard. |
 | R012 | failure-visibility | validated | M001/S06 | none | S06 integration tests prove: LateRent (Critical, DueDate+5 threshold), UpcomingBill (Warning, 7-day window), LeaseExpiry (Critical/Warning/Info at 30/60/90 day tiers) notifications generated at query time. Frontend NotificationList page with severity-colored cards. In-app only — email/push deferred to R019. |
 | R013 | differentiator | validated | M001/S06 | none | S06 integration tests (9 ReportsTests): profit-loss JSON endpoint with year filtering, Excel export (.xlsx via ClosedXML with correct MIME type), PDF export (via QuestPDF with correct MIME type). Per-property ROI calculation (income - expenses / property value). Frontend export buttons with blob download. Group-based access control on all report endpoints. |
-| R014 | core-capability | active | M001/S02 | M001/S03, M001/S04 | unmapped |
-| R015 | primary-user-loop | active | M001/S03 | none | unmapped |
+| R014 | core-capability | validated | M001/S02 | M001/S03, M001/S04 | S02 integration test creates properties with TRY/USD/EUR — currency persists correctly. S03 tenant/payment entities carry currency. S04 expense/bill entities carry currency (EUR expense + USD bill tested). S06 dashboard aggregates by currency, no cross-currency summing. |
+| R015 | primary-user-loop | validated | M001/S03 | none | S03 integration tests: tenant CRUD with all fields (name, phone, email, identity number, lease dates, deposit), active tenant enforcement (409 on duplicate), cross-group 403, active/inactive filtering. Frontend TenantList/TenantForm/TenantDetail browser-verified. |
 | R016 | operability | deferred | none | none | unmapped |
 | R017 | core-capability | deferred | none | none | unmapped |
 | R018 | core-capability | deferred | none | none | unmapped |
@@ -300,12 +298,12 @@ This file is the explicit capability and coverage contract for the project.
 | R020 | integration | out-of-scope | none | none | n/a |
 | R021 | differentiator | out-of-scope | none | none | n/a |
 | R022 | failure-visibility | validated | M001/S06 | M001/S03 | S06 integration test Notifications_IncludesLeaseExpiry proves lease expiry notification generated with tiered severity: ≤30 days = Critical, ≤60 days = Warning, ≤90 days = Info. Test uses 25-day-out lease end → Critical severity. Frontend shows severity-colored card. |
-| R023 | core-capability | active | M001/S02 | none | unmapped |
+| R023 | core-capability | validated | M001/S02 | none | S02 integration tests: note add 201, update 200, delete 204, list, cross-group denial 403. PropertyNotesController with creator-only edit/delete enforcement. Frontend inline note editing browser-verified on PropertyDetail page. |
 | R024 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching. |
 
 ## Coverage Summary
 
-- Active requirements: 8
-- Mapped to slices: 8
-- Validated: 10 (R006, R007, R008, R009, R010, R011, R012, R013, R022, R024)
+- Active requirements: 0
+- Mapped to slices: 0
+- Validated: 18 (R001, R002, R003, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013, R014, R015, R022, R023, R024)
 - Unmapped active requirements: 0
