@@ -15,14 +15,15 @@ export interface UserInfo {
 
 // ── Enums (match backend GurkanApi.Entities.Enums) ───
 // Using const objects instead of enums to comply with erasableSyntaxOnly.
+// Values are strings matching ASP.NET Core JsonStringEnumConverter output.
 
 export const PropertyType = {
-  Apartment: 0,
-  House: 1,
-  Shop: 2,
-  Land: 3,
-  Office: 4,
-  Other: 5,
+  Apartment: 'Apartment',
+  House: 'House',
+  Shop: 'Shop',
+  Land: 'Land',
+  Office: 'Office',
+  Other: 'Other',
 } as const;
 
 export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType];
@@ -37,9 +38,9 @@ export const PropertyTypeLabels: Record<PropertyType, string> = {
 };
 
 export const Currency = {
-  TRY: 0,
-  USD: 1,
-  EUR: 2,
+  TRY: 'TRY',
+  USD: 'USD',
+  EUR: 'EUR',
 } as const;
 
 export type Currency = (typeof Currency)[keyof typeof Currency];

@@ -88,6 +88,14 @@ This task replaces the placeholder routes from T03 with real pages wired to the 
   - `GET /api/groups` — returns `GroupResponse[]` (for group dropdown)
 - TypeScript types already defined in `gurkan-ui/src/types/index.ts`
 
+## Observability Impact
+
+- **Browser DevTools → Network tab**: All property CRUD calls visible as fetch/XHR requests to `/api/properties`, `/api/properties/:id`, `/api/properties/:id/notes` with JWT Authorization header. Failed requests (4xx/5xx) surface as red entries with `{ error, message }` JSON bodies.
+- **Console errors**: API failures logged via catch blocks; React error boundaries for component-level crashes.
+- **UI loading states**: Skeleton/spinner visible during fetch; error banners with retry guidance on failure.
+- **UI state inspection**: Property list card count reflects API response length. Notes section item count matches `/api/properties/:id/notes` response. Empty states render when arrays are empty.
+- **Failure visibility**: Form validation errors inline; API errors displayed as alert banners; 403 results in access denied message; 401 triggers auth redirect.
+
 ## Expected Output
 
 - `gurkan-ui/src/pages/Properties/PropertyList.tsx` — property list page with cards/table

@@ -63,7 +63,7 @@
   - Verify: `cd gurkan-ui && npm run build` succeeds; `npm run dev` serves at localhost:5173; login form renders
   - Done when: TypeScript compiles, login page renders, successful login redirects to a placeholder properties route
 
-- [ ] **T04: Build property list and detail pages with notes** `est:40m`
+- [x] **T04: Build property list and detail pages with notes** `est:40m`
   - Why: Completes the slice demo — users see their group's properties in a list, can create/edit properties, and view property details with notes. This is the user-facing payoff that proves frontend-backend integration works end-to-end.
   - Files: `gurkan-ui/src/pages/Properties/PropertyList.tsx`, `gurkan-ui/src/pages/Properties/PropertyDetail.tsx`, `gurkan-ui/src/pages/Properties/PropertyForm.tsx`, `gurkan-ui/src/types/index.ts`, `gurkan-ui/src/App.tsx`
   - Do: Create PropertyList page that fetches GET /api/properties and displays a card/table layout with name, type, city, currency. Add "New Property" button that opens PropertyForm. Create PropertyForm component (modal or page) with fields for name, type (dropdown), address, city, district, area, rooms, floor, total floors, build year, currency (dropdown), description, groupId (dropdown — fetched from GET /api/groups). Create PropertyDetail page at /properties/:id that fetches GET /api/properties/{id} and displays all fields, plus a notes section that fetches GET /api/properties/{id}/notes. Notes section has an "add note" input and displays notes chronologically. Wire routes in App.tsx: /properties → PropertyList, /properties/new → PropertyForm, /properties/:id → PropertyDetail. Relevant skill for executors: `~/.gsd/agent/skills/frontend-design/SKILL.md` — load for UI design guidance.
