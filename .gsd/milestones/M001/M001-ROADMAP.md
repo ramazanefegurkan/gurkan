@@ -63,7 +63,7 @@ This milestone is complete only when all are true:
 - [x] **S02: Mülk Yönetimi** `risk:medium` `depends:[S01]`
   > After this: Mülk eklenir/düzenlenir/silinir. Mülk gruba atanır. Kullanıcı sadece kendi grubundaki mülkleri görür. Multi-currency desteği çalışır. Mülk notları eklenebilir. Frontend'de mülk listesi ve detay sayfası çalışır.
 
-- [ ] **S03: Kira & Kiracı Takibi** `risk:high` `depends:[S02]`
+- [x] **S03: Kira & Kiracı Takibi** `risk:high` `depends:[S02]`
   > After this: Uzun dönem kiracı kaydedilir, aylık kira ödeme takibi yapılır, gecikme otomatik algılanır. Kısa dönem rezervasyon kaydedilir. Kira artış takibi çalışır. Frontend'de kira listesi, ödeme durumu ve kiracı bilgileri görünür.
 
 - [ ] **S04: Gider & Fatura Takibi** `risk:low` `depends:[S02]`
