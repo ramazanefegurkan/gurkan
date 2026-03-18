@@ -59,61 +59,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Refresh token mekanizması dahil.
 
-### R006 — Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
-- Class: primary-user-loop
-- Status: active
-- Description: Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
-- Why it matters: Kira gelirinin takibi — uygulamanın ana kullanım amacı.
-- Source: user
-- Primary owning slice: M001/S03
-- Supporting slices: M001/S06
-- Validation: unmapped
-- Notes: Gecikme otomatik hesaplanır (ödeme tarihi geçtiğinde).
-
-### R007 — Rezervasyon bazlı gelir kaydı (giriş-çıkış tarihi, gecelik/toplam tutar, platform komisyonu). Manuel giriş.
-- Class: primary-user-loop
-- Status: active
-- Description: Rezervasyon bazlı gelir kaydı (giriş-çıkış tarihi, gecelik/toplam tutar, platform komisyonu). Manuel giriş.
-- Why it matters: Airbnb'den gelen kısa dönem kira gelirinin takibi.
-- Source: user
-- Primary owning slice: M001/S03
-- Supporting slices: M001/S06
-- Validation: unmapped
-- Notes: Airbnb API erişimi olmadığı için veriler manuel girilecek.
-
-### R011 — Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
-- Class: primary-user-loop
-- Status: active
-- Description: Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
-- Why it matters: Uygulamayı açtığında tüm portföyün finansal durumunu tek bakışta görmek.
-- Source: user
-- Primary owning slice: M001/S06
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Kullanıcı sadece kendi erişebildiği mülklerin özetini görür.
-
-### R012 — Kira gecikme, fatura son ödeme yaklaşması, sözleşme bitiş tarihi yaklaşması için in-app bildirimler.
-- Class: failure-visibility
-- Status: active
-- Description: Kira gecikme, fatura son ödeme yaklaşması, sözleşme bitiş tarihi yaklaşması için in-app bildirimler.
-- Why it matters: Önemli tarihleri kaçırmamak.
-- Source: user
-- Primary owning slice: M001/S06
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Şimdilik sadece in-app. Email/push bildirimler deferred (R019).
-
-### R013 — Excel/PDF export, vergi raporu, mülk bazlı ROI hesaplama, dönemsel (aylık/yıllık) gelir-gider özeti.
-- Class: differentiator
-- Status: active
-- Description: Excel/PDF export, vergi raporu, mülk bazlı ROI hesaplama, dönemsel (aylık/yıllık) gelir-gider özeti.
-- Why it matters: Muhasebeci ile paylaşım, vergi beyannamesi hazırlığı, yatırım getirisi analizi.
-- Source: user
-- Primary owning slice: M001/S06
-- Supporting slices: none
-- Validation: unmapped
-- Notes: Mülkler arası karşılaştırma da dahil.
-
 ### R014 — TL, USD ve EUR cinsinden kira/gider/fatura kaydı. Para birimi mülk veya işlem bazında seçilebilir.
 - Class: core-capability
 - Status: active
@@ -136,17 +81,6 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Uzun dönem kiracılar için zorunlu, kısa dönem için opsiyonel.
 
-### R022 — Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
-- Class: failure-visibility
-- Status: active
-- Description: Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
-- Why it matters: Sözleşme yenileme sürecini zamanında başlatmak.
-- Source: research
-- Primary owning slice: M001/S06
-- Supporting slices: M001/S03
-- Validation: unmapped
-- Notes: R012 bildirim sistemi ile entegre çalışır.
-
 ### R023 — Mülke not/yorum ekleyebilme — bakım geçmişi, önemli bilgiler, hatırlatmalar.
 - Class: core-capability
 - Status: active
@@ -158,18 +92,29 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: unmapped
 - Notes: Kronolojik sıralı, tarih damgalı notlar.
 
-### R024 — Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
+## Validated
+
+### R006 — Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
 - Class: primary-user-loop
-- Status: active
-- Description: Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
-- Why it matters: Türkiye'de kira artışları yasal sınırlarla düzenleniyor — takibi önemli.
-- Source: research
+- Status: validated
+- Description: Aylık kira miktarı, ödeme tarihi, ödeme durumu (ödendi/ödenmedi/gecikti). Kira geçmişi.
+- Why it matters: Kira gelirinin takibi — uygulamanın ana kullanım amacı.
+- Source: user
 - Primary owning slice: M001/S03
 - Supporting slices: M001/S06
-- Validation: unmapped
-- Notes: TÜFE/ÜFE bağlantısı şimdilik yok, sadece manuel oran girişi.
+- Validation: S03 integration tests (13/13 pass) prove rent payment CRUD, auto-generation, late detection (DueDate+5). S06 integration tests prove dashboard aggregates rent payments into income, counts unpaid rent, generates LateRent notifications. Full lifecycle: create tenant → auto-generate payments → mark paid/overdue → see in dashboard + notifications.
+- Notes: Gecikme otomatik hesaplanır (ödeme tarihi geçtiğinde).
 
-## Validated
+### R007 — Rezervasyon bazlı gelir kaydı (giriş-çıkış tarihi, gecelik/toplam tutar, platform komisyonu). Manuel giriş.
+- Class: primary-user-loop
+- Status: validated
+- Description: Rezervasyon bazlı gelir kaydı (giriş-çıkış tarihi, gecelik/toplam tutar, platform komisyonu). Manuel giriş.
+- Why it matters: Airbnb'den gelen kısa dönem kira gelirinin takibi.
+- Source: user
+- Primary owning slice: M001/S03
+- Supporting slices: M001/S06
+- Validation: S03 integration tests prove short-term rental CRUD with platform fee, net amount calculation. S06 dashboard integration test proves short-term rental net income aggregated into property financials. Full lifecycle: create reservation → track income → see aggregated in dashboard.
+- Notes: Airbnb API erişimi olmadığı için veriler manuel girilecek.
 
 ### R008 — Mülk bazlı gider kaydı — bakım, tamir, vergi, sigorta, yönetim ücreti vs. Kategori, tutar, tarih.
 - Class: primary-user-loop
@@ -203,6 +148,61 @@ This file is the explicit capability and coverage contract for the project.
 - Supporting slices: none
 - Validation: S05 integration tests (8/8 pass) prove upload/list/download/delete API contract + extension/content-type validation + cross-group access denial (403). Browser verification proves end-to-end UI flow: upload with category → document table with badges → download → delete with confirmation. Dökümanlar tab in PropertyLayout.
 - Notes: Basit dosya yükleme — OCR veya akıllı işleme yok.
+
+### R011 — Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
+- Class: primary-user-loop
+- Status: validated
+- Description: Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
+- Why it matters: Uygulamayı açtığında tüm portföyün finansal durumunu tek bakışta görmek.
+- Source: user
+- Primary owning slice: M001/S06
+- Supporting slices: none
+- Validation: S06 integration tests (16/16 pass): DashboardAndNotificationTests prove per-property income/expense/profit aggregation by currency, unpaid rent count, upcoming bill count, cross-group access denial (empty response for non-member). Frontend Dashboard page with summary cards per currency + per-property breakdown table. Default route after login is /dashboard.
+- Notes: Kullanıcı sadece kendi erişebildiği mülklerin özetini görür.
+
+### R012 — Kira gecikme, fatura son ödeme yaklaşması, sözleşme bitiş tarihi yaklaşması için in-app bildirimler.
+- Class: failure-visibility
+- Status: validated
+- Description: Kira gecikme, fatura son ödeme yaklaşması, sözleşme bitiş tarihi yaklaşması için in-app bildirimler.
+- Why it matters: Önemli tarihleri kaçırmamak.
+- Source: user
+- Primary owning slice: M001/S06
+- Supporting slices: none
+- Validation: S06 integration tests prove: LateRent (Critical, DueDate+5 threshold), UpcomingBill (Warning, 7-day window), LeaseExpiry (Critical/Warning/Info at 30/60/90 day tiers) notifications generated at query time. Frontend NotificationList page with severity-colored cards. In-app only — email/push deferred to R019.
+- Notes: Şimdilik sadece in-app. Email/push bildirimler deferred (R019).
+
+### R013 — Excel/PDF export, vergi raporu, mülk bazlı ROI hesaplama, dönemsel (aylık/yıllık) gelir-gider özeti.
+- Class: differentiator
+- Status: validated
+- Description: Excel/PDF export, vergi raporu, mülk bazlı ROI hesaplama, dönemsel (aylık/yıllık) gelir-gider özeti.
+- Why it matters: Muhasebeci ile paylaşım, vergi beyannamesi hazırlığı, yatırım getirisi analizi.
+- Source: user
+- Primary owning slice: M001/S06
+- Supporting slices: none
+- Validation: S06 integration tests (9 ReportsTests): profit-loss JSON endpoint with year filtering, Excel export (.xlsx via ClosedXML with correct MIME type), PDF export (via QuestPDF with correct MIME type). Per-property ROI calculation (income - expenses / property value). Frontend export buttons with blob download. Group-based access control on all report endpoints.
+- Notes: Mülkler arası karşılaştırma da dahil.
+
+### R022 — Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
+- Class: failure-visibility
+- Status: validated
+- Description: Kira sözleşmesi bitiş tarihi yaklaştığında hatırlatma. Yapılandırılabilir süre (30/60/90 gün önce).
+- Why it matters: Sözleşme yenileme sürecini zamanında başlatmak.
+- Source: research
+- Primary owning slice: M001/S06
+- Supporting slices: M001/S03
+- Validation: S06 integration test Notifications_IncludesLeaseExpiry proves lease expiry notification generated with tiered severity: ≤30 days = Critical, ≤60 days = Warning, ≤90 days = Info. Test uses 25-day-out lease end → Critical severity. Frontend shows severity-colored card.
+- Notes: R012 bildirim sistemi ile entegre çalışır.
+
+### R024 — Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
+- Class: primary-user-loop
+- Status: validated
+- Description: Yıllık kira artış oranı kaydı, artış geçmişi, bir sonraki artış tarihi hatırlatması.
+- Why it matters: Türkiye'de kira artışları yasal sınırlarla düzenleniyor — takibi önemli.
+- Source: research
+- Primary owning slice: M001/S03
+- Supporting slices: M001/S06
+- Validation: S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching.
+- Notes: TÜFE/ÜFE bağlantısı şimdilik yok, sadece manuel oran girişi.
 
 ## Deferred
 
@@ -283,14 +283,14 @@ This file is the explicit capability and coverage contract for the project.
 | R003 | core-capability | active | M001/S01 | none | unmapped |
 | R004 | core-capability | active | M001/S01 | none | unmapped |
 | R005 | core-capability | active | M001/S01 | none | unmapped |
-| R006 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
-| R007 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
+| R006 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests (13/13 pass) prove rent payment CRUD, auto-generation, late detection (DueDate+5). S06 integration tests prove dashboard aggregates rent payments into income, counts unpaid rent, generates LateRent notifications. Full lifecycle: create tenant → auto-generate payments → mark paid/overdue → see in dashboard + notifications. |
+| R007 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests prove short-term rental CRUD with platform fee, net amount calculation. S06 dashboard integration test proves short-term rental net income aggregated into property financials. Full lifecycle: create reservation → track income → see aggregated in dashboard. |
 | R008 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: expense create/edit/delete with 6 categories, recurring support, multi-currency (EUR). Group access control tested. |
 | R009 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: bill create/edit/delete with 5 types, due date tracking, mark-as-paid status transition, multi-currency (USD). Group access control tested. |
 | R010 | core-capability | validated | M001/S05 | none | S05 integration tests (8/8 pass) prove upload/list/download/delete API contract + extension/content-type validation + cross-group access denial (403). Browser verification proves end-to-end UI flow: upload with category → document table with badges → download → delete with confirmation. Dökümanlar tab in PropertyLayout. |
-| R011 | primary-user-loop | active | M001/S06 | none | unmapped |
-| R012 | failure-visibility | active | M001/S06 | none | unmapped |
-| R013 | differentiator | active | M001/S06 | none | unmapped |
+| R011 | primary-user-loop | validated | M001/S06 | none | S06 integration tests (16/16 pass): DashboardAndNotificationTests prove per-property income/expense/profit aggregation by currency, unpaid rent count, upcoming bill count, cross-group access denial (empty response for non-member). Frontend Dashboard page with summary cards per currency + per-property breakdown table. Default route after login is /dashboard. |
+| R012 | failure-visibility | validated | M001/S06 | none | S06 integration tests prove: LateRent (Critical, DueDate+5 threshold), UpcomingBill (Warning, 7-day window), LeaseExpiry (Critical/Warning/Info at 30/60/90 day tiers) notifications generated at query time. Frontend NotificationList page with severity-colored cards. In-app only — email/push deferred to R019. |
+| R013 | differentiator | validated | M001/S06 | none | S06 integration tests (9 ReportsTests): profit-loss JSON endpoint with year filtering, Excel export (.xlsx via ClosedXML with correct MIME type), PDF export (via QuestPDF with correct MIME type). Per-property ROI calculation (income - expenses / property value). Frontend export buttons with blob download. Group-based access control on all report endpoints. |
 | R014 | core-capability | active | M001/S02 | M001/S03, M001/S04 | unmapped |
 | R015 | primary-user-loop | active | M001/S03 | none | unmapped |
 | R016 | operability | deferred | none | none | unmapped |
@@ -299,13 +299,13 @@ This file is the explicit capability and coverage contract for the project.
 | R019 | failure-visibility | deferred | none | none | unmapped |
 | R020 | integration | out-of-scope | none | none | n/a |
 | R021 | differentiator | out-of-scope | none | none | n/a |
-| R022 | failure-visibility | active | M001/S06 | M001/S03 | unmapped |
+| R022 | failure-visibility | validated | M001/S06 | M001/S03 | S06 integration test Notifications_IncludesLeaseExpiry proves lease expiry notification generated with tiered severity: ≤30 days = Critical, ≤60 days = Warning, ≤90 days = Info. Test uses 25-day-out lease end → Critical severity. Frontend shows severity-colored card. |
 | R023 | core-capability | active | M001/S02 | none | unmapped |
-| R024 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
+| R024 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching. |
 
 ## Coverage Summary
 
-- Active requirements: 15
-- Mapped to slices: 15
-- Validated: 3 (R008, R009, R010)
+- Active requirements: 8
+- Mapped to slices: 8
+- Validated: 10 (R006, R007, R008, R009, R010, R011, R012, R013, R022, R024)
 - Unmapped active requirements: 0

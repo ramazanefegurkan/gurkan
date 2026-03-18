@@ -72,7 +72,7 @@ This milestone is complete only when all are true:
 - [x] **S05: Döküman Yönetimi** `risk:low` `depends:[S02]`
   > After this: Dosya yüklenir (tapu, sözleşme, sigorta), mülke bağlanır, kategorize edilir. Dosya görüntüleme ve indirme çalışır. Frontend'de döküman listesi ve yükleme formu çalışır.
 
-- [ ] **S06: Dashboard, Bildirimler & Raporlama** `risk:medium` `depends:[S03,S04]`
+- [x] **S06: Dashboard, Bildirimler & Raporlama** `risk:medium` `depends:[S03,S04]`
   > After this: Dashboard mülk bazlı kâr/zarar, toplam gelir, ödenmemiş kiraları gösterir. Kira gecikme, fatura yaklaşma, sözleşme bitiş bildirimleri oluşur. Excel/PDF rapor export edilir, ROI hesaplanır. Kullanıcı sadece kendi mülklerinin verilerini görür.
 
 ## Boundary Map
