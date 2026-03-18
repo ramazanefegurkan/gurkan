@@ -1,19 +1,24 @@
 # GSD State
 
-**Active Milestone:** M001: Gayrimenkul Portföy Yönetimi
-**Active Slice:** S06: Dashboard, Bildirimler & Raporlama
-**Phase:** executing
-**Requirements Status:** 15 active · 3 validated · 4 deferred · 2 out of scope
+**Active Milestone:** M003 — Production Ready: Deploy, Mobil Uygulama, Import & Polish
+**Active Slice:** None
+**Phase:** ready-for-slice-planning
+**Requirements Status:** 6 active · 18 validated · 1 deferred · 2 out of scope
 
 ## Milestone Registry
-- 🔄 **M001:** Gayrimenkul Portföy Yönetimi
-- ⬜ **M002:** M002
+- ✅ **M001:** Gayrimenkul Portföy Yönetimi
+- 🔄 **M003:** Production Ready — Deploy, Mobil Uygulama, Import & Polish
+- ⬜ **M002:** Servet Yönetimi Evrimi
 
 ## Recent Decisions
-- None recorded
+- D014: React Native + Expo (managed workflow) for mobile
+- D015: Hetzner VPS
+- D016: Nginx/Caddy + Let's Encrypt for HTTPS
+- D017: Expo Push Notifications
+- D018: Kısmi import — Airbnb CSV + geçmiş kira ödemeleri
 
 ## Blockers
 - None
 
 ## Next Action
-Execute S06/T01 — Build Dashboard and Notifications API endpoints.
+Plan and execute S01: Production Deploy.

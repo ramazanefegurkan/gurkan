@@ -202,29 +202,75 @@ This file is the explicit capability and coverage contract for the project.
 - Validation: S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching.
 - Notes: TÜFE/ÜFE bağlantısı şimdilik yok, sadece manuel oran girişi.
 
-## Deferred
+## Active
 
-### R016 — Mevcut Excel/Google Sheets verilerini uygulamaya import etme.
+### R016 — Airbnb CSV import + geçmiş uzun dönem kira ödemelerini toplu yükleme.
 - Class: operability
-- Status: deferred
-- Description: Mevcut Excel/Google Sheets verilerini uygulamaya import etme.
-- Why it matters: Mevcut verilerin taşınması zaman kazandırır.
+- Status: active
+- Description: Airbnb CSV export dosyasını parse edip kısa dönem kiralama kayıtlarına dönüştürme + geçmiş uzun dönem kira ödemelerini Excel/CSV ile toplu import etme.
+- Why it matters: 2 yıldır kirada olan evlerin geçmiş verilerini tek tek girmek pratik değil. Airbnb gelir raporu CSV olarak import edilebilmeli.
 - Source: user
-- Primary owning slice: none
+- Primary owning slice: M003/S03
 - Supporting slices: none
 - Validation: unmapped
-- Notes: M001 tamamlandıktan sonra değerlendirilecek.
+- Notes: R016 kapsamı daraltıldı — sadece Airbnb CSV + geçmiş kira ödemeleri. Gider/fatura import'u şimdilik yok.
 
-### R017 — Native iOS/Android uygulama. Ayrı frontend + backend API mimarisi bunu kolaylaştırır.
+### R017 — React Native/Expo ile iOS + Android mobil uygulama. Mevcut backend API'yi kullanan native uygulama.
 - Class: core-capability
-- Status: deferred
-- Description: Native iOS/Android uygulama. Ayrı frontend + backend API mimarisi bunu kolaylaştırır.
-- Why it matters: Hareket halinde mülk takibi.
+- Status: active
+- Description: React Native/Expo ile iOS + Android mobil uygulama. Dashboard, mülk listesi/detay, kiracı, gider, fatura, döküman, bildirim sayfaları. JWT auth ile mevcut backend'e bağlanır.
+- Why it matters: Aile üyeleri telefonda mülk takibi yapabilmeli — masabaşına bağlı kalmadan.
 - Source: user
-- Primary owning slice: none
+- Primary owning slice: M003/S04
+- Supporting slices: M003/S05
+- Validation: unmapped
+- Notes: Expo managed workflow. EAS Build ile iOS + Android. Mevcut REST API aynen kullanılır.
+
+### R019 — Push notification — kira gecikme, fatura yaklaşma, sözleşme bitiş bildirimleri telefona gelsin.
+- Class: failure-visibility
+- Status: active
+- Description: Expo Push Notifications ile mobil cihaza push bildirim gönderme. Mevcut query-time notification logic'i tetikleyen push akışı.
+- Why it matters: Uygulamayı açmadan önemli tarihleri kaçırmamak.
+- Source: user
+- Primary owning slice: M003/S06
 - Supporting slices: none
 - Validation: unmapped
-- Notes: Web app öncelikli. Mobil ilerde.
+- Notes: Backend'de device token kayıt endpoint'i + push gönderme servisi gerekli. Expo Push servisi ücretsiz.
+
+### R025 — Production deploy — Hetzner VPS + domain + HTTPS + Docker Compose.
+- Class: operability
+- Status: active
+- Description: Backend API + frontend + PostgreSQL'in Hetzner VPS'te Docker Compose ile deploy edilmesi. Domain + Let's Encrypt HTTPS. Reverse proxy (Nginx veya Caddy).
+- Why it matters: Mobil uygulama için backend'in internetten erişilebilir olması şart. Localhost'ta kalmak mobil geliştirmeyi imkansız kılar.
+- Source: inferred
+- Primary owning slice: M003/S01
+- Supporting slices: none
+- Validation: unmapped
+- Notes: İlk slice olmalı — mobil uygulama ve import akışları erişilebilir backend gerektirir.
+
+### R026 — Token refresh mekanizması — frontend'de otomatik token yenileme, session kopmaması.
+- Class: continuity
+- Status: active
+- Description: JWT access token expire olduğunda refresh token ile otomatik yenileme. Kullanıcı 15 dakikada login ekranına atılmasın.
+- Why it matters: Gerçek kullanımda 15dk session süresi kabul edilemez — veri girerken session kopması veri kaybına yol açar.
+- Source: inferred
+- Primary owning slice: M003/S02
+- Supporting slices: M003/S04
+- Validation: unmapped
+- Notes: Backend refresh endpoint zaten var (M001/S01). Frontend axios interceptor'da 401 → refresh → retry pattern'ı lazım. Mobil app'te de aynı pattern.
+
+### R027 — Web UI polish — spacing tutarlılığı, responsive iyileştirme, genel görsel kalite artışı.
+- Class: quality-attribute
+- Status: active
+- Description: Mevcut web arayüzünün üstünden geçme — spacing, tipografi, renk tutarlılığı, responsive davranış, loading state'ler, boş durum görselleri.
+- Why it matters: M001'de fonksiyon öncelikliydi, artık günlük kullanım için görsel kalite artırılmalı.
+- Source: user
+- Primary owning slice: M003/S02
+- Supporting slices: none
+- Validation: unmapped
+- Notes: Mevcut tasarım sistemi korunacak (terracotta accent, DM Sans, Playfair Display). Overhaul değil, polish.
+
+## Deferred
 
 ### R018 — Multi-tenant mimari, ödeme planları, onboarding akışı.
 - Class: core-capability
@@ -236,17 +282,6 @@ This file is the explicit capability and coverage contract for the project.
 - Supporting slices: none
 - Validation: unmapped
 - Notes: Çok ileri — M001 ve M002'den sonra.
-
-### R019 — In-app bildirimlerin yanı sıra email ve/veya push notification.
-- Class: failure-visibility
-- Status: deferred
-- Description: In-app bildirimlerin yanı sıra email ve/veya push notification.
-- Why it matters: Uygulamayı açmadan da önemli bildirimleri almak.
-- Source: inferred
-- Primary owning slice: none
-- Supporting slices: none
-- Validation: unmapped
-- Notes: M001'de sadece in-app bildirim (R012).
 
 ## Out of Scope
 
@@ -291,19 +326,22 @@ This file is the explicit capability and coverage contract for the project.
 | R013 | differentiator | validated | M001/S06 | none | S06 integration tests (9 ReportsTests): profit-loss JSON endpoint with year filtering, Excel export (.xlsx via ClosedXML with correct MIME type), PDF export (via QuestPDF with correct MIME type). Per-property ROI calculation (income - expenses / property value). Frontend export buttons with blob download. Group-based access control on all report endpoints. |
 | R014 | core-capability | validated | M001/S02 | M001/S03, M001/S04 | S02 integration test creates properties with TRY/USD/EUR — currency persists correctly. S03 tenant/payment entities carry currency. S04 expense/bill entities carry currency (EUR expense + USD bill tested). S06 dashboard aggregates by currency, no cross-currency summing. |
 | R015 | primary-user-loop | validated | M001/S03 | none | S03 integration tests: tenant CRUD with all fields (name, phone, email, identity number, lease dates, deposit), active tenant enforcement (409 on duplicate), cross-group 403, active/inactive filtering. Frontend TenantList/TenantForm/TenantDetail browser-verified. |
-| R016 | operability | deferred | none | none | unmapped |
-| R017 | core-capability | deferred | none | none | unmapped |
+| R016 | operability | active | M003/S03 | none | unmapped |
+| R017 | core-capability | active | M003/S04 | M003/S05 | unmapped |
 | R018 | core-capability | deferred | none | none | unmapped |
-| R019 | failure-visibility | deferred | none | none | unmapped |
+| R019 | failure-visibility | active | M003/S06 | none | unmapped |
 | R020 | integration | out-of-scope | none | none | n/a |
 | R021 | differentiator | out-of-scope | none | none | n/a |
 | R022 | failure-visibility | validated | M001/S06 | M001/S03 | S06 integration test Notifications_IncludesLeaseExpiry proves lease expiry notification generated with tiered severity: ≤30 days = Critical, ≤60 days = Warning, ≤90 days = Info. Test uses 25-day-out lease end → Critical severity. Frontend shows severity-colored card. |
 | R023 | core-capability | validated | M001/S02 | none | S02 integration tests: note add 201, update 200, delete 204, list, cross-group denial 403. PropertyNotesController with creator-only edit/delete enforcement. Frontend inline note editing browser-verified on PropertyDetail page. |
 | R024 | primary-user-loop | validated | M001/S03 | M001/S06 | S03 integration tests prove rent increase CRUD with rate/effective date. S06 notification logic includes RentIncreaseApproaching (Info, within 30 days of effective date). Full lifecycle: record increase → see notification when approaching. |
+| R025 | operability | active | M003/S01 | none | unmapped |
+| R026 | continuity | active | M003/S02 | M003/S04 | unmapped |
+| R027 | quality-attribute | active | M003/S02 | none | unmapped |
 
 ## Coverage Summary
 
-- Active requirements: 0
-- Mapped to slices: 0
-- Validated: 18 (R001, R002, R003, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013, R014, R015, R022, R023, R024)
+- Active requirements: 6 (R016, R017, R019, R025, R026, R027)
+- Mapped to slices: 6
+- Validated: 18 (R001–R015, R022–R024)
 - Unmapped active requirements: 0
