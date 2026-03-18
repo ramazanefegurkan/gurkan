@@ -89,7 +89,7 @@ This file is the explicit capability and coverage contract for the project.
 - Source: user
 - Primary owning slice: M001/S05
 - Supporting slices: none
-- Validation: unmapped
+- Validation: T01 integration tests prove upload/list/download/delete API contract + access control. T02 browser verification proves end-to-end UI flow.
 - Notes: Basit dosya yükleme — OCR veya akıllı işleme yok.
 
 ### R011 — Mülk bazlı kâr/zarar, toplam gelir, toplam gider, ödenmemiş kiralar, yaklaşan faturalar. Ana ekran.
@@ -287,7 +287,7 @@ This file is the explicit capability and coverage contract for the project.
 | R007 | primary-user-loop | active | M001/S03 | M001/S06 | unmapped |
 | R008 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: expense create/edit/delete with 6 categories, recurring support, multi-currency (EUR). Group access control tested. |
 | R009 | primary-user-loop | validated | M001/S04 | M001/S06 | S04 integration tests (8/8 pass) + browser-verified CRUD: bill create/edit/delete with 5 types, due date tracking, mark-as-paid status transition, multi-currency (USD). Group access control tested. |
-| R010 | core-capability | active | M001/S05 | none | unmapped |
+| R010 | core-capability | active | M001/S05 | none | T01 integration tests prove upload/list/download/delete API contract + access control. T02 browser verification proves end-to-end UI flow. |
 | R011 | primary-user-loop | active | M001/S06 | none | unmapped |
 | R012 | failure-visibility | active | M001/S06 | none | unmapped |
 | R013 | differentiator | active | M001/S06 | none | unmapped |
