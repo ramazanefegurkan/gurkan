@@ -61,7 +61,7 @@
   - Verify: `dotnet build GurkanApi/` compiles. Swagger UI shows all new endpoints with correct schemas.
   - Done when: All 4 controllers compile, all DTOs defined, Swagger shows ~16 new endpoints.
 
-- [ ] **T03: Write integration tests covering all S03 business logic** `est:1h`
+- [x] **T03: Write integration tests covering all S03 business logic** `est:1h`
   - Why: Proves the contract — tenant CRUD, access control, payment generation, late detection, termination, short-term rental CRUD, rent increase propagation. These tests are S06's confidence that the data layer works.
   - Files: `GurkanApi.Tests/IntegrationTests/TenantTests.cs`, `GurkanApi.Tests/IntegrationTests/TestFixture.cs`
   - Do: Add new tables to TRUNCATE in TestFixture.cs (RentIncreases, RentPayments, ShortTermRentals, Tenants — before PropertyNotes). Write TenantTests.cs with `[Trait("Category", "S03")]` covering: tenant create (verify payments auto-generated), tenant update, active tenant enforcement (409 on second active), cross-group access denial (403), list active vs inactive, payment late detection (create tenant with past DueDate, verify Late status in response), mark payment as paid, terminate tenant (verify future payments cancelled), short-term rental CRUD with date overlap rejection, rent increase with future payment amount update, multi-currency tenant creation.

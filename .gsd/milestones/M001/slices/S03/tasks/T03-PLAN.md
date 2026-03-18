@@ -75,6 +75,13 @@ Follow the exact pattern from `GurkanApi.Tests/IntegrationTests/PropertyTests.cs
 - `GurkanApi.Tests/IntegrationTests/HttpClientExtensions.cs` — LoginAsAsync, ReadAsApiJsonAsync helpers
 - T01 entities, T02 controllers/DTOs — the API surface being tested
 
+## Observability Impact
+
+- **Test signals:** `dotnet test --filter "Category=S03"` runs all 13 S03 tests — any failure points to a regression in the tenant/payment/rental/increase business logic
+- **Failure inspection:** Test names map 1:1 to business rules (e.g. `TerminateTenant_CancelsFuturePayments` failing means the cancellation cascade broke). xUnit output includes the assertion message and expected vs actual values
+- **Regression surface:** Full suite (`dotnet test GurkanApi.Tests/`) shows S01+S02+S03 together — a new failure in S01/S02 after S03 changes indicates a TRUNCATE order or schema issue
+- **TRUNCATE order:** `TestFixture.cs` TRUNCATE list must have child tables (RentIncreases, RentPayments, ShortTermRentals, Tenants) before parent tables (Properties) — CASCADE handles it, but wrong order without CASCADE would surface as FK constraint errors in test initialization
+
 ## Expected Output
 
 - `GurkanApi.Tests/IntegrationTests/TenantTests.cs` — new, ≥12 test methods
