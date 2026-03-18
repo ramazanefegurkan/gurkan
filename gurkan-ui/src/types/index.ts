@@ -309,6 +309,114 @@ export interface PropertyNoteResponse {
   createdAt: string;
 }
 
+// ── Expense / Bill Enums ─────────────────────────────
+
+export const ExpenseCategory = {
+  Maintenance: 'Maintenance',
+  Repair: 'Repair',
+  Tax: 'Tax',
+  Insurance: 'Insurance',
+  Management: 'Management',
+  Other: 'Other',
+} as const;
+
+export type ExpenseCategory = (typeof ExpenseCategory)[keyof typeof ExpenseCategory];
+
+export const ExpenseCategoryLabels: Record<ExpenseCategory, string> = {
+  [ExpenseCategory.Maintenance]: 'Bakım',
+  [ExpenseCategory.Repair]: 'Tamir',
+  [ExpenseCategory.Tax]: 'Vergi',
+  [ExpenseCategory.Insurance]: 'Sigorta',
+  [ExpenseCategory.Management]: 'Yönetim',
+  [ExpenseCategory.Other]: 'Diğer',
+};
+
+export const BillType = {
+  Water: 'Water',
+  Electric: 'Electric',
+  Gas: 'Gas',
+  Internet: 'Internet',
+  Dues: 'Dues',
+} as const;
+
+export type BillType = (typeof BillType)[keyof typeof BillType];
+
+export const BillTypeLabels: Record<BillType, string> = {
+  [BillType.Water]: 'Su',
+  [BillType.Electric]: 'Elektrik',
+  [BillType.Gas]: 'Doğalgaz',
+  [BillType.Internet]: 'İnternet',
+  [BillType.Dues]: 'Aidat',
+};
+
+export const BillPaymentStatus = {
+  Pending: 'Pending',
+  Paid: 'Paid',
+  Overdue: 'Overdue',
+} as const;
+
+export type BillPaymentStatus = (typeof BillPaymentStatus)[keyof typeof BillPaymentStatus];
+
+export const BillPaymentStatusLabels: Record<BillPaymentStatus, string> = {
+  [BillPaymentStatus.Pending]: 'Bekliyor',
+  [BillPaymentStatus.Paid]: 'Ödendi',
+  [BillPaymentStatus.Overdue]: 'Gecikmiş',
+};
+
+// ── Expenses ─────────────────────────────────────────
+
+export interface ExpenseResponse {
+  id: string;
+  propertyId: string;
+  category: ExpenseCategory;
+  description: string;
+  amount: number;
+  currency: Currency;
+  date: string;
+  isRecurring: boolean;
+  recurrenceInterval: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface CreateExpenseRequest {
+  category: ExpenseCategory;
+  description: string;
+  amount: number;
+  currency: Currency;
+  date: string;
+  isRecurring: boolean;
+  recurrenceInterval?: string | null;
+  notes?: string | null;
+}
+
+export interface UpdateExpenseRequest extends CreateExpenseRequest {}
+
+// ── Bills ────────────────────────────────────────────
+
+export interface BillResponse {
+  id: string;
+  propertyId: string;
+  type: BillType;
+  amount: number;
+  currency: Currency;
+  dueDate: string;
+  paidDate: string | null;
+  status: BillPaymentStatus;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface CreateBillRequest {
+  type: BillType;
+  amount: number;
+  currency: Currency;
+  dueDate: string;
+  notes?: string | null;
+}
+
+export interface UpdateBillRequest extends CreateBillRequest {}
+
 // ── Groups ───────────────────────────────────────────
 
 export interface GroupResponse {

@@ -34,6 +34,8 @@ export default function PropertyLayout() {
   const isDetail = location.pathname === basePath;
   const isTenants = location.pathname.includes('/tenants');
   const isShortTerm = location.pathname.includes('/short-term-rentals');
+  const isExpenses = location.pathname.includes('/expenses');
+  const isBills = location.pathname.includes('/bills');
 
   if (loading) {
     return (
@@ -76,6 +78,18 @@ export default function PropertyLayout() {
           className={`property-tab ${isShortTerm ? 'property-tab--active' : ''}`}
         >
           Kısa Dönem
+        </Link>
+        <Link
+          to={`${basePath}/expenses`}
+          className={`property-tab ${isExpenses ? 'property-tab--active' : ''}`}
+        >
+          Giderler
+        </Link>
+        <Link
+          to={`${basePath}/bills`}
+          className={`property-tab ${isBills ? 'property-tab--active' : ''}`}
+        >
+          Faturalar
         </Link>
       </nav>
 

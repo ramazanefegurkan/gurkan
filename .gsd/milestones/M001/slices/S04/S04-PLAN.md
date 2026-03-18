@@ -52,7 +52,7 @@
   - Verify: `dotnet test GurkanApi.Tests/ --filter "Category=S04"` passes AND `dotnet test GurkanApi.Tests/` full regression passes
   - Done when: All S04 tests pass, all existing S01/S02/S03 tests still pass, `dotnet build` clean
 
-- [ ] **T02: Wire frontend types, API client, routes, and PropertyLayout tabs** `est:20m`
+- [x] **T02: Wire frontend types, API client, routes, and PropertyLayout tabs** `est:20m`
   - Why: Connects the frontend to the new backend endpoints and adds navigation for expense/bill pages. Unblocks T03 page development.
   - Files: `gurkan-ui/src/types/index.ts`, `gurkan-ui/src/api/client.ts`, `gurkan-ui/src/App.tsx`, `gurkan-ui/src/pages/Properties/PropertyLayout.tsx`
   - Do: Add TypeScript types (ExpenseResponse, BillResponse, CreateExpenseRequest, etc.) and const label objects (ExpenseCategoryLabels, BillTypeLabels, BillPaymentStatusLabels) with Turkish labels to types/index.ts. Add API functions (getExpenses, createExpense, updateExpense, deleteExpense, getBills, createBill, updateBill, deleteBill, markBillPaid) to client.ts. Add expense/bill routes nested under PropertyLayout in App.tsx. Add "Giderler" and "Faturalar" tab links to PropertyLayout.tsx.

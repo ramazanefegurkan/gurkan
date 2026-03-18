@@ -11,6 +11,10 @@ import TenantForm from './pages/Tenants/TenantForm';
 import TenantDetail from './pages/Tenants/TenantDetail';
 import ShortTermRentalList from './pages/ShortTermRentals/ShortTermRentalList';
 import ShortTermRentalForm from './pages/ShortTermRentals/ShortTermRentalForm';
+import ExpenseList from './pages/Expenses/ExpenseList';
+import ExpenseForm from './pages/Expenses/ExpenseForm';
+import BillList from './pages/Bills/BillList';
+import BillForm from './pages/Bills/BillForm';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -64,6 +68,12 @@ function AppRoutes() {
           <Route path="short-term-rentals" element={<ShortTermRentalList />} />
           <Route path="short-term-rentals/new" element={<ShortTermRentalForm />} />
           <Route path="short-term-rentals/:rentalId/edit" element={<ShortTermRentalForm />} />
+          <Route path="expenses" element={<ExpenseList />} />
+          <Route path="expenses/new" element={<ExpenseForm />} />
+          <Route path="expenses/:expenseId/edit" element={<ExpenseForm />} />
+          <Route path="bills" element={<BillList />} />
+          <Route path="bills/new" element={<BillForm />} />
+          <Route path="bills/:billId/edit" element={<BillForm />} />
         </Route>
       </Route>
 

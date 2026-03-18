@@ -120,6 +120,13 @@ Add TypeScript types and const label objects for expenses and bills, wire API cl
 - `gurkan-ui/src/pages/Properties/PropertyLayout.tsx` — existing tab navigation with 3 tabs
 - T01 backend must be complete (endpoints available for API function URLs)
 
+## Observability Impact
+
+- **New inspection surface:** PropertyLayout tabs now show "Giderler" and "Faturalar" — visible at any `/properties/:id` route. Future agents can verify tab presence via browser accessibility tree or DOM inspection.
+- **API client coverage:** 11 new API functions in `client.ts` wire to `/api/properties/{propertyId}/expenses` and `/api/properties/{propertyId}/bills` endpoints. Network requests to these URLs confirm the client layer is functional.
+- **Failure visibility:** TypeScript compile errors in `npm run build` surface any type mismatches between frontend types and backend DTO shapes. Browser console network errors (4xx/5xx) on expense/bill API calls indicate wiring issues.
+- **No runtime signals added:** This task is pure frontend wiring — no new structured logs or server-side observability. Runtime signals come from T01's backend controllers.
+
 ## Expected Output
 
 - `gurkan-ui/src/types/index.ts` — extended with expense/bill types and label objects

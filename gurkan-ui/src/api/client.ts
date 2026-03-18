@@ -18,6 +18,12 @@ import type {
   UpdateShortTermRentalRequest,
   RentIncreaseResponse,
   CreateRentIncreaseRequest,
+  ExpenseResponse,
+  CreateExpenseRequest,
+  UpdateExpenseRequest,
+  BillResponse,
+  CreateBillRequest,
+  UpdateBillRequest,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -313,6 +319,124 @@ export async function createRentIncrease(
   const { data } = await api.post<RentIncreaseResponse>(
     `/properties/${propertyId}/tenants/${tenantId}/rent-increases`,
     payload,
+  );
+  return data;
+}
+
+// ── Expenses ─────────────────────────────────────────
+
+export async function getExpenses(
+  propertyId: string,
+  category?: string,
+): Promise<ExpenseResponse[]> {
+  const params = category ? { category } : {};
+  const { data } = await api.get<ExpenseResponse[]>(
+    `/properties/${propertyId}/expenses`,
+    { params },
+  );
+  return data;
+}
+
+export async function getExpense(
+  propertyId: string,
+  id: string,
+): Promise<ExpenseResponse> {
+  const { data } = await api.get<ExpenseResponse>(
+    `/properties/${propertyId}/expenses/${id}`,
+  );
+  return data;
+}
+
+export async function createExpense(
+  propertyId: string,
+  payload: CreateExpenseRequest,
+): Promise<ExpenseResponse> {
+  const { data } = await api.post<ExpenseResponse>(
+    `/properties/${propertyId}/expenses`,
+    payload,
+  );
+  return data;
+}
+
+export async function updateExpense(
+  propertyId: string,
+  id: string,
+  payload: UpdateExpenseRequest,
+): Promise<ExpenseResponse> {
+  const { data } = await api.put<ExpenseResponse>(
+    `/properties/${propertyId}/expenses/${id}`,
+    payload,
+  );
+  return data;
+}
+
+export async function deleteExpense(
+  propertyId: string,
+  id: string,
+): Promise<void> {
+  await api.delete(`/properties/${propertyId}/expenses/${id}`);
+}
+
+// ── Bills ────────────────────────────────────────────
+
+export async function getBills(
+  propertyId: string,
+  status?: string,
+): Promise<BillResponse[]> {
+  const params = status ? { status } : {};
+  const { data } = await api.get<BillResponse[]>(
+    `/properties/${propertyId}/bills`,
+    { params },
+  );
+  return data;
+}
+
+export async function getBill(
+  propertyId: string,
+  id: string,
+): Promise<BillResponse> {
+  const { data } = await api.get<BillResponse>(
+    `/properties/${propertyId}/bills/${id}`,
+  );
+  return data;
+}
+
+export async function createBill(
+  propertyId: string,
+  payload: CreateBillRequest,
+): Promise<BillResponse> {
+  const { data } = await api.post<BillResponse>(
+    `/properties/${propertyId}/bills`,
+    payload,
+  );
+  return data;
+}
+
+export async function updateBill(
+  propertyId: string,
+  id: string,
+  payload: UpdateBillRequest,
+): Promise<BillResponse> {
+  const { data } = await api.put<BillResponse>(
+    `/properties/${propertyId}/bills/${id}`,
+    payload,
+  );
+  return data;
+}
+
+export async function deleteBill(
+  propertyId: string,
+  id: string,
+): Promise<void> {
+  await api.delete(`/properties/${propertyId}/bills/${id}`);
+}
+
+export async function markBillPaid(
+  propertyId: string,
+  id: string,
+): Promise<BillResponse> {
+  const { data } = await api.patch<BillResponse>(
+    `/properties/${propertyId}/bills/${id}/pay`,
   );
   return data;
 }
