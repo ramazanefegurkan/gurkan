@@ -13,7 +13,7 @@ Tüm mülklerin finansal durumunu tek bir dashboard'dan görmek — kira gelirle
 
 ## Current State
 
-Greenfield proje. Henüz kod yok. Mevcut veriler spreadsheet'lerde takip ediliyor.
+S01 tamamlandı: ASP.NET Core 10 Web API + PostgreSQL 16 (Docker, port 5434) + JWT auth + grup bazlı RBAC. Seed admin (admin@gurkan.com), 3 controller (Auth, Groups, Users), 15 endpoint, 18 integration test. Backend çalışır durumda, frontend henüz yok.
 
 ## Architecture / Key Patterns
 

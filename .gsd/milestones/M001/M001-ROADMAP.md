@@ -57,7 +57,7 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Auth & Grup Bazlı Erişim** `risk:high` `depends:[]`
+- [x] **S01: Auth & Grup Bazlı Erişim** `risk:high` `depends:[]`
   > After this: Kullanıcı email+şifre ile login olur. Superadmin grup oluşturur, kullanıcı ekler, grup admini delege eder. API endpoint'leri JWT ile korunur. Test ile kanıtlanır.
 
 - [ ] **S02: Mülk Yönetimi** `risk:medium` `depends:[S01]`
