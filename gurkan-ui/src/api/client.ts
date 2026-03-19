@@ -31,6 +31,9 @@ import type {
   ImportPreviewResponse,
   AirbnbImportRow,
   RentPaymentImportRow,
+  BankAccountResponse,
+  CreateBankAccountRequest,
+  UpdateBankAccountRequest,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -660,6 +663,33 @@ export async function importRentPayments(
     { headers: { 'Content-Type': 'multipart/form-data' } },
   );
   return data;
+}
+
+// ── Bank Accounts ────────────────────────────────────
+
+export async function getBankAccounts(groupId?: string): Promise<BankAccountResponse[]> {
+  const params = groupId ? { groupId } : {};
+  const { data } = await api.get<BankAccountResponse[]>('/bank-accounts', { params });
+  return data;
+}
+
+export async function getBankAccount(id: string): Promise<BankAccountResponse> {
+  const { data } = await api.get<BankAccountResponse>(`/bank-accounts/${id}`);
+  return data;
+}
+
+export async function createBankAccount(payload: CreateBankAccountRequest): Promise<BankAccountResponse> {
+  const { data } = await api.post<BankAccountResponse>('/bank-accounts', payload);
+  return data;
+}
+
+export async function updateBankAccount(id: string, payload: UpdateBankAccountRequest): Promise<BankAccountResponse> {
+  const { data } = await api.put<BankAccountResponse>(`/bank-accounts/${id}`, payload);
+  return data;
+}
+
+export async function deleteBankAccount(id: string): Promise<void> {
+  await api.delete(`/bank-accounts/${id}`);
 }
 
 export default api;

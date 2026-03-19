@@ -36,6 +36,30 @@ public class CreatePropertyRequest
     [MaxLength(2000)]
     public string? Description { get; set; }
 
+    // ── Ownership & subscription ──
+    [MaxLength(200)]
+    public string? TitleDeedOwner { get; set; }
+
+    [MaxLength(200)]
+    public string? SubscriptionHolder { get; set; }
+
+    [MaxLength(50)]
+    public string? ElectricSubscriptionNo { get; set; }
+
+    [MaxLength(50)]
+    public string? GasSubscriptionNo { get; set; }
+
+    [MaxLength(50)]
+    public string? WaterSubscriptionNo { get; set; }
+
+    [MaxLength(50)]
+    public string? InternetSubscriptionNo { get; set; }
+
+    [MaxLength(50)]
+    public string? DuesSubscriptionNo { get; set; }
+
+    public Guid? DefaultBankAccountId { get; set; }
+
     [Required]
     public Guid GroupId { get; set; }
 }

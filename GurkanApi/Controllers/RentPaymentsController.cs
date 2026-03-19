@@ -39,6 +39,7 @@ public class RentPaymentsController : ControllerBase
         if (!allowed) return errorResult!;
 
         var payments = await _db.RentPayments
+            .Include(p => p.BankAccount)
             .Where(p => p.TenantId == tenantId)
             .OrderBy(p => p.DueDate)
             .ToListAsync();
@@ -82,6 +83,7 @@ public class RentPaymentsController : ControllerBase
         payment.Status = RentPaymentStatus.Paid;
         payment.PaidDate = request.PaidDate ?? DateTime.UtcNow;
         payment.PaymentMethod = request.PaymentMethod;
+        payment.BankAccountId = request.BankAccountId;
 
         if (request.Notes is not null)
             payment.Notes = request.Notes;
@@ -115,6 +117,10 @@ public class RentPaymentsController : ControllerBase
             PaidDate = p.PaidDate,
             Status = effectiveStatus,
             PaymentMethod = p.PaymentMethod?.ToString(),
+            BankAccountId = p.BankAccountId,
+            BankAccountName = p.BankAccount != null
+                ? $"{p.BankAccount.HolderName} - {p.BankAccount.BankName}"
+                : null,
             Notes = p.Notes,
             CreatedAt = p.CreatedAt,
         };

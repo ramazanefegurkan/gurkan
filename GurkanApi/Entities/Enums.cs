@@ -40,8 +40,7 @@ public enum RentPaymentStatus
 public enum PaymentMethod
 {
     Cash,
-    BankTransfer,
-    Check
+    BankTransfer
 }
 
 public enum RentalPlatform

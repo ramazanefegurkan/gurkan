@@ -12,6 +12,8 @@ public class RentPaymentResponse
     public DateTime? PaidDate { get; set; }
     public string Status { get; set; } = string.Empty;
     public string? PaymentMethod { get; set; }
+    public Guid? BankAccountId { get; set; }
+    public string? BankAccountName { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
 }
