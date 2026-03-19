@@ -468,14 +468,17 @@ export default function TenantDetail() {
                 <select
                   className="form-select"
                   value={payMethod}
-                  onChange={(e) => setPayMethod(e.target.value)}
+                  onChange={(e) => {
+                    setPayMethod(e.target.value);
+                    if (e.target.value === PaymentMethod.Cash) setPayBankAccountId('');
+                  }}
                 >
                   {Object.entries(PaymentMethodLabels).map(([val, label]) => (
                     <option key={val} value={val}>{label}</option>
                   ))}
                 </select>
               </div>
-              {bankAccounts.length > 0 && (
+              {bankAccounts.length > 0 && payMethod !== PaymentMethod.Cash && (
                 <div className="form-field">
                   <label className="form-label">Banka Hesabı</label>
                   <select
