@@ -46,15 +46,26 @@ export default function ShortTermRentalForm() {
   const [currency, setCurrency] = useState<string>(Currency.TRY);
   const [notes, setNotes] = useState('');
 
+  // Track which financial field the user last edited to avoid circular updates
+  const [lastEdited, setLastEdited] = useState<'nightly' | 'total' | null>(null);
+
   const nightCount = checkIn && checkOut ? daysBetween(checkIn, checkOut) : 0;
 
-  // Auto-compute totalAmount from nightlyRate * nightCount
+  // Auto-compute totalAmount when nightlyRate or nightCount changes (user edited nightly)
   useEffect(() => {
-    if (nightlyRate && nightCount > 0) {
+    if (lastEdited !== 'total' && nightlyRate && nightCount > 0) {
       const total = Number(nightlyRate) * nightCount;
       setTotalAmount(total.toFixed(2));
     }
-  }, [nightlyRate, nightCount]);
+  }, [nightlyRate, nightCount, lastEdited]);
+
+  // Auto-compute nightlyRate when totalAmount changes (user edited total)
+  useEffect(() => {
+    if (lastEdited === 'total' && totalAmount && nightCount > 0) {
+      const nightly = Number(totalAmount) / nightCount;
+      setNightlyRate(nightly.toFixed(2));
+    }
+  }, [totalAmount, nightCount, lastEdited]);
 
   // Auto-compute netAmount from totalAmount - platformFee
   useEffect(() => {
@@ -281,7 +292,7 @@ export default function ShortTermRentalForm() {
                   step="0.01"
                   min="0"
                   value={nightlyRate}
-                  onChange={(e) => setNightlyRate(e.target.value)}
+                  onChange={(e) => { setLastEdited('nightly'); setNightlyRate(e.target.value); }}
                   required
                   placeholder="0.00"
                 />
@@ -296,7 +307,7 @@ export default function ShortTermRentalForm() {
                   step="0.01"
                   min="0"
                   value={totalAmount}
-                  onChange={(e) => setTotalAmount(e.target.value)}
+                  onChange={(e) => { setLastEdited('total'); setTotalAmount(e.target.value); }}
                   required
                   placeholder="0.00"
                 />

@@ -512,6 +512,7 @@ export const NotificationSeverity = {
 export type NotificationSeverity = (typeof NotificationSeverity)[keyof typeof NotificationSeverity];
 
 export interface NotificationItem {
+  key: string;
   type: NotificationType;
   severity: NotificationSeverity;
   message: string;

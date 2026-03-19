@@ -61,6 +61,7 @@ public class NotificationComputeService : INotificationComputeService
         {
             notifications.Add(new NotificationItem
             {
+                Key = $"LateRent:{rp.Id}",
                 Type = "LateRent",
                 Severity = "Critical",
                 Message = $"Kira ödemesi gecikti: {rp.Tenant.FullName} - {rp.Amount} {rp.Currency} (Vade: {rp.DueDate:dd.MM.yyyy})",
@@ -83,6 +84,7 @@ public class NotificationComputeService : INotificationComputeService
         {
             notifications.Add(new NotificationItem
             {
+                Key = $"UpcomingBill:{bill.Id}",
                 Type = "UpcomingBill",
                 Severity = "Warning",
                 Message = $"Fatura son ödeme yaklaşıyor: {bill.Type} - {bill.Amount} {bill.Currency} (Son ödeme: {bill.DueDate:dd.MM.yyyy})",
@@ -104,6 +106,7 @@ public class NotificationComputeService : INotificationComputeService
         {
             notifications.Add(new NotificationItem
             {
+                Key = $"OverdueBill:{bill.Id}",
                 Type = "UpcomingBill",
                 Severity = "Critical",
                 Message = $"Fatura gecikmiş: {bill.Type} - {bill.Amount} {bill.Currency} (Son ödeme: {bill.DueDate:dd.MM.yyyy})",
@@ -135,6 +138,7 @@ public class NotificationComputeService : INotificationComputeService
 
             notifications.Add(new NotificationItem
             {
+                Key = $"LeaseExpiry:{tenant.Id}",
                 Type = "LeaseExpiry",
                 Severity = severity,
                 Message = $"Kira sözleşmesi bitiyor: {tenant.FullName} (Bitiş: {tenant.LeaseEnd:dd.MM.yyyy})",
@@ -158,6 +162,7 @@ public class NotificationComputeService : INotificationComputeService
         {
             notifications.Add(new NotificationItem
             {
+                Key = $"RentIncrease:{ri.Id}",
                 Type = "RentIncrease",
                 Severity = "Info",
                 Message = $"Kira artışı yaklaşıyor: {ri.Tenant.FullName} - {ri.NewAmount} {ri.Tenant.Currency} (Tarih: {ri.EffectiveDate:dd.MM.yyyy})",
@@ -168,8 +173,19 @@ public class NotificationComputeService : INotificationComputeService
             });
         }
 
+        // --- Filter out dismissed notifications ---
+        var allKeys = notifications.Select(n => n.Key).ToList();
+        var dismissedKeys = await _db.DismissedNotifications
+            .Where(dn => dn.UserId == userId && allKeys.Contains(dn.NotificationKey))
+            .Select(dn => dn.NotificationKey)
+            .ToHashSetAsync();
+
+        var filtered = notifications
+            .Where(n => !dismissedKeys.Contains(n.Key))
+            .ToList();
+
         // Sort: Critical first, then Warning, then Info; within same severity by Date ascending
-        var sorted = notifications
+        var sorted = filtered
             .OrderBy(n => SeverityOrder.GetValueOrDefault(n.Severity, 99))
             .ThenBy(n => n.Date)
             .ToList();

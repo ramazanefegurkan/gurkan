@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Bill> Bills => Set<Bill>();
     public DbSet<Document> Documents => Set<Document>();
     public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
+    public DbSet<DismissedNotification> DismissedNotifications => Set<DismissedNotification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -309,6 +310,21 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(dt => dt.User)
                   .WithMany()
                   .HasForeignKey(dt => dt.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- DismissedNotification ----------
+        modelBuilder.Entity<DismissedNotification>(entity =>
+        {
+            entity.HasKey(dn => dn.Id);
+            entity.HasIndex(dn => new { dn.UserId, dn.NotificationKey }).IsUnique();
+            entity.Property(dn => dn.NotificationKey).IsRequired().HasMaxLength(300);
+            entity.Property(dn => dn.DismissedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(dn => dn.User)
+                  .WithMany()
+                  .HasForeignKey(dn => dn.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }

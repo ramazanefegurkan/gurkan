@@ -30,7 +30,6 @@ export default function PropertyForm() {
   const [area, setArea] = useState('');
   const [roomCount, setRoomCount] = useState('');
   const [floor, setFloor] = useState('');
-  const [totalFloors, setTotalFloors] = useState('');
   const [buildYear, setBuildYear] = useState('');
   const [currency, setCurrency] = useState<Currency>(Currency.TRY);
   const [description, setDescription] = useState('');
@@ -66,7 +65,6 @@ export default function PropertyForm() {
           setArea(propertyData.area != null ? String(propertyData.area) : '');
           setRoomCount(propertyData.roomCount != null ? String(propertyData.roomCount) : '');
           setFloor(propertyData.floor != null ? String(propertyData.floor) : '');
-          setTotalFloors(propertyData.totalFloors != null ? String(propertyData.totalFloors) : '');
           setBuildYear(propertyData.buildYear != null ? String(propertyData.buildYear) : '');
           setCurrency(propertyData.currency);
           setDescription(propertyData.description ?? '');
@@ -115,7 +113,6 @@ export default function PropertyForm() {
           area: parseOptionalInt(area),
           roomCount: parseOptionalInt(roomCount),
           floor: parseOptionalInt(floor),
-          totalFloors: parseOptionalInt(totalFloors),
           buildYear: parseOptionalInt(buildYear),
           currency,
           description: description.trim() || null,
@@ -131,7 +128,6 @@ export default function PropertyForm() {
           area: parseOptionalInt(area),
           roomCount: parseOptionalInt(roomCount),
           floor: parseOptionalInt(floor),
-          totalFloors: parseOptionalInt(totalFloors),
           buildYear: parseOptionalInt(buildYear),
           currency,
           description: description.trim() || null,
@@ -356,19 +352,6 @@ export default function PropertyForm() {
                   value={floor}
                   onChange={(e) => setFloor(e.target.value)}
                   placeholder="3"
-                  disabled={submitting}
-                />
-              </div>
-              <div className="form-field">
-                <label className="form-label" htmlFor="totalFloors">Toplam Kat</label>
-                <input
-                  id="totalFloors"
-                  className="form-input"
-                  type="number"
-                  min="1"
-                  value={totalFloors}
-                  onChange={(e) => setTotalFloors(e.target.value)}
-                  placeholder="10"
                   disabled={submitting}
                 />
               </div>
