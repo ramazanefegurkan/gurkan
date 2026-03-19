@@ -6,6 +6,7 @@ import {
   updateProperty,
   getGroups,
   getBankAccounts,
+  createBankAccount,
 } from '../../api/client';
 import {
   PropertyType,
@@ -50,6 +51,11 @@ export default function PropertyForm() {
   // ── UI state ──
   const [groups, setGroups] = useState<GroupResponse[]>([]);
   const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([]);
+  const [showNewBankAccount, setShowNewBankAccount] = useState(false);
+  const [newBaHolder, setNewBaHolder] = useState('');
+  const [newBaBank, setNewBaBank] = useState('');
+  const [newBaIban, setNewBaIban] = useState('');
+  const [savingBa, setSavingBa] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -446,23 +452,114 @@ export default function PropertyForm() {
 
             <div className="form-field">
               <label className="form-label" htmlFor="defaultBankAccount">Kira Geliri Hesabı</label>
-              <select
-                id="defaultBankAccount"
-                className="form-select"
-                value={defaultBankAccountId}
-                onChange={(e) => setDefaultBankAccountId(e.target.value)}
-                disabled={submitting}
-              >
-                <option value="">Seçilmemiş</option>
-                {bankAccounts
-                  .filter((ba) => !groupId || ba.groupId === groupId)
-                  .map((ba) => (
-                    <option key={ba.id} value={ba.id}>
-                      {ba.holderName} - {ba.bankName}{ba.iban ? ` (${ba.iban})` : ''}
-                    </option>
-                  ))}
-              </select>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
+                <select
+                  id="defaultBankAccount"
+                  className="form-select"
+                  value={defaultBankAccountId}
+                  onChange={(e) => setDefaultBankAccountId(e.target.value)}
+                  disabled={submitting}
+                  style={{ flex: 1 }}
+                >
+                  <option value="">Seçilmemiş</option>
+                  {bankAccounts
+                    .filter((ba) => !groupId || ba.groupId === groupId)
+                    .map((ba) => (
+                      <option key={ba.id} value={ba.id}>
+                        {ba.holderName} - {ba.bankName}{ba.iban ? ` (${ba.iban})` : ''}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                  onClick={() => setShowNewBankAccount(true)}
+                  disabled={!groupId || submitting}
+                >
+                  + Yeni Hesap
+                </button>
+              </div>
               <span className="form-hint">Kira ödemelerinde bu hesap otomatik seçilir</span>
+
+              {showNewBankAccount && (
+                <div style={{
+                  marginTop: '12px',
+                  padding: '16px',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-card)',
+                }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '12px' }}>Yeni Banka Hesabı</div>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <label className="form-label">Hesap Sahibi *</label>
+                      <input
+                        className="form-input"
+                        value={newBaHolder}
+                        onChange={(e) => setNewBaHolder(e.target.value)}
+                        placeholder="Örn: Efe Gürkan"
+                        maxLength={200}
+                      />
+                    </div>
+                    <div className="form-field">
+                      <label className="form-label">Banka *</label>
+                      <input
+                        className="form-input"
+                        value={newBaBank}
+                        onChange={(e) => setNewBaBank(e.target.value)}
+                        placeholder="Örn: İş Bankası"
+                        maxLength={200}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-field">
+                    <label className="form-label">IBAN</label>
+                    <input
+                      className="form-input"
+                      value={newBaIban}
+                      onChange={(e) => setNewBaIban(e.target.value)}
+                      placeholder="TR..."
+                      maxLength={34}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      disabled={!newBaHolder.trim() || !newBaBank.trim() || savingBa}
+                      onClick={async () => {
+                        if (!groupId || !newBaHolder.trim() || !newBaBank.trim()) return;
+                        setSavingBa(true);
+                        try {
+                          const created = await createBankAccount({
+                            groupId,
+                            holderName: newBaHolder.trim(),
+                            bankName: newBaBank.trim(),
+                            iban: newBaIban.trim() || null,
+                          });
+                          setBankAccounts((prev) => [...prev, created]);
+                          setDefaultBankAccountId(created.id);
+                          setShowNewBankAccount(false);
+                          setNewBaHolder('');
+                          setNewBaBank('');
+                          setNewBaIban('');
+                        } catch { /* ignore */ }
+                        finally { setSavingBa(false); }
+                      }}
+                    >
+                      {savingBa ? 'Kaydediliyor...' : 'Kaydet'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => { setShowNewBankAccount(false); setNewBaHolder(''); setNewBaBank(''); setNewBaIban(''); }}
+                    >
+                      İptal
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="form-row">
