@@ -11,6 +11,49 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gurkan"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    build:
+      context: ./GurkanApi
+    container_name: gurkan-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5039:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=gurkan;Username=postgres;Password=postgres"
+      Jwt__Secret: "GurkanApi-SuperSecret-Key-Min32Chars!!"
+      Jwt__Issuer: "GurkanApi"
+      Jwt__Audience: "GurkanClient"
+      Jwt__AccessTokenExpirationMinutes: "15"
+      Jwt__RefreshTokenExpirationDays: "7"
+      SeedAdmin__Email: "admin@gurkan.com"
+      SeedAdmin__Password: "Admin123!"
+      SeedAdmin__FullName: "System Admin"
+    volumes:
+      - api_uploads:/app/uploads
+
+  web:
+    build:
+      context: ./gurkan-ui
+      args:
+        VITE_API_URL: "http://localhost:5039/api"
+    container_name: gurkan-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "5173:80"
 
 volumes:
   pgdata:
+  api_uploads:

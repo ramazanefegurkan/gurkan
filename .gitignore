@@ -48,3 +48,6 @@ obj/
 *.suo
 *.userosscache
 *.sln.docuser
+
+# ── GSD baseline (auto-generated) ──
+.gsd
