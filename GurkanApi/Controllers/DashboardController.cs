@@ -33,11 +33,12 @@ public class DashboardController : ControllerBase
     /// Income/expenses are grouped per currency — never summed across currencies.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] int? year)
+    public async Task<IActionResult> Get([FromQuery] int? year, [FromQuery] int? month, [FromQuery] string? rentalType)
     {
         var userId = User.GetUserId();
         var role = User.GetRole();
         var selectedYear = year ?? DateTime.UtcNow.Year;
+        // rentalType: "LongTerm", "ShortTerm", or null/empty = All
 
         // --- Resolve accessible properties ---
         IQueryable<Property> propertyQuery = _db.Properties.Include(p => p.Group);
@@ -66,26 +67,30 @@ public class DashboardController : ControllerBase
             ? Math.Round((decimal)propertiesWithActiveTenant / properties.Count * 100, 1)
             : 0;
 
-        // --- Bulk-load financial data filtered by year ---
+        // --- Bulk-load financial data filtered by year (and optionally month) ---
         var rentPayments = await _db.RentPayments
             .Include(rp => rp.Tenant)
             .Where(rp => propertyIds.Contains(rp.Tenant.PropertyId)
-                      && rp.DueDate.Year == selectedYear)
+                      && rp.DueDate.Year == selectedYear
+                      && (!month.HasValue || rp.DueDate.Month == month.Value))
             .ToListAsync();
 
         var shortTermRentals = await _db.ShortTermRentals
             .Where(str => propertyIds.Contains(str.PropertyId)
-                       && str.CheckIn.Year == selectedYear)
+                       && str.CheckIn.Year == selectedYear
+                       && (!month.HasValue || str.CheckIn.Month == month.Value))
             .ToListAsync();
 
         var expenses = await _db.Expenses
             .Where(e => propertyIds.Contains(e.PropertyId)
-                     && e.Date.Year == selectedYear)
+                     && e.Date.Year == selectedYear
+                     && (!month.HasValue || e.Date.Month == month.Value))
             .ToListAsync();
 
         var bills = await _db.Bills
             .Where(b => propertyIds.Contains(b.PropertyId)
-                     && b.DueDate.Year == selectedYear)
+                     && b.DueDate.Year == selectedYear
+                     && (!month.HasValue || b.DueDate.Month == month.Value))
             .ToListAsync();
 
         // --- Build per-property financials ---
@@ -98,15 +103,22 @@ public class DashboardController : ControllerBase
             var propExpenses = expenses.Where(e => e.PropertyId == prop.Id).ToList();
             var propBills = bills.Where(b => b.PropertyId == prop.Id).ToList();
 
-            // Income: Paid rent payments + short-term rental NetAmount, grouped by currency
-            var rentIncome = propRentPayments
-                .Where(rp => rp.Status == RentPaymentStatus.Paid)
-                .GroupBy(rp => rp.Currency)
-                .Select(g => new CurrencyAmount { Currency = g.Key, Amount = g.Sum(rp => rp.Amount) });
+            var isLongTerm = string.Equals(rentalType, "LongTerm", StringComparison.OrdinalIgnoreCase);
+            var isShortTerm = string.Equals(rentalType, "ShortTerm", StringComparison.OrdinalIgnoreCase);
 
-            var shortTermIncome = propShortTermRentals
-                .GroupBy(str => str.Currency)
-                .Select(g => new CurrencyAmount { Currency = g.Key, Amount = g.Sum(str => str.NetAmount) });
+            // Income: Paid rent payments + short-term rental NetAmount, grouped by currency
+            var rentIncome = (!isShortTerm)
+                ? propRentPayments
+                    .Where(rp => rp.Status == RentPaymentStatus.Paid)
+                    .GroupBy(rp => rp.Currency)
+                    .Select(g => new CurrencyAmount { Currency = g.Key, Amount = g.Sum(rp => rp.Amount) })
+                : Enumerable.Empty<CurrencyAmount>();
+
+            var shortTermIncome = (!isLongTerm)
+                ? propShortTermRentals
+                    .GroupBy(str => str.Currency)
+                    .Select(g => new CurrencyAmount { Currency = g.Key, Amount = g.Sum(str => str.NetAmount) })
+                : Enumerable.Empty<CurrencyAmount>();
 
             var income = MergeCurrencyAmounts(rentIncome, shortTermIncome);
 
@@ -134,8 +146,8 @@ public class DashboardController : ControllerBase
                        - (expenseTotal.FirstOrDefault(e => e.Currency == c)?.Amount ?? 0)
             }).ToList();
 
-            // Unpaid rent: Pending + DueDate+5 < now (same threshold as S03 RentPaymentsController)
-            var unpaidRentCount = propRentPayments
+            // Unpaid rent: Pending + DueDate+5 < now (hidden when ShortTerm filter)
+            var unpaidRentCount = isShortTerm ? 0 : propRentPayments
                 .Count(rp => rp.Status == RentPaymentStatus.Pending && rp.DueDate.AddDays(5) < now);
 
             // Upcoming bills: not Paid and due within 7 days
