@@ -37,7 +37,7 @@ public class PropertiesController : ControllerBase
         var userId = User.GetUserId();
         var role = User.GetRole();
 
-        IQueryable<Property> query = _db.Properties.Include(p => p.Group);
+        IQueryable<Property> query = _db.Properties.Include(p => p.Group).Include(p => p.DefaultBankAccount);
 
         if (role != UserRole.SuperAdmin)
         {
@@ -69,6 +69,7 @@ public class PropertiesController : ControllerBase
     {
         var property = await _db.Properties
             .Include(p => p.Group)
+            .Include(p => p.DefaultBankAccount)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (property is null)
@@ -122,6 +123,14 @@ public class PropertiesController : ControllerBase
             BuildYear = request.BuildYear,
             Currency = request.Currency,
             Description = request.Description,
+            TitleDeedOwner = request.TitleDeedOwner,
+            SubscriptionHolder = request.SubscriptionHolder,
+            ElectricSubscriptionNo = request.ElectricSubscriptionNo,
+            GasSubscriptionNo = request.GasSubscriptionNo,
+            WaterSubscriptionNo = request.WaterSubscriptionNo,
+            InternetSubscriptionNo = request.InternetSubscriptionNo,
+            DuesSubscriptionNo = request.DuesSubscriptionNo,
+            DefaultBankAccountId = request.DefaultBankAccountId,
             GroupId = request.GroupId,
             CreatedAt = DateTime.UtcNow,
         };
@@ -145,6 +154,7 @@ public class PropertiesController : ControllerBase
     {
         var property = await _db.Properties
             .Include(p => p.Group)
+            .Include(p => p.DefaultBankAccount)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (property is null)
@@ -171,6 +181,14 @@ public class PropertiesController : ControllerBase
         if (request.BuildYear is not null) property.BuildYear = request.BuildYear;
         if (request.Currency is not null) property.Currency = request.Currency.Value;
         if (request.Description is not null) property.Description = request.Description;
+        if (request.TitleDeedOwner is not null) property.TitleDeedOwner = request.TitleDeedOwner;
+        if (request.SubscriptionHolder is not null) property.SubscriptionHolder = request.SubscriptionHolder;
+        if (request.ElectricSubscriptionNo is not null) property.ElectricSubscriptionNo = request.ElectricSubscriptionNo;
+        if (request.GasSubscriptionNo is not null) property.GasSubscriptionNo = request.GasSubscriptionNo;
+        if (request.WaterSubscriptionNo is not null) property.WaterSubscriptionNo = request.WaterSubscriptionNo;
+        if (request.InternetSubscriptionNo is not null) property.InternetSubscriptionNo = request.InternetSubscriptionNo;
+        if (request.DuesSubscriptionNo is not null) property.DuesSubscriptionNo = request.DuesSubscriptionNo;
+        if (request.DefaultBankAccountId is not null) property.DefaultBankAccountId = request.DefaultBankAccountId;
 
         property.UpdatedAt = DateTime.UtcNow;
 
@@ -230,6 +248,17 @@ public class PropertiesController : ControllerBase
         BuildYear = p.BuildYear,
         Currency = p.Currency,
         Description = p.Description,
+        TitleDeedOwner = p.TitleDeedOwner,
+        SubscriptionHolder = p.SubscriptionHolder,
+        ElectricSubscriptionNo = p.ElectricSubscriptionNo,
+        GasSubscriptionNo = p.GasSubscriptionNo,
+        WaterSubscriptionNo = p.WaterSubscriptionNo,
+        InternetSubscriptionNo = p.InternetSubscriptionNo,
+        DuesSubscriptionNo = p.DuesSubscriptionNo,
+        DefaultBankAccountId = p.DefaultBankAccountId,
+        DefaultBankAccountName = p.DefaultBankAccount != null
+            ? $"{p.DefaultBankAccount.HolderName} - {p.DefaultBankAccount.BankName}"
+            : null,
         GroupId = p.GroupId,
         GroupName = p.Group?.Name,
         CreatedAt = p.CreatedAt,

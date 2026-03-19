@@ -16,4 +16,14 @@ public class UpdatePropertyRequest
     public int? BuildYear { get; set; }
     public Currency? Currency { get; set; }
     public string? Description { get; set; }
+
+    // ── Ownership & subscription ──
+    public string? TitleDeedOwner { get; set; }
+    public string? SubscriptionHolder { get; set; }
+    public string? ElectricSubscriptionNo { get; set; }
+    public string? GasSubscriptionNo { get; set; }
+    public string? WaterSubscriptionNo { get; set; }
+    public string? InternetSubscriptionNo { get; set; }
+    public string? DuesSubscriptionNo { get; set; }
+    public Guid? DefaultBankAccountId { get; set; }
 }
