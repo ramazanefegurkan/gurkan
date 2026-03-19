@@ -5,6 +5,7 @@ import {
   createProperty,
   updateProperty,
   getGroups,
+  getBankAccounts,
 } from '../../api/client';
 import {
   PropertyType,
@@ -12,6 +13,7 @@ import {
   Currency,
   CurrencyLabels,
   type GroupResponse,
+  type BankAccountResponse,
 } from '../../types';
 import '../../styles/shared.css';
 import './Properties.css';
@@ -35,8 +37,19 @@ export default function PropertyForm() {
   const [description, setDescription] = useState('');
   const [groupId, setGroupId] = useState('');
 
+  // ── Ownership & subscription ──
+  const [titleDeedOwner, setTitleDeedOwner] = useState('');
+  const [subscriptionHolder, setSubscriptionHolder] = useState('');
+  const [electricSubNo, setElectricSubNo] = useState('');
+  const [gasSubNo, setGasSubNo] = useState('');
+  const [waterSubNo, setWaterSubNo] = useState('');
+  const [internetSubNo, setInternetSubNo] = useState('');
+  const [duesSubNo, setDuesSubNo] = useState('');
+  const [defaultBankAccountId, setDefaultBankAccountId] = useState('');
+
   // ── UI state ──
   const [groups, setGroups] = useState<GroupResponse[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -47,14 +60,16 @@ export default function PropertyForm() {
 
     async function loadData() {
       try {
-        const [groupsData, propertyData] = await Promise.all([
+        const [groupsData, bankAccountsData, propertyData] = await Promise.all([
           getGroups(),
+          getBankAccounts(),
           isEdit && id ? getProperty(id) : Promise.resolve(null),
         ]);
 
         if (cancelled) return;
 
         setGroups(groupsData);
+        setBankAccounts(bankAccountsData);
 
         if (propertyData) {
           setName(propertyData.name);
@@ -69,6 +84,14 @@ export default function PropertyForm() {
           setCurrency(propertyData.currency);
           setDescription(propertyData.description ?? '');
           setGroupId(propertyData.groupId ?? '');
+          setTitleDeedOwner(propertyData.titleDeedOwner ?? '');
+          setSubscriptionHolder(propertyData.subscriptionHolder ?? '');
+          setElectricSubNo(propertyData.electricSubscriptionNo ?? '');
+          setGasSubNo(propertyData.gasSubscriptionNo ?? '');
+          setWaterSubNo(propertyData.waterSubscriptionNo ?? '');
+          setInternetSubNo(propertyData.internetSubscriptionNo ?? '');
+          setDuesSubNo(propertyData.duesSubscriptionNo ?? '');
+          setDefaultBankAccountId(propertyData.defaultBankAccountId ?? '');
         }
       } catch {
         if (!cancelled) setError('Veriler yüklenirken hata oluştu.');
@@ -116,6 +139,14 @@ export default function PropertyForm() {
           buildYear: parseOptionalInt(buildYear),
           currency,
           description: description.trim() || null,
+          titleDeedOwner: titleDeedOwner.trim() || null,
+          subscriptionHolder: subscriptionHolder.trim() || null,
+          electricSubscriptionNo: electricSubNo.trim() || null,
+          gasSubscriptionNo: gasSubNo.trim() || null,
+          waterSubscriptionNo: waterSubNo.trim() || null,
+          internetSubscriptionNo: internetSubNo.trim() || null,
+          duesSubscriptionNo: duesSubNo.trim() || null,
+          defaultBankAccountId: defaultBankAccountId || null,
         });
         navigate(`/properties/${result.id}`);
       } else {
@@ -131,6 +162,14 @@ export default function PropertyForm() {
           buildYear: parseOptionalInt(buildYear),
           currency,
           description: description.trim() || null,
+          titleDeedOwner: titleDeedOwner.trim() || null,
+          subscriptionHolder: subscriptionHolder.trim() || null,
+          electricSubscriptionNo: electricSubNo.trim() || null,
+          gasSubscriptionNo: gasSubNo.trim() || null,
+          waterSubscriptionNo: waterSubNo.trim() || null,
+          internetSubscriptionNo: internetSubNo.trim() || null,
+          duesSubscriptionNo: duesSubNo.trim() || null,
+          defaultBankAccountId: defaultBankAccountId || null,
           groupId,
         });
         navigate(`/properties/${result.id}`);
@@ -370,6 +409,121 @@ export default function PropertyForm() {
                 placeholder="Mülk hakkında ek bilgiler..."
                 disabled={submitting}
                 rows={3}
+              />
+            </div>
+          </div>
+
+          {/* ── Ownership & Subscription ── */}
+          <div className="form-section">
+            <div className="form-section-title">Sahiplik & Abonelik</div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label className="form-label" htmlFor="titleDeedOwner">Tapu Sahibi</label>
+                <input
+                  id="titleDeedOwner"
+                  className="form-input"
+                  value={titleDeedOwner}
+                  onChange={(e) => setTitleDeedOwner(e.target.value)}
+                  placeholder="Örn: Ahmet Gürkan"
+                  maxLength={200}
+                  disabled={submitting}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-label" htmlFor="subscriptionHolder">Abonelik Sahibi</label>
+                <input
+                  id="subscriptionHolder"
+                  className="form-input"
+                  value={subscriptionHolder}
+                  onChange={(e) => setSubscriptionHolder(e.target.value)}
+                  placeholder="Örn: Mehmet Gürkan"
+                  maxLength={200}
+                  disabled={submitting}
+                />
+              </div>
+            </div>
+
+            <div className="form-field">
+              <label className="form-label" htmlFor="defaultBankAccount">Kira Geliri Hesabı</label>
+              <select
+                id="defaultBankAccount"
+                className="form-select"
+                value={defaultBankAccountId}
+                onChange={(e) => setDefaultBankAccountId(e.target.value)}
+                disabled={submitting}
+              >
+                <option value="">Seçilmemiş</option>
+                {bankAccounts
+                  .filter((ba) => !groupId || ba.groupId === groupId)
+                  .map((ba) => (
+                    <option key={ba.id} value={ba.id}>
+                      {ba.holderName} - {ba.bankName}{ba.iban ? ` (${ba.iban})` : ''}
+                    </option>
+                  ))}
+              </select>
+              <span className="form-hint">Kira ödemelerinde bu hesap otomatik seçilir</span>
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label className="form-label" htmlFor="electricSubNo">Elektrik Abone No</label>
+                <input
+                  id="electricSubNo"
+                  className="form-input"
+                  value={electricSubNo}
+                  onChange={(e) => setElectricSubNo(e.target.value)}
+                  maxLength={50}
+                  disabled={submitting}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-label" htmlFor="gasSubNo">Doğalgaz Abone No</label>
+                <input
+                  id="gasSubNo"
+                  className="form-input"
+                  value={gasSubNo}
+                  onChange={(e) => setGasSubNo(e.target.value)}
+                  maxLength={50}
+                  disabled={submitting}
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-field">
+                <label className="form-label" htmlFor="waterSubNo">Su Abone No</label>
+                <input
+                  id="waterSubNo"
+                  className="form-input"
+                  value={waterSubNo}
+                  onChange={(e) => setWaterSubNo(e.target.value)}
+                  maxLength={50}
+                  disabled={submitting}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-label" htmlFor="internetSubNo">İnternet Abone No</label>
+                <input
+                  id="internetSubNo"
+                  className="form-input"
+                  value={internetSubNo}
+                  onChange={(e) => setInternetSubNo(e.target.value)}
+                  maxLength={50}
+                  disabled={submitting}
+                />
+              </div>
+            </div>
+
+            <div className="form-field" style={{ maxWidth: '50%' }}>
+              <label className="form-label" htmlFor="duesSubNo">Aidat Abone No</label>
+              <input
+                id="duesSubNo"
+                className="form-input"
+                value={duesSubNo}
+                onChange={(e) => setDuesSubNo(e.target.value)}
+                maxLength={50}
+                disabled={submitting}
               />
             </div>
           </div>

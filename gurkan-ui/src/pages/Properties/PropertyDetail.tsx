@@ -289,6 +289,27 @@ export default function PropertyDetail() {
             {property.description && renderField('Açıklama', property.description, true)}
           </div>
         </div>
+
+        {/* ── Ownership & Subscription section ── */}
+        {(property.titleDeedOwner || property.subscriptionHolder || property.defaultBankAccountName ||
+          property.electricSubscriptionNo || property.gasSubscriptionNo || property.waterSubscriptionNo ||
+          property.internetSubscriptionNo || property.duesSubscriptionNo) && (
+          <div className="detail-body" style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>
+              Sahiplik & Abonelik Bilgileri
+            </h3>
+            <div className="detail-grid">
+              {renderField('Tapu Sahibi', property.titleDeedOwner)}
+              {renderField('Abonelik Sahibi', property.subscriptionHolder)}
+              {renderField('Kira Hesabı', property.defaultBankAccountName)}
+              {renderField('Elektrik Abone No', property.electricSubscriptionNo)}
+              {renderField('Doğalgaz Abone No', property.gasSubscriptionNo)}
+              {renderField('Su Abone No', property.waterSubscriptionNo)}
+              {renderField('İnternet Abone No', property.internetSubscriptionNo)}
+              {renderField('Aidat Abone No', property.duesSubscriptionNo)}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Notes section ── */}

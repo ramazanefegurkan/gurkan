@@ -67,6 +67,15 @@ export interface PropertyResponse {
   buildYear: number | null;
   currency: Currency;
   description: string | null;
+  titleDeedOwner: string | null;
+  subscriptionHolder: string | null;
+  electricSubscriptionNo: string | null;
+  gasSubscriptionNo: string | null;
+  waterSubscriptionNo: string | null;
+  internetSubscriptionNo: string | null;
+  duesSubscriptionNo: string | null;
+  defaultBankAccountId: string | null;
+  defaultBankAccountName: string | null;
   groupId: string | null;
   groupName: string | null;
   createdAt: string;
@@ -96,6 +105,14 @@ export interface CreatePropertyRequest {
   buildYear?: number | null;
   currency: Currency;
   description?: string | null;
+  titleDeedOwner?: string | null;
+  subscriptionHolder?: string | null;
+  electricSubscriptionNo?: string | null;
+  gasSubscriptionNo?: string | null;
+  waterSubscriptionNo?: string | null;
+  internetSubscriptionNo?: string | null;
+  duesSubscriptionNo?: string | null;
+  defaultBankAccountId?: string | null;
   groupId: string;
 }
 
@@ -112,6 +129,14 @@ export interface UpdatePropertyRequest {
   buildYear?: number | null;
   currency?: Currency;
   description?: string | null;
+  titleDeedOwner?: string | null;
+  subscriptionHolder?: string | null;
+  electricSubscriptionNo?: string | null;
+  gasSubscriptionNo?: string | null;
+  waterSubscriptionNo?: string | null;
+  internetSubscriptionNo?: string | null;
+  duesSubscriptionNo?: string | null;
+  defaultBankAccountId?: string | null;
 }
 
 // ── Rental / Tenant Enums ────────────────────────────
@@ -135,7 +160,6 @@ export const RentPaymentStatusLabels: Record<RentPaymentStatus, string> = {
 export const PaymentMethod = {
   Cash: 'Cash',
   BankTransfer: 'BankTransfer',
-  Check: 'Check',
 } as const;
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
@@ -143,7 +167,6 @@ export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 export const PaymentMethodLabels: Record<PaymentMethod, string> = {
   [PaymentMethod.Cash]: 'Nakit',
   [PaymentMethod.BankTransfer]: 'Banka Transferi',
-  [PaymentMethod.Check]: 'Çek',
 };
 
 export const RentalPlatform = {
@@ -226,6 +249,8 @@ export interface RentPaymentResponse {
   paidDate: string | null;
   status: string; // "Pending" | "Paid" | "Late" | "Cancelled" — string because backend computes Late at query time
   paymentMethod: string | null;
+  bankAccountId: string | null;
+  bankAccountName: string | null;
   notes: string | null;
   createdAt: string;
 }
@@ -233,6 +258,7 @@ export interface RentPaymentResponse {
 export interface MarkPaymentPaidRequest {
   paidDate?: string | null;
   paymentMethod?: PaymentMethod | null;
+  bankAccountId?: string | null;
   notes?: string | null;
 }
 
@@ -610,4 +636,31 @@ export interface RentPaymentImportRow {
 export interface ImportPreviewResponse<TRow> {
   summary: ImportSummary;
   rows: TRow[];
+}
+
+// ── Bank Accounts ────────────────────────────────────
+
+export interface BankAccountResponse {
+  id: string;
+  groupId: string;
+  holderName: string;
+  bankName: string;
+  iban: string | null;
+  description: string | null;
+  createdAt: string;
+}
+
+export interface CreateBankAccountRequest {
+  groupId: string;
+  holderName: string;
+  bankName: string;
+  iban?: string | null;
+  description?: string | null;
+}
+
+export interface UpdateBankAccountRequest {
+  holderName?: string;
+  bankName?: string;
+  iban?: string | null;
+  description?: string | null;
 }
