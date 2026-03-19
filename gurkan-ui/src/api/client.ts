@@ -552,7 +552,8 @@ export async function downloadDocument(
     `/properties/${propertyId}/documents/${documentId}/download`,
     { responseType: 'blob' },
   );
-  const blob = new Blob([data]);
+  // axios responseType:'blob' returns a Blob — use directly to preserve MIME type
+  const blob = data instanceof Blob ? data : new Blob([data], { type: headers['content-type'] });
   const url = URL.createObjectURL(blob);
   const contentDisposition = headers['content-disposition'] || '';
   // Extract filename from content-disposition or fall back to documentId
@@ -588,6 +589,14 @@ export async function getNotifications(): Promise<NotificationItem[]> {
   return data;
 }
 
+export async function dismissNotification(key: string): Promise<void> {
+  await api.post('/notifications/dismiss', { key });
+}
+
+export async function dismissAllNotifications(keys: string[]): Promise<void> {
+  await api.post('/notifications/dismiss-all', { keys });
+}
+
 // ── Reports ──────────────────────────────────────────
 
 export async function getProfitLossReport(year?: number): Promise<ProfitLossReport> {
@@ -598,7 +607,7 @@ export async function getProfitLossReport(year?: number): Promise<ProfitLossRepo
 
 export async function exportExcel(): Promise<void> {
   const { data } = await api.get('/reports/export/excel', { responseType: 'blob' });
-  const blob = new Blob([data]);
+  const blob = data instanceof Blob ? data : new Blob([data]);
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -611,7 +620,7 @@ export async function exportExcel(): Promise<void> {
 
 export async function exportPdf(): Promise<void> {
   const { data } = await api.get('/reports/export/pdf', { responseType: 'blob' });
-  const blob = new Blob([data]);
+  const blob = data instanceof Blob ? data : new Blob([data]);
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

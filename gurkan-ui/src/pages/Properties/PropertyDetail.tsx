@@ -282,10 +282,7 @@ export default function PropertyDetail() {
             {renderField('İlçe', property.district)}
             {renderField('Alan', property.area != null ? `${property.area} m²` : null)}
             {renderField('Oda Sayısı', property.roomCount)}
-            {renderField('Kat', property.floor != null && property.totalFloors != null
-              ? `${property.floor} / ${property.totalFloors}`
-              : property.floor)}
-            {renderField('Toplam Kat', property.floor != null ? null : property.totalFloors)}
+            {renderField('Kat', property.floor)}
             {renderField('Yapım Yılı', property.buildYear)}
             {renderField('Oluşturulma', formatDate(property.createdAt))}
             {renderField('Son Güncelleme', property.updatedAt ? formatDate(property.updatedAt) : null)}

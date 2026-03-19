@@ -50,6 +50,32 @@
   gap: 10px;
 }
 
+.dismiss-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dismiss-btn:hover {
+  opacity: 1;
+  color: var(--text-primary);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dismiss-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 .severity-badge {
   display: inline-flex;
   align-items: center;
