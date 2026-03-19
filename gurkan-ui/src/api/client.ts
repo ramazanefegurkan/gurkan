@@ -580,8 +580,9 @@ export async function deleteDocument(
 
 // ── Dashboard ────────────────────────────────────────
 
-export async function getDashboard(): Promise<DashboardResponse> {
-  const { data } = await api.get<DashboardResponse>('/dashboard');
+export async function getDashboard(year?: number): Promise<DashboardResponse> {
+  const params = year ? { year } : {};
+  const { data } = await api.get<DashboardResponse>('/dashboard', { params });
   return data;
 }
 

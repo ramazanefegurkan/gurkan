@@ -33,10 +33,11 @@ public class DashboardController : ControllerBase
     /// Income/expenses are grouped per currency — never summed across currencies.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery] int? year)
     {
         var userId = User.GetUserId();
         var role = User.GetRole();
+        var selectedYear = year ?? DateTime.UtcNow.Year;
 
         // --- Resolve accessible properties ---
         IQueryable<Property> propertyQuery = _db.Properties.Include(p => p.Group);
@@ -51,22 +52,40 @@ public class DashboardController : ControllerBase
         var propertyIds = properties.Select(p => p.Id).ToList();
         var now = DateTime.UtcNow;
 
-        // --- Bulk-load all financial data for accessible properties ---
+        // --- Count active tenants (not filtered by year — snapshot metric) ---
+        var activeTenantCount = await _db.Tenants
+            .CountAsync(t => propertyIds.Contains(t.PropertyId) && t.IsActive);
+
+        var propertiesWithActiveTenant = await _db.Tenants
+            .Where(t => propertyIds.Contains(t.PropertyId) && t.IsActive)
+            .Select(t => t.PropertyId)
+            .Distinct()
+            .CountAsync();
+
+        var occupancyRate = properties.Count > 0
+            ? Math.Round((decimal)propertiesWithActiveTenant / properties.Count * 100, 1)
+            : 0;
+
+        // --- Bulk-load financial data filtered by year ---
         var rentPayments = await _db.RentPayments
             .Include(rp => rp.Tenant)
-            .Where(rp => propertyIds.Contains(rp.Tenant.PropertyId))
+            .Where(rp => propertyIds.Contains(rp.Tenant.PropertyId)
+                      && rp.DueDate.Year == selectedYear)
             .ToListAsync();
 
         var shortTermRentals = await _db.ShortTermRentals
-            .Where(str => propertyIds.Contains(str.PropertyId))
+            .Where(str => propertyIds.Contains(str.PropertyId)
+                       && str.CheckIn.Year == selectedYear)
             .ToListAsync();
 
         var expenses = await _db.Expenses
-            .Where(e => propertyIds.Contains(e.PropertyId))
+            .Where(e => propertyIds.Contains(e.PropertyId)
+                     && e.Date.Year == selectedYear)
             .ToListAsync();
 
         var bills = await _db.Bills
-            .Where(b => propertyIds.Contains(b.PropertyId))
+            .Where(b => propertyIds.Contains(b.PropertyId)
+                     && b.DueDate.Year == selectedYear)
             .ToListAsync();
 
         // --- Build per-property financials ---
@@ -166,11 +185,15 @@ public class DashboardController : ControllerBase
             .OrderBy(s => s.Currency)
             .ToList();
 
-        _logger.LogInformation("Dashboard requested: UserId={UserId}, PropertyCount={Count}",
-            userId, properties.Count);
+        _logger.LogInformation("Dashboard requested: UserId={UserId}, Year={Year}, PropertyCount={Count}",
+            userId, selectedYear, properties.Count);
 
         return Ok(new DashboardResponse
         {
+            TotalPropertyCount = properties.Count,
+            ActiveTenantCount = activeTenantCount,
+            OccupancyRate = occupancyRate,
+            Year = selectedYear,
             Summary = summary,
             Properties = propertyFinancials,
         });
