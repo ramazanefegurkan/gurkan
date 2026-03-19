@@ -6,6 +6,8 @@ import {
   getRentIncreases,
   markPaymentPaid,
   terminateTenant,
+  getProperty,
+  getBankAccounts,
 } from '../../api/client';
 import {
   CurrencyLabels,
@@ -16,6 +18,7 @@ import {
   type RentPaymentResponse,
   type RentIncreaseResponse,
   type Currency,
+  type BankAccountResponse,
 } from '../../types';
 import '../../styles/shared.css';
 import './Tenants.css';
@@ -80,8 +83,10 @@ export default function TenantDetail() {
   const [payingPayment, setPayingPayment] = useState<RentPaymentResponse | null>(null);
   const [payDate, setPayDate] = useState('');
   const [payMethod, setPayMethod] = useState('');
+  const [payBankAccountId, setPayBankAccountId] = useState('');
   const [payNotes, setPayNotes] = useState('');
   const [paying, setPaying] = useState(false);
+  const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([]);
 
   // Terminate confirmation
   const [showTerminate, setShowTerminate] = useState(false);
@@ -102,6 +107,19 @@ export default function TenantDetail() {
           setTenant(t);
           setPayments(p);
           setIncreases(r);
+
+          // Load bank accounts for the property's group (for pay modal)
+          try {
+            const prop = await getProperty(propertyId!);
+            if (prop.groupId && !cancelled) {
+              const accounts = await getBankAccounts(prop.groupId);
+              setBankAccounts(accounts);
+              // Store default for pay modal
+              if (prop.defaultBankAccountId) {
+                setPayBankAccountId(prop.defaultBankAccountId);
+              }
+            }
+          } catch { /* bank accounts optional */ }
         }
       } catch {
         if (!cancelled) setError('Kiracı bilgileri yüklenemedi.');
@@ -118,6 +136,10 @@ export default function TenantDetail() {
     setPayingPayment(payment);
     setPayDate(new Date().toISOString().split('T')[0]);
     setPayMethod(PaymentMethod.BankTransfer);
+    // Default bank account from property, or from previous payment if set
+    if (!payBankAccountId && bankAccounts.length > 0) {
+      setPayBankAccountId(bankAccounts[0].id);
+    }
     setPayNotes('');
     setPayModalOpen(true);
   }
@@ -135,6 +157,7 @@ export default function TenantDetail() {
         {
           paidDate: payDate ? `${payDate}T00:00:00Z` : null,
           paymentMethod: (payMethod as typeof PaymentMethod.Cash) || null,
+          bankAccountId: payBankAccountId || null,
           notes: payNotes || null,
         },
       );
@@ -350,6 +373,11 @@ export default function TenantDetail() {
                       {p.paymentMethod
                         ? PaymentMethodLabels[p.paymentMethod as keyof typeof PaymentMethodLabels] ?? p.paymentMethod
                         : '—'}
+                      {p.bankAccountName && (
+                        <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                          {p.bankAccountName}
+                        </span>
+                      )}
                     </td>
                     <td className="date">
                       {p.paidDate ? formatDate(p.paidDate) : '—'}
@@ -447,6 +475,23 @@ export default function TenantDetail() {
                   ))}
                 </select>
               </div>
+              {bankAccounts.length > 0 && (
+                <div className="form-field">
+                  <label className="form-label">Banka Hesabı</label>
+                  <select
+                    className="form-select"
+                    value={payBankAccountId}
+                    onChange={(e) => setPayBankAccountId(e.target.value)}
+                  >
+                    <option value="">Seçilmemiş</option>
+                    {bankAccounts.map((ba) => (
+                      <option key={ba.id} value={ba.id}>
+                        {ba.holderName} - {ba.bankName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className="form-field">
                 <label className="form-label">Not</label>
                 <textarea
