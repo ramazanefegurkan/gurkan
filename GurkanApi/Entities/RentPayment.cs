@@ -10,8 +10,10 @@ public class RentPayment
     public DateTime? PaidDate { get; set; }
     public RentPaymentStatus Status { get; set; }
     public PaymentMethod? PaymentMethod { get; set; }
+    public Guid? BankAccountId { get; set; }
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public Tenant Tenant { get; set; } = null!;
+    public BankAccount? BankAccount { get; set; }
 }

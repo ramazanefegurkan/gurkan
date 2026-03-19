@@ -22,6 +22,45 @@ namespace GurkanApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("GurkanApi.Entities.BankAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BankName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now() at time zone 'utc'");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("HolderName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("IBAN")
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("BankAccounts");
+                });
+
             modelBuilder.Entity("GurkanApi.Entities.Bill", b =>
                 {
                     b.Property<Guid>("Id")
@@ -321,6 +360,9 @@ namespace GurkanApi.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
+                    b.Property<Guid?>("DefaultBankAccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
@@ -330,11 +372,27 @@ namespace GurkanApi.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("DuesSubscriptionNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ElectricSubscriptionNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<int?>("Floor")
                         .HasColumnType("integer");
 
+                    b.Property<string>("GasSubscriptionNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<Guid?>("GroupId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("InternetSubscriptionNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -343,6 +401,14 @@ namespace GurkanApi.Migrations
 
                     b.Property<int?>("RoomCount")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SubscriptionHolder")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TitleDeedOwner")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int?>("TotalFloors")
                         .HasColumnType("integer");
@@ -355,7 +421,13 @@ namespace GurkanApi.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("WaterSubscriptionNo")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("DefaultBankAccountId");
 
                     b.HasIndex("GroupId");
 
@@ -474,6 +546,9 @@ namespace GurkanApi.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("BankAccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -507,6 +582,8 @@ namespace GurkanApi.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BankAccountId");
 
                     b.HasIndex("TenantId");
 
@@ -672,6 +749,17 @@ namespace GurkanApi.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("GurkanApi.Entities.BankAccount", b =>
+                {
+                    b.HasOne("GurkanApi.Entities.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+                });
+
             modelBuilder.Entity("GurkanApi.Entities.Bill", b =>
                 {
                     b.HasOne("GurkanApi.Entities.Property", "Property")
@@ -756,10 +844,17 @@ namespace GurkanApi.Migrations
 
             modelBuilder.Entity("GurkanApi.Entities.Property", b =>
                 {
+                    b.HasOne("GurkanApi.Entities.BankAccount", "DefaultBankAccount")
+                        .WithMany()
+                        .HasForeignKey("DefaultBankAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("GurkanApi.Entities.Group", "Group")
                         .WithMany("Properties")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DefaultBankAccount");
 
                     b.Navigation("Group");
                 });
@@ -807,11 +902,18 @@ namespace GurkanApi.Migrations
 
             modelBuilder.Entity("GurkanApi.Entities.RentPayment", b =>
                 {
+                    b.HasOne("GurkanApi.Entities.BankAccount", "BankAccount")
+                        .WithMany()
+                        .HasForeignKey("BankAccountId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("GurkanApi.Entities.Tenant", "Tenant")
                         .WithMany("RentPayments")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("BankAccount");
 
                     b.Navigation("Tenant");
                 });

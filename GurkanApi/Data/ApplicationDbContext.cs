@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Document> Documents => Set<Document>();
     public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
     public DbSet<DismissedNotification> DismissedNotifications => Set<DismissedNotification>();
+    public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -93,12 +94,24 @@ public class ApplicationDbContext : DbContext
                   .HasConversion<string>()
                   .HasMaxLength(10);
             entity.Property(p => p.Description).HasMaxLength(2000);
+            entity.Property(p => p.TitleDeedOwner).HasMaxLength(200);
+            entity.Property(p => p.SubscriptionHolder).HasMaxLength(200);
+            entity.Property(p => p.ElectricSubscriptionNo).HasMaxLength(50);
+            entity.Property(p => p.GasSubscriptionNo).HasMaxLength(50);
+            entity.Property(p => p.WaterSubscriptionNo).HasMaxLength(50);
+            entity.Property(p => p.InternetSubscriptionNo).HasMaxLength(50);
+            entity.Property(p => p.DuesSubscriptionNo).HasMaxLength(50);
             entity.Property(p => p.CreatedAt)
                   .HasDefaultValueSql("now() at time zone 'utc'");
 
             entity.HasOne(p => p.Group)
                   .WithMany(g => g.Properties)
                   .HasForeignKey(p => p.GroupId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(p => p.DefaultBankAccount)
+                  .WithMany()
+                  .HasForeignKey(p => p.DefaultBankAccountId)
                   .OnDelete(DeleteBehavior.SetNull);
         });
 
@@ -180,6 +193,11 @@ public class ApplicationDbContext : DbContext
                   .WithMany(t => t.RentPayments)
                   .HasForeignKey(r => r.TenantId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.BankAccount)
+                  .WithMany()
+                  .HasForeignKey(r => r.BankAccountId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // ---------- ShortTermRental ----------
@@ -310,6 +328,23 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(dt => dt.User)
                   .WithMany()
                   .HasForeignKey(dt => dt.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- BankAccount ----------
+        modelBuilder.Entity<BankAccount>(entity =>
+        {
+            entity.HasKey(ba => ba.Id);
+            entity.Property(ba => ba.HolderName).IsRequired().HasMaxLength(200);
+            entity.Property(ba => ba.BankName).IsRequired().HasMaxLength(200);
+            entity.Property(ba => ba.IBAN).HasMaxLength(34);
+            entity.Property(ba => ba.Description).HasMaxLength(500);
+            entity.Property(ba => ba.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(ba => ba.Group)
+                  .WithMany()
+                  .HasForeignKey(ba => ba.GroupId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
