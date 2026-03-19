@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   getTenant,
   getRentPayments,
@@ -71,6 +71,7 @@ function statusLabel(status: string): string {
 
 export default function TenantDetail() {
   const { id: propertyId, tenantId } = useParams<{ id: string; tenantId: string }>();
+  const navigate = useNavigate();
 
   const [tenant, setTenant] = useState<TenantResponse | null>(null);
   const [payments, setPayments] = useState<RentPaymentResponse[]>([]);
@@ -178,14 +179,7 @@ export default function TenantDetail() {
     setTerminating(true);
     try {
       await terminateTenant(propertyId, tenantId);
-      // Reload to see cancelled payments
-      const [t, p] = await Promise.all([
-        getTenant(propertyId, tenantId),
-        getRentPayments(propertyId, tenantId),
-      ]);
-      setTenant(t);
-      setPayments(p);
-      setShowTerminate(false);
+      navigate(`/properties/${propertyId}/tenants`);
     } catch {
       setError('Sözleşme sonlandırılamadı.');
       setShowTerminate(false);

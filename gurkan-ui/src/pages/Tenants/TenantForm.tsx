@@ -28,7 +28,6 @@ export default function TenantForm() {
   // Form fields
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
   const [identityNumber, setIdentityNumber] = useState('');
   const [leaseStart, setLeaseStart] = useState('');
   const [leaseEnd, setLeaseEnd] = useState('');
@@ -47,7 +46,6 @@ export default function TenantForm() {
         if (!cancelled) {
           setFullName(t.fullName);
           setPhone(t.phone ?? '');
-          setEmail(t.email ?? '');
           setIdentityNumber(t.identityNumber ?? '');
           setLeaseStart(t.leaseStart.split('T')[0]);
           setLeaseEnd(t.leaseEnd.split('T')[0]);
@@ -100,7 +98,6 @@ export default function TenantForm() {
         await updateTenant(propertyId, tenantId, {
           fullName,
           phone: phone || null,
-          email: email || null,
           identityNumber: identityNumber || null,
           leaseStart: leaseStart ? toUtcIso(leaseStart) : undefined,
           leaseEnd: leaseEnd ? toUtcIso(leaseEnd) : undefined,
@@ -113,7 +110,6 @@ export default function TenantForm() {
         const created = await createTenant(propertyId, {
           fullName,
           phone: phone || null,
-          email: email || null,
           identityNumber: identityNumber || null,
           leaseStart: toUtcIso(leaseStart),
           leaseEnd: toUtcIso(leaseEnd),
@@ -211,17 +207,6 @@ export default function TenantForm() {
                   onChange={(e) => setPhone(e.target.value)}
                   maxLength={30}
                   placeholder="0555 123 4567"
-                />
-              </div>
-              <div className="form-field">
-                <label className="form-label">E-posta</label>
-                <input
-                  className="form-input"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  maxLength={256}
-                  placeholder="ornek@mail.com"
                 />
               </div>
             </div>
