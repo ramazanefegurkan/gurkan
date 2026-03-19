@@ -507,6 +507,10 @@ export interface PropertyFinancials {
 }
 
 export interface DashboardResponse {
+  totalPropertyCount: number;
+  activeTenantCount: number;
+  occupancyRate: number;
+  year: number;
   summary: CurrencySummary[];
   properties: PropertyFinancials[];
 }
