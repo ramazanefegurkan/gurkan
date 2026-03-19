@@ -4,6 +4,10 @@ namespace GurkanApi.DTOs.Dashboard;
 
 public class DashboardResponse
 {
+    public int TotalPropertyCount { get; set; }
+    public int ActiveTenantCount { get; set; }
+    public decimal OccupancyRate { get; set; }
+    public int Year { get; set; }
     public List<CurrencySummary> Summary { get; set; } = [];
     public List<PropertyFinancials> Properties { get; set; } = [];
 }
