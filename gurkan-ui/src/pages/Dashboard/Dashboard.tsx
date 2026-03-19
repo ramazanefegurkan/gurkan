@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { getDashboard, getNotifications, getGroups, exportExcel, exportPdf } from '../../api/client';
 import {
   CurrencyLabels,
-  PropertyType,
   PropertyTypeLabels,
   NotificationSeverity,
   type DashboardResponse,
   type NotificationItem,
   type CurrencyAmount,
   type GroupResponse,
+  type Currency,
 } from '../../types';
 import './Dashboard.css';
 
@@ -102,7 +102,7 @@ export default function Dashboard() {
     });
 
     return Array.from(allCurrencies).map((currency) => ({
-      currency: currency as any,
+      currency: currency as Currency,
       totalIncome: filteredProperties.flatMap((pf) => pf.income).filter((i) => i.currency === currency).reduce((s, i) => s + i.amount, 0),
       totalExpenses: filteredProperties.flatMap((pf) => pf.expenses).filter((e) => e.currency === currency).reduce((s, e) => s + e.amount, 0),
       totalProfit: filteredProperties.flatMap((pf) => pf.profit).filter((p) => p.currency === currency).reduce((s, p) => s + p.amount, 0),
