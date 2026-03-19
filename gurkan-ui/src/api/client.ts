@@ -580,8 +580,11 @@ export async function deleteDocument(
 
 // ── Dashboard ────────────────────────────────────────
 
-export async function getDashboard(year?: number): Promise<DashboardResponse> {
-  const params = year ? { year } : {};
+export async function getDashboard(year?: number, month?: number, rentalType?: string): Promise<DashboardResponse> {
+  const params: Record<string, unknown> = {};
+  if (year) params.year = year;
+  if (month) params.month = month;
+  if (rentalType) params.rentalType = rentalType;
   const { data } = await api.get<DashboardResponse>('/dashboard', { params });
   return data;
 }

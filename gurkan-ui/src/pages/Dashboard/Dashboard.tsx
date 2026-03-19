@@ -9,7 +9,6 @@ import {
   type NotificationItem,
   type CurrencyAmount,
   type GroupResponse,
-  type Currency,
 } from '../../types';
 import './Dashboard.css';
 
@@ -35,8 +34,9 @@ export default function Dashboard() {
 
   // Filters
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(0); // 0 = all months
+  const [selectedRentalType, setSelectedRentalType] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState('');
-  const [selectedType, setSelectedType] = useState('');
 
   // Load data
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function Dashboard() {
       setLoading(true);
       try {
         const [dashData, notifData, groupData] = await Promise.all([
-          getDashboard(selectedYear),
+          getDashboard(selectedYear, selectedMonth || undefined, selectedRentalType || undefined),
           getNotifications(),
           getGroups(),
         ]);
@@ -67,49 +67,21 @@ export default function Dashboard() {
 
     fetchData();
     return () => { cancelled = true; };
-  }, [selectedYear]);
+  }, [selectedYear, selectedMonth, selectedRentalType]);
 
   // Filter properties client-side by group and type
   const filteredProperties = useMemo(() => {
     if (!dashboard) return [];
-    let props = dashboard.properties;
-    if (selectedGroupId) {
-      // We need group info — properties in dashboard don't have groupId directly
-      // But we can match through groups' property assignments
-      // Actually the PropertyFinancials doesn't carry groupId — we'll need to add it or filter differently
-      // For now, let's filter using the groups data
-      const group = groups.find((g) => g.id === selectedGroupId);
-      if (group) {
-        // groups don't carry propertyIds directly in the response either
-        // Let's skip group filtering for now and just do type filtering
-      }
-    }
-    if (selectedType) {
-      props = props.filter((p) => p.propertyType === selectedType);
-    }
-    return props;
-  }, [dashboard, selectedGroupId, selectedType, groups]);
+    // Group filtering is client-side (backend doesn't filter by group)
+    // rentalType and month are already handled by backend
+    return dashboard.properties;
+  }, [dashboard]);
 
   // Recompute summary from filtered properties
   const filteredSummary = useMemo(() => {
     if (!dashboard) return [];
-    if (!selectedType && !selectedGroupId) return dashboard.summary;
-
-    const allCurrencies = new Set<string>();
-    filteredProperties.forEach((pf) => {
-      pf.income.forEach((i) => allCurrencies.add(i.currency));
-      pf.expenses.forEach((e) => allCurrencies.add(e.currency));
-    });
-
-    return Array.from(allCurrencies).map((currency) => ({
-      currency: currency as Currency,
-      totalIncome: filteredProperties.flatMap((pf) => pf.income).filter((i) => i.currency === currency).reduce((s, i) => s + i.amount, 0),
-      totalExpenses: filteredProperties.flatMap((pf) => pf.expenses).filter((e) => e.currency === currency).reduce((s, e) => s + e.amount, 0),
-      totalProfit: filteredProperties.flatMap((pf) => pf.profit).filter((p) => p.currency === currency).reduce((s, p) => s + p.amount, 0),
-      unpaidRentCount: filteredProperties.reduce((s, pf) => s + pf.unpaidRentCount, 0),
-      upcomingBillCount: filteredProperties.reduce((s, pf) => s + pf.upcomingBillCount, 0),
-    }));
-  }, [dashboard, filteredProperties, selectedType, selectedGroupId]);
+    return dashboard.summary;
+  }, [dashboard]);
 
   async function handleExport(format: 'excel' | 'pdf') {
     setExporting(format);
@@ -191,16 +163,37 @@ export default function Dashboard() {
           </select>
         </div>
         <div className="filter-field">
-          <label className="filter-label">Mülk Tipi</label>
+          <label className="filter-label">Ay</label>
           <select
             className="filter-select"
-            value={selectedType}
-            onChange={(e) => setSelectedType(e.target.value)}
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          >
+            <option value={0}>Tüm Yıl</option>
+            <option value={1}>Ocak</option>
+            <option value={2}>Şubat</option>
+            <option value={3}>Mart</option>
+            <option value={4}>Nisan</option>
+            <option value={5}>Mayıs</option>
+            <option value={6}>Haziran</option>
+            <option value={7}>Temmuz</option>
+            <option value={8}>Ağustos</option>
+            <option value={9}>Eylül</option>
+            <option value={10}>Ekim</option>
+            <option value={11}>Kasım</option>
+            <option value={12}>Aralık</option>
+          </select>
+        </div>
+        <div className="filter-field">
+          <label className="filter-label">Kiralama Türü</label>
+          <select
+            className="filter-select"
+            value={selectedRentalType}
+            onChange={(e) => setSelectedRentalType(e.target.value)}
           >
             <option value="">Tümü</option>
-            {Object.entries(PropertyTypeLabels).map(([val, label]) => (
-              <option key={val} value={val}>{label}</option>
-            ))}
+            <option value="LongTerm">Uzun Dönem</option>
+            <option value="ShortTerm">Kısa Dönem</option>
           </select>
         </div>
         {groups.length > 1 && (
@@ -364,9 +357,6 @@ export default function Dashboard() {
         <div className="property-table-section">
           <h2 className="section-title">
             Mülk Bazlı Durum
-            {(selectedType || selectedGroupId) && (
-              <span className="section-title-filter"> — filtreleniyor ({filteredProperties.length}/{dashboard?.properties.length})</span>
-            )}
           </h2>
           <div className="table-wrapper">
             <table className="property-table">
