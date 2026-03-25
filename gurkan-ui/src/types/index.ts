@@ -130,12 +130,7 @@ export interface PropertyResponse {
   currency: Currency;
   description: string | null;
   titleDeedOwner: string | null;
-  subscriptionHolder: string | null;
-  electricSubscriptionNo: string | null;
-  gasSubscriptionNo: string | null;
-  waterSubscriptionNo: string | null;
-  internetSubscriptionNo: string | null;
-  duesSubscriptionNo: string | null;
+  subscriptions: SubscriptionResponse[];
   defaultBankAccountId: string | null;
   defaultBankAccountName: string | null;
   groupId: string | null;
@@ -168,12 +163,6 @@ export interface CreatePropertyRequest {
   currency: Currency;
   description?: string | null;
   titleDeedOwner?: string | null;
-  subscriptionHolder?: string | null;
-  electricSubscriptionNo?: string | null;
-  gasSubscriptionNo?: string | null;
-  waterSubscriptionNo?: string | null;
-  internetSubscriptionNo?: string | null;
-  duesSubscriptionNo?: string | null;
   defaultBankAccountId?: string | null;
   groupId: string;
 }
@@ -192,12 +181,6 @@ export interface UpdatePropertyRequest {
   currency?: Currency;
   description?: string | null;
   titleDeedOwner?: string | null;
-  subscriptionHolder?: string | null;
-  electricSubscriptionNo?: string | null;
-  gasSubscriptionNo?: string | null;
-  waterSubscriptionNo?: string | null;
-  internetSubscriptionNo?: string | null;
-  duesSubscriptionNo?: string | null;
   defaultBankAccountId?: string | null;
 }
 
@@ -450,6 +433,59 @@ export const BillPaymentStatusLabels: Record<BillPaymentStatus, string> = {
   [BillPaymentStatus.Paid]: 'Ödendi',
   [BillPaymentStatus.Overdue]: 'Gecikmiş',
 };
+
+// ── Subscriptions ────────────────────────────────────
+
+export const SubscriptionType = {
+  Electric: 'Electric',
+  Gas: 'Gas',
+  Water: 'Water',
+  Internet: 'Internet',
+  Dues: 'Dues',
+} as const;
+
+export type SubscriptionType = (typeof SubscriptionType)[keyof typeof SubscriptionType];
+
+export const SubscriptionTypeLabels: Record<SubscriptionType, string> = {
+  [SubscriptionType.Electric]: 'Elektrik',
+  [SubscriptionType.Gas]: 'Doğalgaz',
+  [SubscriptionType.Water]: 'Su',
+  [SubscriptionType.Internet]: 'İnternet',
+  [SubscriptionType.Dues]: 'Aidat',
+};
+
+export const SubscriptionHolderType = {
+  User: 'User',
+  Tenant: 'Tenant',
+} as const;
+
+export type SubscriptionHolderType = (typeof SubscriptionHolderType)[keyof typeof SubscriptionHolderType];
+
+export const SubscriptionHolderTypeLabels: Record<SubscriptionHolderType, string> = {
+  [SubscriptionHolderType.User]: 'Kullanıcı',
+  [SubscriptionHolderType.Tenant]: 'Kiracı',
+};
+
+export interface SubscriptionResponse {
+  id: string;
+  type: SubscriptionType;
+  subscriptionNo: string | null;
+  holderType: SubscriptionHolderType;
+  holderUserId: string | null;
+  holderUserName: string | null;
+  hasAutoPayment: boolean;
+  autoPaymentBankId: string | null;
+  autoPaymentBankName: string | null;
+}
+
+export interface UpsertSubscriptionRequest {
+  type: SubscriptionType;
+  subscriptionNo?: string | null;
+  holderType: SubscriptionHolderType;
+  holderUserId?: string | null;
+  hasAutoPayment: boolean;
+  autoPaymentBankId?: string | null;
+}
 
 // ── Expenses ─────────────────────────────────────────
 
@@ -730,4 +766,16 @@ export interface UpdateBankAccountRequest {
   bankName?: string;
   iban?: string | null;
   description?: string | null;
+}
+
+// ── Banks ────────────────────────────────────────────
+
+export interface BankResponse {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface CreateBankRequest {
+  name: string;
 }

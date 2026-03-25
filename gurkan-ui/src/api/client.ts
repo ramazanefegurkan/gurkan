@@ -34,6 +34,10 @@ import type {
   BankAccountResponse,
   CreateBankAccountRequest,
   UpdateBankAccountRequest,
+  BankResponse,
+  CreateBankRequest,
+  SubscriptionResponse,
+  UpsertSubscriptionRequest,
   UserResponse,
   RegisterRequest,
   UpdateRoleRequest,
@@ -754,6 +758,35 @@ export async function updateBankAccount(id: string, payload: UpdateBankAccountRe
 
 export async function deleteBankAccount(id: string): Promise<void> {
   await api.delete(`/bank-accounts/${id}`);
+}
+
+// ── Banks ────────────────────────────────────────────
+
+export async function getBanks(): Promise<BankResponse[]> {
+  const { data } = await api.get<BankResponse[]>('/banks');
+  return data;
+}
+
+export async function createBank(payload: CreateBankRequest): Promise<BankResponse> {
+  const { data } = await api.post<BankResponse>('/banks', payload);
+  return data;
+}
+
+export async function deleteBank(id: string): Promise<void> {
+  await api.delete(`/banks/${id}`);
+}
+
+// ── Property Subscriptions ────────────────────────────
+
+export async function updatePropertySubscriptions(
+  propertyId: string,
+  payload: UpsertSubscriptionRequest[],
+): Promise<SubscriptionResponse[]> {
+  const { data } = await api.put<SubscriptionResponse[]>(
+    `/properties/${propertyId}/subscriptions`,
+    payload,
+  );
+  return data;
 }
 
 export default api;
