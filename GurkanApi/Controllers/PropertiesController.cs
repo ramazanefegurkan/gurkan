@@ -235,6 +235,24 @@ public class PropertiesController : ControllerBase
         if (!await _access.CanAccessPropertyAsync(userId, id, role))
             return StatusCode(403, new { error = "forbidden", message = "You don't have access to this property." });
 
+        var userHolderIds = requests
+            .Where(r => r.HolderType == SubscriptionHolderType.User && r.HolderUserId.HasValue)
+            .Select(r => r.HolderUserId!.Value)
+            .Distinct()
+            .ToList();
+
+        if (userHolderIds.Count > 0 && property.GroupId.HasValue)
+        {
+            var groupMemberIds = await _db.GroupMembers
+                .Where(gm => gm.GroupId == property.GroupId.Value)
+                .Select(gm => gm.UserId)
+                .ToListAsync();
+
+            var invalidIds = userHolderIds.Except(groupMemberIds).ToList();
+            if (invalidIds.Count > 0)
+                return BadRequest(new { error = "invalid_holder", message = "Seçilen kullanıcı bu grubun üyesi değil." });
+        }
+
         var existing = await _db.PropertySubscriptions
             .Where(ps => ps.PropertyId == id)
             .ToListAsync();

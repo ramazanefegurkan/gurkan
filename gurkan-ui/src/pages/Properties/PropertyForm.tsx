@@ -176,6 +176,26 @@ export default function PropertyForm() {
     return Object.keys(errors).length === 0;
   }
 
+  async function saveSubscriptions(propertyId: string) {
+    const activeSubscriptions = subscriptions.filter(
+      (s) => s.subscriptionNo || s.holderUserId || s.holderType === SubscriptionHolderType.Tenant || s.hasAutoPayment,
+    );
+
+    if (activeSubscriptions.length > 0) {
+      await updatePropertySubscriptions(
+        propertyId,
+        activeSubscriptions.map((s) => ({
+          type: s.type,
+          subscriptionNo: s.subscriptionNo.trim() || null,
+          holderType: s.holderType,
+          holderUserId: s.holderType === SubscriptionHolderType.User && s.holderUserId ? s.holderUserId : null,
+          hasAutoPayment: s.hasAutoPayment,
+          autoPaymentBankId: s.hasAutoPayment && s.autoPaymentBankId ? s.autoPaymentBankId : null,
+        })),
+      );
+    }
+  }
+
   function parseOptionalInt(val: string): number | null {
     if (!val.trim()) return null;
     const n = parseInt(val, 10);
@@ -206,25 +226,7 @@ export default function PropertyForm() {
           titleDeedOwner: titleDeedOwner.trim() || null,
           defaultBankAccountId: defaultBankAccountId || null,
         });
-
-        const activeSubscriptions = subscriptions.filter(
-          (s) => s.subscriptionNo || s.holderUserId || s.holderType === SubscriptionHolderType.Tenant || s.hasAutoPayment,
-        );
-
-        if (activeSubscriptions.length > 0) {
-          await updatePropertySubscriptions(
-            result.id,
-            activeSubscriptions.map((s) => ({
-              type: s.type,
-              subscriptionNo: s.subscriptionNo.trim() || null,
-              holderType: s.holderType,
-              holderUserId: s.holderType === SubscriptionHolderType.User && s.holderUserId ? s.holderUserId : null,
-              hasAutoPayment: s.hasAutoPayment,
-              autoPaymentBankId: s.hasAutoPayment && s.autoPaymentBankId ? s.autoPaymentBankId : null,
-            })),
-          );
-        }
-
+        await saveSubscriptions(result.id);
         navigate(`/properties/${result.id}`);
       } else {
         const result = await createProperty({
@@ -243,25 +245,7 @@ export default function PropertyForm() {
           defaultBankAccountId: defaultBankAccountId || null,
           groupId,
         });
-
-        const activeSubscriptions = subscriptions.filter(
-          (s) => s.subscriptionNo || s.holderUserId || s.holderType === SubscriptionHolderType.Tenant || s.hasAutoPayment,
-        );
-
-        if (activeSubscriptions.length > 0) {
-          await updatePropertySubscriptions(
-            result.id,
-            activeSubscriptions.map((s) => ({
-              type: s.type,
-              subscriptionNo: s.subscriptionNo.trim() || null,
-              holderType: s.holderType,
-              holderUserId: s.holderType === SubscriptionHolderType.User && s.holderUserId ? s.holderUserId : null,
-              hasAutoPayment: s.hasAutoPayment,
-              autoPaymentBankId: s.hasAutoPayment && s.autoPaymentBankId ? s.autoPaymentBankId : null,
-            })),
-          );
-        }
-
+        await saveSubscriptions(result.id);
         navigate(`/properties/${result.id}`);
       }
     } catch (err: unknown) {
@@ -721,17 +705,15 @@ export default function PropertyForm() {
                             <option key={b.id} value={b.id}>{b.name}</option>
                           ))}
                         </select>
-                        {idx === 0 && (
-                          <button
-                            type="button"
-                            className="btn btn-secondary"
-                            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-                            onClick={() => setShowNewBank(true)}
-                            disabled={submitting}
-                          >
-                            + Yeni
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                          onClick={() => setShowNewBank(true)}
+                          disabled={submitting}
+                        >
+                          + Yeni
+                        </button>
                       </div>
                     </div>
                   )}
@@ -768,7 +750,9 @@ export default function PropertyForm() {
                         setBanks((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
                         setShowNewBank(false);
                         setNewBankName('');
-                      } catch { /* ignore */ }
+                      } catch {
+                        setError('Banka eklenemedi. Bu isimde bir banka zaten olabilir.');
+                      }
                       finally { setSavingBank(false); }
                     }}
                   >
