@@ -1,5 +1,6 @@
 using GurkanApi.Data;
 using GurkanApi.DTOs.Properties;
+using GurkanApi.DTOs.Subscriptions;
 using GurkanApi.Entities;
 using GurkanApi.Extensions;
 using GurkanApi.Services;
@@ -70,6 +71,8 @@ public class PropertiesController : ControllerBase
         var property = await _db.Properties
             .Include(p => p.Group)
             .Include(p => p.DefaultBankAccount)
+            .Include(p => p.Subscriptions).ThenInclude(s => s.HolderUser)
+            .Include(p => p.Subscriptions).ThenInclude(s => s.AutoPaymentBank)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (property is null)
@@ -124,12 +127,6 @@ public class PropertiesController : ControllerBase
             Currency = request.Currency,
             Description = request.Description,
             TitleDeedOwner = request.TitleDeedOwner,
-            SubscriptionHolder = request.SubscriptionHolder,
-            ElectricSubscriptionNo = request.ElectricSubscriptionNo,
-            GasSubscriptionNo = request.GasSubscriptionNo,
-            WaterSubscriptionNo = request.WaterSubscriptionNo,
-            InternetSubscriptionNo = request.InternetSubscriptionNo,
-            DuesSubscriptionNo = request.DuesSubscriptionNo,
             DefaultBankAccountId = request.DefaultBankAccountId,
             GroupId = request.GroupId,
             CreatedAt = DateTime.UtcNow,
@@ -182,12 +179,6 @@ public class PropertiesController : ControllerBase
         if (request.Currency is not null) property.Currency = request.Currency.Value;
         if (request.Description is not null) property.Description = request.Description;
         if (request.TitleDeedOwner is not null) property.TitleDeedOwner = request.TitleDeedOwner;
-        if (request.SubscriptionHolder is not null) property.SubscriptionHolder = request.SubscriptionHolder;
-        if (request.ElectricSubscriptionNo is not null) property.ElectricSubscriptionNo = request.ElectricSubscriptionNo;
-        if (request.GasSubscriptionNo is not null) property.GasSubscriptionNo = request.GasSubscriptionNo;
-        if (request.WaterSubscriptionNo is not null) property.WaterSubscriptionNo = request.WaterSubscriptionNo;
-        if (request.InternetSubscriptionNo is not null) property.InternetSubscriptionNo = request.InternetSubscriptionNo;
-        if (request.DuesSubscriptionNo is not null) property.DuesSubscriptionNo = request.DuesSubscriptionNo;
         if (request.DefaultBankAccountId is not null) property.DefaultBankAccountId = request.DefaultBankAccountId;
 
         property.UpdatedAt = DateTime.UtcNow;
@@ -231,6 +222,61 @@ public class PropertiesController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:guid}/subscriptions")]
+    public async Task<IActionResult> UpdateSubscriptions(Guid id, [FromBody] List<UpsertSubscriptionRequest> requests)
+    {
+        var property = await _db.Properties.FindAsync(id);
+        if (property is null)
+            return NotFound(new { error = "not_found", message = "Property not found." });
+
+        var userId = User.GetUserId();
+        var role = User.GetRole();
+
+        if (!await _access.CanAccessPropertyAsync(userId, id, role))
+            return StatusCode(403, new { error = "forbidden", message = "You don't have access to this property." });
+
+        var existing = await _db.PropertySubscriptions
+            .Where(ps => ps.PropertyId == id)
+            .ToListAsync();
+
+        _db.PropertySubscriptions.RemoveRange(existing);
+
+        var newSubscriptions = requests.Select(r => new PropertySubscription
+        {
+            Id = Guid.NewGuid(),
+            PropertyId = id,
+            Type = r.Type,
+            SubscriptionNo = r.SubscriptionNo,
+            HolderType = r.HolderType,
+            HolderUserId = r.HolderType == SubscriptionHolderType.User ? r.HolderUserId : null,
+            HasAutoPayment = r.HasAutoPayment,
+            AutoPaymentBankId = r.HasAutoPayment ? r.AutoPaymentBankId : null,
+            CreatedAt = DateTime.UtcNow,
+        }).ToList();
+
+        _db.PropertySubscriptions.AddRange(newSubscriptions);
+        await _db.SaveChangesAsync();
+
+        var saved = await _db.PropertySubscriptions
+            .Include(ps => ps.HolderUser)
+            .Include(ps => ps.AutoPaymentBank)
+            .Where(ps => ps.PropertyId == id)
+            .ToListAsync();
+
+        return Ok(saved.Select(s => new SubscriptionResponse
+        {
+            Id = s.Id,
+            Type = s.Type,
+            SubscriptionNo = s.SubscriptionNo,
+            HolderType = s.HolderType,
+            HolderUserId = s.HolderUserId,
+            HolderUserName = s.HolderUser?.FullName,
+            HasAutoPayment = s.HasAutoPayment,
+            AutoPaymentBankId = s.AutoPaymentBankId,
+            AutoPaymentBankName = s.AutoPaymentBank?.Name,
+        }).ToList());
+    }
+
     // ---------- Mapping helpers ----------
 
     private static PropertyResponse MapPropertyResponse(Property p) => new()
@@ -249,12 +295,18 @@ public class PropertiesController : ControllerBase
         Currency = p.Currency,
         Description = p.Description,
         TitleDeedOwner = p.TitleDeedOwner,
-        SubscriptionHolder = p.SubscriptionHolder,
-        ElectricSubscriptionNo = p.ElectricSubscriptionNo,
-        GasSubscriptionNo = p.GasSubscriptionNo,
-        WaterSubscriptionNo = p.WaterSubscriptionNo,
-        InternetSubscriptionNo = p.InternetSubscriptionNo,
-        DuesSubscriptionNo = p.DuesSubscriptionNo,
+        Subscriptions = p.Subscriptions?.Select(s => new SubscriptionResponse
+        {
+            Id = s.Id,
+            Type = s.Type,
+            SubscriptionNo = s.SubscriptionNo,
+            HolderType = s.HolderType,
+            HolderUserId = s.HolderUserId,
+            HolderUserName = s.HolderUser?.FullName,
+            HasAutoPayment = s.HasAutoPayment,
+            AutoPaymentBankId = s.AutoPaymentBankId,
+            AutoPaymentBankName = s.AutoPaymentBank?.Name,
+        }).ToList() ?? new(),
         DefaultBankAccountId = p.DefaultBankAccountId,
         DefaultBankAccountName = p.DefaultBankAccount != null
             ? $"{p.DefaultBankAccount.HolderName} - {p.DefaultBankAccount.BankName}"
