@@ -290,6 +290,12 @@ export interface CreateTenantRequest {
   currency: Currency;
 }
 
+export interface RenewLeaseRequest {
+  newLeaseEnd: string;
+  newMonthlyRent: number;
+  notes?: string | null;
+}
+
 export interface UpdateTenantRequest {
   fullName: string;
   phone?: string | null;

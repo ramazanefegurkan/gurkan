@@ -11,6 +11,7 @@ import type {
   TenantResponse,
   CreateTenantRequest,
   UpdateTenantRequest,
+  RenewLeaseRequest,
   RentPaymentResponse,
   MarkPaymentPaidRequest,
   ShortTermRentalResponse,
@@ -360,6 +361,18 @@ export async function terminateTenant(
   tenantId: string,
 ): Promise<void> {
   await api.post(`/properties/${propertyId}/tenants/${tenantId}/terminate`);
+}
+
+export async function renewTenantLease(
+  propertyId: string,
+  tenantId: string,
+  payload: RenewLeaseRequest,
+): Promise<TenantResponse> {
+  const { data } = await api.post<TenantResponse>(
+    `/properties/${propertyId}/tenants/${tenantId}/renew`,
+    payload,
+  );
+  return data;
 }
 
 // ── Rent Payments ────────────────────────────────────

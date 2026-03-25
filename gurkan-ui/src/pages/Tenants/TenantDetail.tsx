@@ -6,6 +6,7 @@ import {
   getRentIncreases,
   markPaymentPaid,
   terminateTenant,
+  renewTenantLease,
   getProperty,
   getBankAccounts,
 } from '../../api/client';
@@ -92,6 +93,13 @@ export default function TenantDetail() {
   // Terminate confirmation
   const [showTerminate, setShowTerminate] = useState(false);
   const [terminating, setTerminating] = useState(false);
+
+  const [showRenew, setShowRenew] = useState(false);
+  const [renewLeaseEnd, setRenewLeaseEnd] = useState('');
+  const [renewRent, setRenewRent] = useState('');
+  const [renewNotes, setRenewNotes] = useState('');
+  const [renewing, setRenewing] = useState(false);
+  const [renewError, setRenewError] = useState('');
 
   useEffect(() => {
     if (!propertyId || !tenantId) return;
@@ -264,6 +272,18 @@ export default function TenantDetail() {
                   >
                     Düzenle
                   </Link>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => {
+                      setRenewRent(String(tenant.monthlyRent));
+                      setRenewLeaseEnd('');
+                      setRenewNotes('');
+                      setRenewError('');
+                      setShowRenew(true);
+                    }}
+                  >
+                    Sözleşmeyi Yenile
+                  </button>
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={() => setShowTerminate(true)}
@@ -544,6 +564,95 @@ export default function TenantDetail() {
                 disabled={terminating}
               >
                 {terminating ? 'Sonlandırılıyor...' : 'Evet, Sonlandır'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Renew Lease Modal ── */}
+      {showRenew && (
+        <div className="confirm-overlay" onClick={() => !renewing && setShowRenew(false)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
+            <h2 className="confirm-title">Sözleşmeyi Yenile</h2>
+            <p className="confirm-text" style={{ marginBottom: 16 }}>
+              Mevcut bitiş: <strong>{formatDateLong(tenant.leaseEnd)}</strong> · Mevcut kira: <strong>{formatMoney(tenant.monthlyRent, tenant.currency)}</strong>
+            </p>
+            {renewError && <div className="error-banner" style={{ marginBottom: 12 }}>{renewError}</div>}
+            <div className="form-field" style={{ marginBottom: 12 }}>
+              <label className="form-label">Yeni Bitiş Tarihi</label>
+              <input
+                type="date"
+                className="form-input"
+                value={renewLeaseEnd}
+                onChange={(e) => setRenewLeaseEnd(e.target.value)}
+                disabled={renewing}
+              />
+            </div>
+            <div className="form-field" style={{ marginBottom: 12 }}>
+              <label className="form-label">Yeni Aylık Kira</label>
+              <input
+                type="number"
+                className="form-input"
+                value={renewRent}
+                onChange={(e) => setRenewRent(e.target.value)}
+                min="0"
+                step="0.01"
+                disabled={renewing}
+              />
+            </div>
+            <div className="form-field" style={{ marginBottom: 16 }}>
+              <label className="form-label">Not</label>
+              <textarea
+                className="form-input"
+                value={renewNotes}
+                onChange={(e) => setRenewNotes(e.target.value)}
+                rows={2}
+                placeholder="Opsiyonel"
+                disabled={renewing}
+              />
+            </div>
+            <div className="confirm-actions">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowRenew(false)}
+                disabled={renewing}
+              >
+                Vazgeç
+              </button>
+              <button
+                className="btn btn-primary"
+                disabled={renewing || !renewLeaseEnd || !renewRent}
+                onClick={async () => {
+                  if (!propertyId || !tenantId) return;
+                  setRenewing(true);
+                  setRenewError('');
+                  try {
+                    const updated = await renewTenantLease(propertyId, tenantId, {
+                      newLeaseEnd: `${renewLeaseEnd}T00:00:00Z`,
+                      newMonthlyRent: parseFloat(renewRent),
+                      notes: renewNotes.trim() || null,
+                    });
+                    setTenant(updated);
+                    setShowRenew(false);
+                    const [newPayments, newIncreases] = await Promise.all([
+                      getRentPayments(propertyId, tenantId),
+                      getRentIncreases(propertyId, tenantId),
+                    ]);
+                    setPayments(newPayments);
+                    setIncreases(newIncreases);
+                  } catch (err: unknown) {
+                    const message =
+                      err && typeof err === 'object' && 'response' in err
+                        ? ((err as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Yenileme başarısız.')
+                        : 'Sunucuya bağlanılamadı.';
+                    setRenewError(message);
+                  } finally {
+                    setRenewing(false);
+                  }
+                }}
+              >
+                {renewing ? 'Yenileniyor...' : 'Yenile'}
               </button>
             </div>
           </div>
