@@ -19,6 +19,9 @@ import BillList from './pages/Bills/BillList';
 import BillForm from './pages/Bills/BillForm';
 import DocumentList from './pages/Documents/DocumentList';
 import ImportPage from './pages/Import/ImportPage';
+import UserList from './pages/Admin/UserList';
+import GroupList from './pages/Admin/GroupList';
+import GroupDetail from './pages/Admin/GroupDetail';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -36,6 +39,16 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function SuperAdminRoute({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+
+  if (user?.role !== 'SuperAdmin') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -84,6 +97,10 @@ function AppRoutes() {
           <Route path="documents" element={<DocumentList />} />
         </Route>
       </Route>
+
+        <Route path="/admin/users" element={<SuperAdminRoute><UserList /></SuperAdminRoute>} />
+        <Route path="/admin/groups" element={<SuperAdminRoute><GroupList /></SuperAdminRoute>} />
+        <Route path="/admin/groups/:id" element={<SuperAdminRoute><GroupDetail /></SuperAdminRoute>} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
