@@ -76,6 +76,21 @@ public enum BillPaymentStatus
     Overdue
 }
 
+public enum SubscriptionType
+{
+    Electric,
+    Gas,
+    Water,
+    Internet,
+    Dues
+}
+
+public enum SubscriptionHolderType
+{
+    User,
+    Tenant
+}
+
 public enum DocumentCategory
 {
     TitleDeed,
