@@ -34,6 +34,13 @@ import type {
   BankAccountResponse,
   CreateBankAccountRequest,
   UpdateBankAccountRequest,
+  UserResponse,
+  RegisterRequest,
+  UpdateRoleRequest,
+  CreateGroupRequest,
+  UpdateGroupRequest,
+  AddMemberRequest,
+  AssignPropertyRequest,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -240,6 +247,59 @@ export async function deletePropertyNote(
 export async function getGroups(): Promise<GroupResponse[]> {
   const { data } = await api.get<GroupResponse[]>('/groups');
   return data;
+}
+
+// ── Users (Admin) ───────────────────────────────────
+
+export async function getUsers(): Promise<UserResponse[]> {
+  const { data } = await api.get<UserResponse[]>('/users');
+  return data;
+}
+
+export async function registerUser(payload: RegisterRequest): Promise<TokenResponse> {
+  const { data } = await api.post<TokenResponse>('/auth/register', payload);
+  return data;
+}
+
+export async function updateUserRole(userId: string, payload: UpdateRoleRequest): Promise<void> {
+  await api.patch(`/users/${userId}/role`, payload);
+}
+
+// ── Groups (Admin) ──────────────────────────────────
+
+export async function getGroup(id: string): Promise<GroupResponse> {
+  const { data } = await api.get<GroupResponse>(`/groups/${id}`);
+  return data;
+}
+
+export async function createGroup(payload: CreateGroupRequest): Promise<GroupResponse> {
+  const { data } = await api.post<GroupResponse>('/groups', payload);
+  return data;
+}
+
+export async function updateGroup(id: string, payload: UpdateGroupRequest): Promise<GroupResponse> {
+  const { data } = await api.put<GroupResponse>(`/groups/${id}`, payload);
+  return data;
+}
+
+export async function deleteGroup(id: string): Promise<void> {
+  await api.delete(`/groups/${id}`);
+}
+
+export async function addGroupMember(groupId: string, payload: AddMemberRequest): Promise<void> {
+  await api.post(`/groups/${groupId}/members`, payload);
+}
+
+export async function removeGroupMember(groupId: string, memberId: string): Promise<void> {
+  await api.delete(`/groups/${groupId}/members/${memberId}`);
+}
+
+export async function assignPropertyToGroup(groupId: string, payload: AssignPropertyRequest): Promise<void> {
+  await api.post(`/groups/${groupId}/properties`, payload);
+}
+
+export async function unassignPropertyFromGroup(groupId: string, propertyId: string): Promise<void> {
+  await api.delete(`/groups/${groupId}/properties/${propertyId}`);
 }
 
 // ── Tenants ──────────────────────────────────────────
