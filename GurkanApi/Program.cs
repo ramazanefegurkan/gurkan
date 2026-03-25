@@ -70,6 +70,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // ---------- Group access service ----------
 builder.Services.AddScoped<IGroupAccessService, GroupAccessService>();
 
+// ---------- Subscription matcher service ----------
+builder.Services.AddScoped<ISubscriptionMatcherService, SubscriptionMatcherService>();
+
 // ---------- Notification compute service ----------
 builder.Services.AddScoped<INotificationComputeService, NotificationComputeService>();
 
