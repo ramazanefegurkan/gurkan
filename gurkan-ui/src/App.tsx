@@ -23,6 +23,8 @@ import UserList from './pages/Admin/UserList';
 import GroupList from './pages/Admin/GroupList';
 import GroupDetail from './pages/Admin/GroupDetail';
 import BankList from './pages/Admin/BankList';
+import AllTenantList from './pages/Tenants/AllTenantList';
+import SubscriptionList from './pages/Subscriptions/SubscriptionList';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -75,6 +77,8 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/notifications" element={<NotificationList />} />
         <Route path="/import" element={<ImportPage />} />
+        <Route path="/tenants" element={<AllTenantList />} />
+        <Route path="/subscriptions" element={<SubscriptionList />} />
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/new" element={<PropertyForm />} />
         <Route path="/properties/:id/edit" element={<PropertyForm />} />

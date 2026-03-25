@@ -512,7 +512,8 @@
 
 /* ── Data Table ───────────────────────────────────── */
 
-.data-table-wrap {
+.data-table-wrap,
+.data-table-wrapper {
   overflow-x: auto;
 }
 
@@ -556,6 +557,26 @@
 
 .data-table .date {
   white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.table-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.table-link:hover {
+  text-decoration: underline;
+}
+
+.badge-status--active {
+  background: var(--success-subtle, #e6f9ee);
+  color: var(--success, #16a34a);
+}
+
+.badge-status--inactive {
+  background: var(--border-subtle);
   color: var(--text-secondary);
 }
 

@@ -242,6 +242,25 @@ export interface TenantListItem {
   isActive: boolean;
 }
 
+export interface GlobalTenantListItem extends TenantListItem {
+  propertyId: string;
+  propertyName: string;
+}
+
+export interface GlobalSubscriptionListItem {
+  id: string;
+  propertyId: string;
+  propertyName: string;
+  type: SubscriptionType;
+  subscriptionNo: string | null;
+  holderType: SubscriptionHolderType;
+  holderUserId: string | null;
+  holderUserName: string | null;
+  hasAutoPayment: boolean;
+  autoPaymentBankId: string | null;
+  autoPaymentBankName: string | null;
+}
+
 export interface TenantResponse {
   id: string;
   propertyId: string;

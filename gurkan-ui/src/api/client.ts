@@ -38,6 +38,8 @@ import type {
   CreateBankRequest,
   SubscriptionResponse,
   UpsertSubscriptionRequest,
+  GlobalTenantListItem,
+  GlobalSubscriptionListItem,
   UserResponse,
   RegisterRequest,
   UpdateRoleRequest,
@@ -786,6 +788,19 @@ export async function updatePropertySubscriptions(
     `/properties/${propertyId}/subscriptions`,
     payload,
   );
+  return data;
+}
+
+// ── Global Lists ──────────────────────────────────────
+
+export async function getAllTenants(active?: boolean): Promise<GlobalTenantListItem[]> {
+  const params = active !== undefined ? { active } : {};
+  const { data } = await api.get<GlobalTenantListItem[]>('/tenants', { params });
+  return data;
+}
+
+export async function getAllSubscriptions(): Promise<GlobalSubscriptionListItem[]> {
+  const { data } = await api.get<GlobalSubscriptionListItem[]>('/subscriptions');
   return data;
 }
 
