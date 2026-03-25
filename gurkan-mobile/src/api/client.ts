@@ -38,6 +38,7 @@ import type {
   RentPaymentImportRow,
   DeviceTokenRequest,
   PushTriggerResponse,
+  TelegramLinkResponse,
 } from './types';
 
 // ── Storage helpers (SecureStore on native, localStorage on web) ──
@@ -749,6 +750,22 @@ export async function unregisterDeviceToken(
   expoPushToken: string,
 ): Promise<void> {
   await api.delete('/device-tokens', { data: { expoPushToken } });
+}
+
+// ── Telegram ─────────────────────────────────────────
+
+export async function getTelegramStatus(): Promise<TelegramLinkResponse> {
+  const res = await api.get('/telegram/status');
+  return res.data;
+}
+
+export async function linkTelegram(linkCode: string): Promise<TelegramLinkResponse> {
+  const res = await api.post('/telegram/link', { linkCode });
+  return res.data;
+}
+
+export async function unlinkTelegram(): Promise<void> {
+  await api.delete('/telegram/link');
 }
 
 // ── Push Trigger ─────────────────────────────────────

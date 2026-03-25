@@ -611,6 +611,15 @@ export interface ImportPreviewResponse<TRow> {
   rows: TRow[];
 }
 
+// ── Telegram ─────────────────────────────────────────
+
+export interface TelegramLinkResponse {
+  isLinked: boolean;
+  telegramUserId: number | null;
+  telegramUsername: string | null;
+  linkedAt: string | null;
+}
+
 // ── Push Notifications ────────────────────────────────
 
 export interface DeviceTokenRequest {
