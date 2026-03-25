@@ -1,0 +1,2 @@
+PropertyName,TenantName,Amount,Currency,DueDate,PaymentStatus
+Test Property,Test Tenant,5000,TRY,2026-04-01,Pending
