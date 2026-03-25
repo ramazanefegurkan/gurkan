@@ -28,6 +28,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<DismissedNotification> DismissedNotifications => Set<DismissedNotification>();
     public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
     public DbSet<Bank> Banks => Set<Bank>();
+    public DbSet<TelegramUserLink> TelegramUserLinks => Set<TelegramUserLink>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -399,6 +400,26 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(dn => dn.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- TelegramUserLink ----------
+        modelBuilder.Entity<TelegramUserLink>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.TelegramUsername).HasMaxLength(200);
+            entity.Property(e => e.LinkCode).HasMaxLength(6).IsRequired();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasIndex(e => e.TelegramUserId).IsUnique();
+            entity.HasIndex(e => e.UserId).IsUnique().HasFilter("\"UserId\" IS NOT NULL");
+            entity.HasIndex(e => e.LinkCode);
+
+            entity.HasOne(e => e.User)
+                  .WithOne()
+                  .HasForeignKey<TelegramUserLink>(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .IsRequired(false);
         });
     }
 }
