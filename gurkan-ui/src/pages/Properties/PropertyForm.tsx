@@ -20,8 +20,6 @@ import {
   SubscriptionType,
   SubscriptionTypeLabels,
   SubscriptionHolderType,
-  type SubscriptionResponse,
-  type UpsertSubscriptionRequest,
   type BankResponse as BankListItem,
   type GroupResponse,
   type BankAccountResponse,
