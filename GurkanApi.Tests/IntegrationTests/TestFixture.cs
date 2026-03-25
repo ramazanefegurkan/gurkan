@@ -1,5 +1,6 @@
 using GurkanApi.Data;
 using GurkanApi.Entities;
+using GurkanApi.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,6 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
 namespace GurkanApi.Tests.IntegrationTests;
+
+public class NoOpTelegramBotService : ITelegramBotService
+{
+    public Task SendMessageAsync(long chatId, string text) => Task.CompletedTask;
+    public Task SendMessageWithKeyboardAsync(long chatId, string text, IEnumerable<IEnumerable<(string, string)>> buttons) => Task.CompletedTask;
+    public Task AnswerCallbackQueryAsync(string callbackQueryId) => Task.CompletedTask;
+    public Task<byte[]> DownloadFileAsync(string fileId) => Task.FromResult(Array.Empty<byte>());
+}
 
 /// <summary>
 /// WebApplicationFactory that points to a separate "gurkan_test" PostgreSQL database.
@@ -45,6 +54,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             // Register with test connection string
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(TestConnectionString));
+
+            // Replace real Telegram bot with no-op stub
+            var telegramDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(ITelegramBotService));
+            if (telegramDescriptor is not null)
+                services.Remove(telegramDescriptor);
+            services.AddSingleton<ITelegramBotService, NoOpTelegramBotService>();
         });
     }
 
@@ -98,7 +114,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         // Truncate all tables (the seed from Program.cs boot may have already inserted admin)
         await db.Database.ExecuteSqlRawAsync("""
-            TRUNCATE TABLE "DeviceTokens", "RentIncreases", "RentPayments", "ShortTermRentals", "Expenses", "Bills", "Documents", "Tenants", "PropertyNotes", "RefreshTokens", "GroupMembers", "Properties", "Groups", "Users" CASCADE;
+            TRUNCATE TABLE "TelegramUserLinks", "DeviceTokens", "RentIncreases", "RentPayments", "ShortTermRentals", "Expenses", "Bills", "Documents", "Tenants", "PropertyNotes", "RefreshTokens", "GroupMembers", "Properties", "Groups", "Users" CASCADE;
         """);
 
         // Clean up test upload directory
