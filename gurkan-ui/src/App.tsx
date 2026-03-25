@@ -22,6 +22,7 @@ import ImportPage from './pages/Import/ImportPage';
 import UserList from './pages/Admin/UserList';
 import GroupList from './pages/Admin/GroupList';
 import GroupDetail from './pages/Admin/GroupDetail';
+import BankList from './pages/Admin/BankList';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -100,6 +101,7 @@ function AppRoutes() {
         <Route path="/admin/users" element={<SuperAdminRoute><UserList /></SuperAdminRoute>} />
         <Route path="/admin/groups" element={<SuperAdminRoute><GroupList /></SuperAdminRoute>} />
         <Route path="/admin/groups/:id" element={<SuperAdminRoute><GroupDetail /></SuperAdminRoute>} />
+        <Route path="/admin/banks" element={<SuperAdminRoute><BankList /></SuperAdminRoute>} />
       </Route>
 
       {/* Catch-all */}

@@ -8,7 +8,6 @@ import {
   getBankAccounts,
   createBankAccount,
   getBanks,
-  createBank,
   updatePropertySubscriptions,
   getGroup,
 } from '../../api/client';
@@ -20,7 +19,7 @@ import {
   SubscriptionType,
   SubscriptionTypeLabels,
   SubscriptionHolderType,
-  type BankResponse as BankListItem,
+  type BankResponse,
   type GroupResponse,
   type BankAccountResponse,
 } from '../../types';
@@ -70,11 +69,8 @@ export default function PropertyForm() {
   const [titleDeedOwner, setTitleDeedOwner] = useState('');
   const [defaultBankAccountId, setDefaultBankAccountId] = useState('');
   const [subscriptions, setSubscriptions] = useState<SubscriptionFormData[]>(defaultSubscriptions());
-  const [banks, setBanks] = useState<BankListItem[]>([]);
+  const [banks, setBanks] = useState<BankResponse[]>([]);
   const [groupMembers, setGroupMembers] = useState<{ id: string; fullName: string }[]>([]);
-  const [showNewBank, setShowNewBank] = useState(false);
-  const [newBankName, setNewBankName] = useState('');
-  const [savingBank, setSavingBank] = useState(false);
 
   // ── UI state ──
   const [groups, setGroups] = useState<GroupResponse[]>([]);
@@ -667,107 +663,48 @@ export default function PropertyForm() {
                   </div>
                 </div>
 
-                <div className="form-row" style={{ alignItems: 'center' }}>
-                  <div className="form-field" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                      type="checkbox"
-                      id={`auto-${sub.type}`}
-                      checked={sub.hasAutoPayment}
-                      onChange={(e) => {
-                        setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : {
-                          ...s,
-                          hasAutoPayment: e.target.checked,
-                          autoPaymentBankId: e.target.checked ? s.autoPaymentBankId : '',
-                        }));
-                      }}
-                      disabled={submitting}
-                    />
-                    <label className="form-label" htmlFor={`auto-${sub.type}`} style={{ marginBottom: 0 }}>
-                      Otomatik Ödeme
+                <div className="form-row">
+                  <div className="form-field">
+                    <label className="form-checkbox" htmlFor={`auto-${sub.type}`}>
+                      <input
+                        type="checkbox"
+                        id={`auto-${sub.type}`}
+                        checked={sub.hasAutoPayment}
+                        onChange={(e) => {
+                          setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : {
+                            ...s,
+                            hasAutoPayment: e.target.checked,
+                            autoPaymentBankId: e.target.checked ? s.autoPaymentBankId : '',
+                          }));
+                        }}
+                        disabled={submitting}
+                      />
+                      <span>Otomatik Ödeme</span>
                     </label>
                   </div>
 
                   {sub.hasAutoPayment && (
                     <div className="form-field">
                       <label className="form-label">Banka</label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <select
-                          className="form-select"
-                          value={sub.autoPaymentBankId}
-                          onChange={(e) => {
-                            setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : { ...s, autoPaymentBankId: e.target.value }));
-                          }}
-                          disabled={submitting}
-                          style={{ flex: 1 }}
-                        >
-                          <option value="">Banka seçin...</option>
-                          {banks.map((b) => (
-                            <option key={b.id} value={b.id}>{b.name}</option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          className="btn btn-secondary"
-                          style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-                          onClick={() => setShowNewBank(true)}
-                          disabled={submitting}
-                        >
-                          + Yeni
-                        </button>
-                      </div>
+                      <select
+                        className="form-select"
+                        value={sub.autoPaymentBankId}
+                        onChange={(e) => {
+                          setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : { ...s, autoPaymentBankId: e.target.value }));
+                        }}
+                        disabled={submitting}
+                      >
+                        <option value="">Banka seçin...</option>
+                        {banks.map((b) => (
+                          <option key={b.id} value={b.id}>{b.name}</option>
+                        ))}
+                      </select>
                     </div>
                   )}
                 </div>
               </div>
             ))}
 
-            {showNewBank && (
-              <div style={{
-                padding: '16px',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                marginBottom: '12px',
-              }}>
-                <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '12px' }}>Yeni Banka</div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    className="form-input"
-                    value={newBankName}
-                    onChange={(e) => setNewBankName(e.target.value)}
-                    placeholder="Banka adı"
-                    maxLength={200}
-                    style={{ flex: 1 }}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    disabled={!newBankName.trim() || savingBank}
-                    onClick={async () => {
-                      setSavingBank(true);
-                      try {
-                        const created = await createBank({ name: newBankName.trim() });
-                        setBanks((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
-                        setShowNewBank(false);
-                        setNewBankName('');
-                      } catch {
-                        setError('Banka eklenemedi. Bu isimde bir banka zaten olabilir.');
-                      }
-                      finally { setSavingBank(false); }
-                    }}
-                  >
-                    {savingBank ? '...' : 'Kaydet'}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => { setShowNewBank(false); setNewBankName(''); }}
-                  >
-                    İptal
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* ── Actions ── */}

@@ -176,6 +176,30 @@ export default function Layout() {
                 </svg>
                 <span>Gruplar</span>
               </NavLink>
+              <NavLink
+                to="/admin/banks"
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? 'nav-item--active' : ''}`
+                }
+              >
+                <svg
+                  className="nav-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path d="M3 21h18" />
+                  <path d="M3 10h18" />
+                  <path d="M5 6l7-3 7 3" />
+                  <path d="M4 10v11" />
+                  <path d="M20 10v11" />
+                  <path d="M8 14v4" />
+                  <path d="M12 14v4" />
+                  <path d="M16 14v4" />
+                </svg>
+                <span>Bankalar</span>
+              </NavLink>
             </>
           )}
         </nav>

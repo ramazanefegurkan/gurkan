@@ -391,6 +391,28 @@
   color: var(--danger);
 }
 
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.form-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.form-checkbox span {
+  user-select: none;
+}
+
 .form-actions {
   display: flex;
   align-items: center;
