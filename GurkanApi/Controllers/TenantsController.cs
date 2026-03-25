@@ -215,6 +215,90 @@ public class TenantsController : ControllerBase
         return Ok(MapTenantResponse(tenant));
     }
 
+    [HttpPost("{tenantId:guid}/renew")]
+    public async Task<IActionResult> Renew(Guid propertyId, Guid tenantId, [FromBody] RenewLeaseRequest request)
+    {
+        var userId = User.GetUserId();
+        var (allowed, errorResult) = await CheckPropertyAccess(propertyId);
+        if (!allowed) return errorResult!;
+
+        var tenant = await _db.Tenants
+            .FirstOrDefaultAsync(t => t.Id == tenantId && t.PropertyId == propertyId);
+
+        if (tenant is null)
+            return NotFound(new { error = "not_found", message = "Tenant not found." });
+
+        if (!tenant.IsActive)
+            return BadRequest(new { error = "validation_error", message = "Sözleşmesi sonlanmış kiracı yenilenemez." });
+
+        if (request.NewLeaseEnd <= tenant.LeaseEnd)
+            return BadRequest(new { error = "validation_error", message = "Yeni bitiş tarihi mevcut bitiş tarihinden sonra olmalıdır." });
+
+        var oldLeaseEnd = tenant.LeaseEnd;
+        var previousRent = tenant.MonthlyRent;
+
+        if (request.NewMonthlyRent != previousRent)
+        {
+            var increaseRate = previousRent > 0
+                ? Math.Round((request.NewMonthlyRent - previousRent) / previousRent * 100, 2)
+                : 0;
+
+            var rentIncrease = new RentIncrease
+            {
+                Id = Guid.NewGuid(),
+                TenantId = tenantId,
+                PreviousAmount = previousRent,
+                NewAmount = request.NewMonthlyRent,
+                IncreaseRate = increaseRate,
+                EffectiveDate = oldLeaseEnd,
+                Notes = request.Notes,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            _db.RentIncreases.Add(rentIncrease);
+            tenant.MonthlyRent = request.NewMonthlyRent;
+        }
+
+        tenant.LeaseEnd = request.NewLeaseEnd;
+        tenant.UpdatedAt = DateTime.UtcNow;
+
+        var newPayments = new List<RentPayment>();
+        var current = oldLeaseEnd;
+        var baseDate = tenant.LeaseStart;
+
+        var monthsOffset = ((current.Year - baseDate.Year) * 12) + current.Month - baseDate.Month;
+        if (current.Day < baseDate.Day) monthsOffset--;
+
+        monthsOffset++;
+        current = baseDate.AddMonths(monthsOffset);
+
+        while (current < request.NewLeaseEnd)
+        {
+            newPayments.Add(new RentPayment
+            {
+                Id = Guid.NewGuid(),
+                TenantId = tenantId,
+                Amount = request.NewMonthlyRent,
+                Currency = tenant.Currency,
+                DueDate = current,
+                Status = RentPaymentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+            });
+
+            monthsOffset++;
+            current = baseDate.AddMonths(monthsOffset);
+        }
+
+        _db.RentPayments.AddRange(newPayments);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Tenant lease renewed: TenantId={TenantId}, PropertyId={PropertyId}, OldEnd={OldEnd}, NewEnd={NewEnd}, NewRent={NewRent}, PaymentsGenerated={PaymentCount}, By={UserId}",
+            tenantId, propertyId, oldLeaseEnd, request.NewLeaseEnd, request.NewMonthlyRent, newPayments.Count, userId);
+
+        return Ok(MapTenantResponse(tenant));
+    }
+
     // ---------- Helpers ----------
 
     private List<RentPayment> GenerateMonthlyPayments(Tenant tenant)
