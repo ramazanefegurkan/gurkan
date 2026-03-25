@@ -86,6 +86,10 @@ builder.Services.AddHttpClient("ExpoPush", client =>
     client.BaseAddress = new Uri("https://exp.host/--/api/v2/push/");
 });
 
+// ---------- Telegram bill handler ----------
+builder.Services.AddScoped<ITelegramBillHandler, TelegramBillHandler>();
+builder.Services.AddHostedService<TelegramStateCleanupService>();
+
 // ---------- Bill parser service ----------
 builder.Services.AddHttpClient("Anthropic", client =>
 {
