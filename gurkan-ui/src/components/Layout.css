@@ -122,6 +122,22 @@
   flex-shrink: 0;
 }
 
+.nav-separator {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 12px 16px;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  padding: 4px 24px;
+  margin-bottom: 4px;
+}
+
 /* ── Sidebar Footer ──────────────────────────────── */
 
 .sidebar-footer {
