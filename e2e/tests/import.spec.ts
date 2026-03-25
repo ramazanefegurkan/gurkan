@@ -8,8 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 test.describe('Import', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
+  let groupId: string;
+  let propertyId: string;
 
   test.beforeAll(async () => {
     apiCtx = await createAdminApiContext();
@@ -29,7 +29,7 @@ test.describe('Import', () => {
     const page = authenticatedPage;
     await page.goto('/import');
 
-    await page.getByText('Airbnb CSV').click();
+    await page.locator('.import-tab').filter({ hasText: 'Airbnb CSV' }).click();
     await page.locator('select').selectOption(String(propertyId));
 
     const fileInput = page.locator('input[type="file"]');

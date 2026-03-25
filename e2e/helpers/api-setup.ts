@@ -8,7 +8,7 @@ function uid() {
 export async function createGroup(
   request: APIRequestContext,
   name?: string
-): Promise<{ id: number; name: string }> {
+): Promise<{ id: string; name: string }> {
   const groupName = name || `E2E Group ${uid()}`;
   const res = await request.post(`${API_URL}/groups`, {
     data: { name: groupName, description: 'E2E test group' },
@@ -17,14 +17,14 @@ export async function createGroup(
   return { id: body.id, name: groupName };
 }
 
-export async function deleteGroup(request: APIRequestContext, id: number): Promise<void> {
+export async function deleteGroup(request: APIRequestContext, id: string): Promise<void> {
   await request.delete(`${API_URL}/groups/${id}`);
 }
 
 export async function addGroupMember(
   request: APIRequestContext,
-  groupId: number,
-  userId: number,
+  groupId: string,
+  userId: string,
   role: string = 'Admin'
 ): Promise<void> {
   await request.post(`${API_URL}/groups/${groupId}/members`, {
@@ -34,15 +34,16 @@ export async function addGroupMember(
 
 export async function createProperty(
   request: APIRequestContext,
-  groupId: number,
+  groupId: string,
   overrides?: Record<string, unknown>
-): Promise<{ id: number; name: string }> {
+): Promise<{ id: string; name: string }> {
   const name = `E2E Property ${uid()}`;
   const res = await request.post(`${API_URL}/properties`, {
     data: {
       name,
       type: 'Apartment',
       currency: 'TRY',
+      address: 'Test Sokak 1',
       city: 'İstanbul',
       district: 'Kadıköy',
       groupId,
@@ -53,24 +54,25 @@ export async function createProperty(
   return { id: body.id, name };
 }
 
-export async function deleteProperty(request: APIRequestContext, id: number): Promise<void> {
+export async function deleteProperty(request: APIRequestContext, id: string): Promise<void> {
   await request.delete(`${API_URL}/properties/${id}`);
 }
 
 export async function createTenant(
   request: APIRequestContext,
-  propertyId: number,
+  propertyId: string,
   overrides?: Record<string, unknown>
-): Promise<{ id: number; fullName: string }> {
+): Promise<{ id: string; fullName: string }> {
   const fullName = `E2E Tenant ${uid()}`;
   const today = new Date();
   const threeMonthsLater = new Date(today);
   threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+  const toUtcIso = (d: Date) => `${d.toISOString().split('T')[0]}T00:00:00Z`;
   const res = await request.post(`${API_URL}/properties/${propertyId}/tenants`, {
     data: {
       fullName,
-      leaseStart: today.toISOString().split('T')[0],
-      leaseEnd: threeMonthsLater.toISOString().split('T')[0],
+      leaseStart: toUtcIso(today),
+      leaseEnd: toUtcIso(threeMonthsLater),
       monthlyRent: 5000,
       currency: 'TRY',
       ...overrides,
@@ -82,13 +84,14 @@ export async function createTenant(
 
 export async function createExpense(
   request: APIRequestContext,
-  propertyId: number,
+  propertyId: string,
   overrides?: Record<string, unknown>
-): Promise<{ id: number }> {
+): Promise<{ id: string }> {
+  const toUtcIso = (d: Date) => `${d.toISOString().split('T')[0]}T00:00:00Z`;
   const res = await request.post(`${API_URL}/properties/${propertyId}/expenses`, {
     data: {
       category: 'Maintenance',
-      date: new Date().toISOString().split('T')[0],
+      date: toUtcIso(new Date()),
       description: `E2E Expense ${uid()}`,
       amount: 1000,
       currency: 'TRY',
@@ -101,13 +104,14 @@ export async function createExpense(
 
 export async function createBill(
   request: APIRequestContext,
-  propertyId: number,
+  propertyId: string,
   overrides?: Record<string, unknown>
-): Promise<{ id: number }> {
+): Promise<{ id: string }> {
+  const toUtcIso = (d: Date) => `${d.toISOString().split('T')[0]}T00:00:00Z`;
   const res = await request.post(`${API_URL}/properties/${propertyId}/bills`, {
     data: {
       type: 'Water',
-      dueDate: new Date().toISOString().split('T')[0],
+      dueDate: toUtcIso(new Date()),
       amount: 250,
       currency: 'TRY',
       ...overrides,
@@ -119,17 +123,18 @@ export async function createBill(
 
 export async function createShortTermRental(
   request: APIRequestContext,
-  propertyId: number,
+  propertyId: string,
   overrides?: Record<string, unknown>
-): Promise<{ id: number }> {
+): Promise<{ id: string }> {
+  const toUtcIso = (d: Date) => `${d.toISOString().split('T')[0]}T00:00:00Z`;
   const checkIn = new Date();
   const checkOut = new Date(checkIn);
   checkOut.setDate(checkOut.getDate() + 3);
   const res = await request.post(`${API_URL}/properties/${propertyId}/short-term-rentals`, {
     data: {
       guestName: `E2E Guest ${uid()}`,
-      checkIn: checkIn.toISOString().split('T')[0],
-      checkOut: checkOut.toISOString().split('T')[0],
+      checkIn: toUtcIso(checkIn),
+      checkOut: toUtcIso(checkOut),
       nightCount: 3,
       platform: 'Airbnb',
       currency: 'TRY',
@@ -149,16 +154,15 @@ export async function registerUser(
   email: string,
   password: string,
   fullName: string
-): Promise<{ userId: number }> {
+): Promise<{ userId: string }> {
   const res = await request.post(`${API_URL}/auth/register`, {
     data: { email, password, fullName },
   });
   const body = await res.json();
   const token = body.accessToken;
   const payload = JSON.parse(atob(token.split('.')[1]));
-  const userId = parseInt(
-    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
-  );
+  const userId =
+    payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
   return { userId };
 }
 

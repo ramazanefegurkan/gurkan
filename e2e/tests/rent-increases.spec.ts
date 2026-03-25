@@ -4,9 +4,9 @@ import { createProperty, createGroup, createTenant, createAdminApiContext, delet
 
 test.describe('Rent Increases', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
-  let tenantId: number;
+  let groupId: string;
+  let propertyId: string;
+  let tenantId: string;
 
   test.beforeAll(async () => {
     apiCtx = await createAdminApiContext();
@@ -32,10 +32,10 @@ test.describe('Rent Increases', () => {
 
     const newEnd = new Date();
     newEnd.setFullYear(newEnd.getFullYear() + 1);
-    await page.locator('#renewLeaseEnd').fill(newEnd.toISOString().split('T')[0]);
-    await page.locator('#renewRate').fill('20');
-    await page.getByRole('button', { name: 'Yenile' }).click();
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Yeni Bitiş Tarihi' }).locator('input').fill(newEnd.toISOString().split('T')[0]);
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Artış Oranı' }).locator('input').fill('20');
+    await page.locator('.modal-dialog').getByRole('button', { name: 'Yenile', exact: true }).click();
 
-    await expect(page.getByText(/6.000|6,000/)).toBeVisible();
+    await expect(page.getByText(/6.000|6,000/).first()).toBeVisible();
   });
 });

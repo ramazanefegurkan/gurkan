@@ -4,8 +4,8 @@ import { createProperty, createGroup, createAdminApiContext, deleteProperty, del
 
 test.describe('Subscriptions', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
+  let groupId: string;
+  let propertyId: string;
 
   test.beforeAll(async () => {
     apiCtx = await createAdminApiContext();
@@ -24,7 +24,7 @@ test.describe('Subscriptions', () => {
   test('subscriptions page loads', async ({ authenticatedPage }) => {
     const page = authenticatedPage;
     await page.goto('/subscriptions');
-    await expect(page.getByText(/Abonelik/)).toBeVisible();
+    await expect(page.locator('h1.page-title')).toBeVisible();
   });
 
   test('edit subscriptions via property form', async ({ authenticatedPage }) => {

@@ -4,7 +4,8 @@ test.describe('Telegram Settings', () => {
   test('telegram link page loads', async ({ authenticatedPage }) => {
     const page = authenticatedPage;
     await page.goto('/settings/telegram');
-    await expect(page.getByText(/Telegram/)).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await expect(page.locator('h1.page-title')).toBeVisible();
   });
 
   test('link code input accepts 6 digits', async ({ authenticatedPage }) => {

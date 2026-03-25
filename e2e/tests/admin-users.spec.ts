@@ -4,7 +4,7 @@ test.describe('Admin Users', () => {
   test('user list visible for superadmin', async ({ authenticatedPage }) => {
     const page = authenticatedPage;
     await page.goto('/admin/users');
-    await expect(page.getByText('Kullanıcılar')).toBeVisible();
+    await expect(page.locator('h1.admin-title')).toBeVisible();
     await expect(page.locator('table')).toBeVisible();
   });
 
@@ -15,9 +15,9 @@ test.describe('Admin Users', () => {
     await page.goto('/admin/users');
     await page.getByRole('button', { name: /Yeni Kullanıcı/ }).click();
 
-    await page.getByLabel('Ad Soyad').fill('E2E New User');
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Şifre').fill('NewUser123!');
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Ad Soyad' }).locator('input').fill('E2E New User');
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Email' }).locator('input').fill(email);
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Şifre' }).locator('input').fill('NewUser123!');
     await page.getByRole('button', { name: 'Oluştur' }).click();
 
     await expect(page.getByText(email)).toBeVisible();

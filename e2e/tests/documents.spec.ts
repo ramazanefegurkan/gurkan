@@ -9,8 +9,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 test.describe('Documents', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
+  let groupId: string;
+  let propertyId: string;
   const testFilePath = path.join(__dirname, '..', 'test-data', 'test-doc.pdf');
   const invalidFilePath = path.join(__dirname, '..', 'test-data', 'invalid.exe');
 
@@ -78,6 +78,6 @@ test.describe('Documents', () => {
     await page.locator('select').selectOption('Contract');
     await page.getByRole('button', { name: 'Yükle' }).click();
 
-    await expect(page.locator('.error-banner, [role="alert"]')).toBeVisible();
+    await expect(page.locator('.doc-upload-error, .error-banner, [role="alert"]')).toBeVisible();
   });
 });

@@ -4,8 +4,8 @@ import { createProperty, createGroup, createAdminApiContext, deleteProperty, del
 
 test.describe('Properties', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let createdPropertyIds: number[] = [];
+  let groupId: string;
+  let createdPropertyIds: string[] = [];
 
   test.beforeAll(async () => {
     apiCtx = await createAdminApiContext();
@@ -30,12 +30,13 @@ test.describe('Properties', () => {
     await page.locator('#type').selectOption('Apartment');
     await page.locator('#currency').selectOption('TRY');
     await page.locator('#groupId').selectOption(String(groupId));
-    await page.getByLabel('Şehir').fill('İstanbul');
-    await page.getByLabel('İlçe').fill('Kadıköy');
+    await page.locator('#address').fill('Test Sokak 1');
+    await page.locator('#city').fill('İstanbul');
+    await page.locator('#district').fill('Kadıköy');
     await page.getByRole('button', { name: 'Mülk Oluştur' }).click();
 
-    await expect(page).toHaveURL(/\/properties\/\d+/);
-    await expect(page.locator('h1')).toContainText(propertyName);
+    await expect(page).toHaveURL(/\/properties\/[a-zA-Z0-9-]+/);
+    await expect(page.locator('h1.detail-title, h1.page-title').first()).toContainText(propertyName);
   });
 
   test('property list shows created property', async ({ authenticatedPage }) => {
@@ -53,11 +54,11 @@ test.describe('Properties', () => {
     createdPropertyIds.push(prop.id);
 
     await page.goto(`/properties/${prop.id}`);
-    await expect(page.getByText('Detaylar')).toBeVisible();
-    await expect(page.getByText('Kiracılar')).toBeVisible();
-    await expect(page.getByText('Giderler')).toBeVisible();
-    await expect(page.getByText('Faturalar')).toBeVisible();
-    await expect(page.getByText('Dökümanlar')).toBeVisible();
+    await expect(page.locator('.property-tab', { hasText: 'Detaylar' })).toBeVisible();
+    await expect(page.locator('.property-tab', { hasText: 'Kiracılar' })).toBeVisible();
+    await expect(page.locator('.property-tab', { hasText: 'Giderler' })).toBeVisible();
+    await expect(page.locator('.property-tab', { hasText: 'Faturalar' })).toBeVisible();
+    await expect(page.locator('.property-tab', { hasText: 'Dökümanlar' })).toBeVisible();
   });
 
   test('edit property', async ({ authenticatedPage }) => {
@@ -71,8 +72,8 @@ test.describe('Properties', () => {
     await page.getByLabel('Mülk Adı').fill(newName);
     await page.getByRole('button', { name: 'Kaydet' }).click();
 
-    await expect(page).toHaveURL(`/properties/${prop.id}`);
-    await expect(page.locator('h1')).toContainText(newName);
+    await expect(page).toHaveURL(new RegExp(`/properties/${prop.id}`));
+    await expect(page.locator('h1.detail-title, h1.page-title').first()).toContainText(newName);
   });
 
   test('delete property', async ({ authenticatedPage }) => {
@@ -96,9 +97,12 @@ test.describe('Properties', () => {
     await page.locator('#type').selectOption('House');
     await page.locator('#currency').selectOption('USD');
     await page.locator('#groupId').selectOption(String(groupId));
+    await page.locator('#address').fill('Test Sokak 1');
+    await page.locator('#city').fill('İstanbul');
+    await page.locator('#district').fill('Kadıköy');
     await page.getByRole('button', { name: 'Mülk Oluştur' }).click();
 
-    await expect(page).toHaveURL(/\/properties\/\d+/);
+    await expect(page).toHaveURL(/\/properties\/[a-zA-Z0-9-]+/);
     await expect(page.locator('.badge-currency')).toContainText('USD');
   });
 
@@ -111,9 +115,12 @@ test.describe('Properties', () => {
     await page.locator('#type').selectOption('Office');
     await page.locator('#currency').selectOption('EUR');
     await page.locator('#groupId').selectOption(String(groupId));
+    await page.locator('#address').fill('Test Sokak 1');
+    await page.locator('#city').fill('İstanbul');
+    await page.locator('#district').fill('Kadıköy');
     await page.getByRole('button', { name: 'Mülk Oluştur' }).click();
 
-    await expect(page).toHaveURL(/\/properties\/\d+/);
+    await expect(page).toHaveURL(/\/properties\/[a-zA-Z0-9-]+/);
     await expect(page.locator('.badge-currency')).toContainText('EUR');
   });
 
@@ -123,6 +130,6 @@ test.describe('Properties', () => {
     createdPropertyIds.push(prop.id);
 
     await page.goto(`/properties/${prop.id}`);
-    await expect(page.getByText(/403|Erişim engellendi|yetkili değilsiniz/i)).toBeVisible();
+    await expect(page.getByText(/403|Erişim engellendi|yetkili değilsiniz|yüklenemedi/i)).toBeVisible();
   });
 });

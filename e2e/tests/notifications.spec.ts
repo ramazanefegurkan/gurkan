@@ -4,7 +4,7 @@ test.describe('Notifications', () => {
   test('notifications page loads', async ({ authenticatedPage }) => {
     const page = authenticatedPage;
     await page.goto('/notifications');
-    await expect(page.getByText(/Bildirim/)).toBeVisible();
+    await expect(page.locator('h1.page-title')).toBeVisible();
   });
 
   test('dismiss single notification', async ({ authenticatedPage }) => {

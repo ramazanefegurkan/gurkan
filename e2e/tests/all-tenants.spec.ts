@@ -4,8 +4,8 @@ import { createProperty, createGroup, createTenant, createAdminApiContext, delet
 
 test.describe('All Tenants', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
+  let groupId: string;
+  let propertyId: string;
   let tenantName: string;
 
   test.beforeAll(async () => {

@@ -4,8 +4,8 @@ import { createProperty, createGroup, createBill, createAdminApiContext, deleteP
 
 test.describe('Bills', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
+  let groupId: string;
+  let propertyId: string;
 
   test.beforeAll(async () => {
     apiCtx = await createAdminApiContext();
@@ -24,10 +24,10 @@ test.describe('Bills', () => {
   test('create bill via form', async ({ authenticatedPage }) => {
     const page = authenticatedPage;
     await page.goto(`/properties/${propertyId}/bills/new`);
-    await page.locator('#type').selectOption('Electric');
-    await page.locator('#dueDate').fill(new Date().toISOString().split('T')[0]);
-    await page.locator('#amount').fill('350');
-    await page.locator('#currency').selectOption('TRY');
+    await page.locator('.form-field').filter({ hasText: 'Fatura Türü' }).locator('select').selectOption('Electric');
+    await page.locator('.form-field').filter({ hasText: 'Son Ödeme Tarihi' }).locator('input').fill(new Date().toISOString().split('T')[0]);
+    await page.locator('.form-field').filter({ hasText: 'Tutar' }).locator('input').fill('350');
+    await page.locator('.form-field').filter({ hasText: 'Para Birimi' }).locator('select').selectOption('TRY');
     await page.getByRole('button', { name: 'Fatura Ekle' }).click();
 
     await expect(page).toHaveURL(new RegExp(`/properties/${propertyId}/bills`));
@@ -40,8 +40,8 @@ test.describe('Bills', () => {
     await page.goto(`/properties/${propertyId}/bills`);
     await page.locator('[title="Düzenle"], .action-btn').first().click();
 
-    await page.locator('#amount').clear();
-    await page.locator('#amount').fill('500');
+    await page.locator('.form-field').filter({ hasText: 'Tutar' }).locator('input').clear();
+    await page.locator('.form-field').filter({ hasText: 'Tutar' }).locator('input').fill('500');
     await page.getByRole('button', { name: 'Güncelle' }).click();
 
     await expect(page.getByText('500')).toBeVisible();
@@ -62,6 +62,7 @@ test.describe('Bills', () => {
     await createBill(apiCtx, propertyId);
 
     await page.goto(`/properties/${propertyId}/bills`);
+    await expect(page.locator('.action-btn--danger, [title="Sil"]').first()).toBeVisible();
     const rowCount = await page.locator('tbody tr').count();
 
     page.once('dialog', (dialog) => dialog.accept());

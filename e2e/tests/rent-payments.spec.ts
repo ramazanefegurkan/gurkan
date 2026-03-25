@@ -4,9 +4,9 @@ import { createProperty, createGroup, createTenant, createAdminApiContext, delet
 
 test.describe('Rent Payments', () => {
   let apiCtx: APIRequestContext;
-  let groupId: number;
-  let propertyId: number;
-  let tenantId: number;
+  let groupId: string;
+  let propertyId: string;
+  let tenantId: string;
 
   test.beforeAll(async () => {
     apiCtx = await createAdminApiContext();
@@ -36,8 +36,8 @@ test.describe('Rent Payments', () => {
     await page.goto(`/properties/${propertyId}/tenants/${tenantId}`);
 
     await page.getByRole('button', { name: 'Ödendi İşaretle' }).first().click();
-    await page.locator('#payDate').fill(new Date().toISOString().split('T')[0]);
-    await page.locator('#payMethod').selectOption('BankTransfer');
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Ödeme Tarihi' }).locator('input').fill(new Date().toISOString().split('T')[0]);
+    await page.locator('.modal-dialog .form-field').filter({ hasText: 'Ödeme Yöntemi' }).locator('select').selectOption('BankTransfer');
     await page.getByRole('button', { name: /Ödendi Olarak İşaretle/ }).click();
 
     await expect(page.getByText('Ödendi').first()).toBeVisible();
