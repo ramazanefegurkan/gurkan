@@ -12,8 +12,11 @@ import {
   PropertyTypeLabels,
   CurrencyLabels,
   Currency,
+  SubscriptionTypeLabels,
+  SubscriptionHolderType,
   type PropertyResponse,
   type PropertyNoteResponse,
+  type SubscriptionResponse,
 } from '../../types';
 import '../../styles/shared.css';
 import './Properties.css';
@@ -290,23 +293,51 @@ export default function PropertyDetail() {
           </div>
         </div>
 
-        {/* ── Ownership & Subscription section ── */}
-        {(property.titleDeedOwner || property.subscriptionHolder || property.defaultBankAccountName ||
-          property.electricSubscriptionNo || property.gasSubscriptionNo || property.waterSubscriptionNo ||
-          property.internetSubscriptionNo || property.duesSubscriptionNo) && (
+        {(property.titleDeedOwner || property.defaultBankAccountName) && (
           <div className="detail-body" style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>
-              Sahiplik & Abonelik Bilgileri
+              Sahiplik Bilgileri
             </h3>
             <div className="detail-grid">
               {renderField('Tapu Sahibi', property.titleDeedOwner)}
-              {renderField('Abonelik Sahibi', property.subscriptionHolder)}
               {renderField('Kira Hesabı', property.defaultBankAccountName)}
-              {renderField('Elektrik Abone No', property.electricSubscriptionNo)}
-              {renderField('Doğalgaz Abone No', property.gasSubscriptionNo)}
-              {renderField('Su Abone No', property.waterSubscriptionNo)}
-              {renderField('İnternet Abone No', property.internetSubscriptionNo)}
-              {renderField('Aidat Abone No', property.duesSubscriptionNo)}
+            </div>
+          </div>
+        )}
+
+        {property.subscriptions?.length > 0 && (
+          <div className="detail-body" style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>
+              Abonelik Bilgileri
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {property.subscriptions.map((sub: SubscriptionResponse) => (
+                <div key={sub.id} style={{
+                  padding: '12px 16px',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-card)',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontWeight: 700, fontSize: '13px' }}>
+                      {SubscriptionTypeLabels[sub.type]}
+                    </span>
+                    {sub.hasAutoPayment && (
+                      <span className="badge" style={{ fontSize: '11px' }}>
+                        Otomatik Ödeme{sub.autoPaymentBankName ? ` — ${sub.autoPaymentBankName}` : ''}
+                      </span>
+                    )}
+                  </div>
+                  <div className="detail-grid">
+                    {renderField('Abone Sahibi',
+                      sub.holderType === SubscriptionHolderType.Tenant
+                        ? 'Kiracı'
+                        : sub.holderUserName ?? '—'
+                    )}
+                    {renderField('Abone No', sub.subscriptionNo)}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
