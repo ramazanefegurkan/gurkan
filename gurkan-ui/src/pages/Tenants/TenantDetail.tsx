@@ -97,6 +97,7 @@ export default function TenantDetail() {
   const [showRenew, setShowRenew] = useState(false);
   const [renewLeaseEnd, setRenewLeaseEnd] = useState('');
   const [renewRent, setRenewRent] = useState('');
+  const [renewRate, setRenewRate] = useState('');
   const [renewNotes, setRenewNotes] = useState('');
   const [renewing, setRenewing] = useState(false);
   const [renewError, setRenewError] = useState('');
@@ -276,6 +277,7 @@ export default function TenantDetail() {
                     className="btn btn-primary btn-sm"
                     onClick={() => {
                       setRenewRent(String(tenant.monthlyRent));
+                      setRenewRate('');
                       setRenewLeaseEnd('');
                       setRenewNotes('');
                       setRenewError('');
@@ -445,7 +447,7 @@ export default function TenantDetail() {
                     <td className="amount">{formatMoney(inc.newAmount, tenant.currency)}</td>
                     <td>
                       <span className="increase-rate">
-                        +%{(inc.increaseRate * 100).toFixed(1)}
+                        %{inc.increaseRate.toFixed(1)}
                       </span>
                     </td>
                     <td>{inc.notes || '—'}</td>
@@ -589,17 +591,47 @@ export default function TenantDetail() {
                 disabled={renewing}
               />
             </div>
-            <div className="form-field" style={{ marginBottom: 12 }}>
-              <label className="form-label">Yeni Aylık Kira</label>
-              <input
-                type="number"
-                className="form-input"
-                value={renewRent}
-                onChange={(e) => setRenewRent(e.target.value)}
-                min="0"
-                step="0.01"
-                disabled={renewing}
-              />
+            <div className="form-row" style={{ marginBottom: 12 }}>
+              <div className="form-field">
+                <label className="form-label">Artış Oranı (%)</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={renewRate}
+                  onChange={(e) => {
+                    const rate = e.target.value;
+                    setRenewRate(rate);
+                    const r = parseFloat(rate);
+                    if (!isNaN(r)) {
+                      const newAmount = tenant.monthlyRent * (1 + r / 100);
+                      setRenewRent(newAmount.toFixed(2));
+                    }
+                  }}
+                  step="0.1"
+                  placeholder="Örn: 25"
+                  disabled={renewing}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Yeni Aylık Kira</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={renewRent}
+                  onChange={(e) => {
+                    const rent = e.target.value;
+                    setRenewRent(rent);
+                    const r = parseFloat(rent);
+                    if (!isNaN(r) && tenant.monthlyRent > 0) {
+                      const rate = ((r - tenant.monthlyRent) / tenant.monthlyRent) * 100;
+                      setRenewRate(rate.toFixed(1));
+                    }
+                  }}
+                  min="0"
+                  step="0.01"
+                  disabled={renewing}
+                />
+              </div>
             </div>
             <div className="form-field" style={{ marginBottom: 16 }}>
               <label className="form-label">Not</label>
