@@ -86,6 +86,15 @@ builder.Services.AddHttpClient("ExpoPush", client =>
     client.BaseAddress = new Uri("https://exp.host/--/api/v2/push/");
 });
 
+// ---------- Bill parser service ----------
+builder.Services.AddHttpClient("Anthropic", client =>
+{
+    client.BaseAddress = new Uri("https://api.anthropic.com/");
+    client.DefaultRequestHeaders.Add("x-api-key", builder.Configuration["Anthropic:ApiKey"]);
+    client.DefaultRequestHeaders.Add("anthropic-version", "2024-10-22");
+});
+builder.Services.AddScoped<IBillParserService, BillParserService>();
+
 // ---------- JWT Authentication ----------
 var jwtSecret = builder.Configuration["Jwt:Secret"]!;
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
