@@ -25,9 +25,9 @@ Kullanıcı → Telegram Bot'a fotoğraf/SMS gönderir
 
 ## Bileşenler
 
-### 1. TelegramWebhookController
+### 1. TelegramController
 
-- Route: `api/telegram/webhook`
+- Route: `api/telegram`
 - Telegram webhook endpoint
 - Secret token doğrulaması (header: `X-Telegram-Bot-Api-Secret-Token`)
 - Mesaj routing: fotoğraf → BillParserService, metin → BillParserService, callback query → onay/seçim işleme
@@ -54,13 +54,17 @@ Kullanıcı → Telegram Bot'a fotoğraf/SMS gönderir
 }
 ```
 
+- `provider` alanı parse edilir ama Bill entity'de karşılığı yok, loglanır ama kaydedilmez
 - System prompt Türk fatura formatlarını tanımlar
-- Tanınamayan alanlar `null` döner, bot kullanıcıya sorar
+- Zorunlu alanlar: `billType` ve `amount` — bunlar parse edilemezse bot kullanıcıya sorar
+- Opsiyonel alanlar: `dueDate`, `subscriberNo`, `currency` — null ise bot sorar veya varsayılan kullanır
+- `currency` parse edilemezse varsayılan TRY
 - Hem fotoğraf hem SMS metni aynı API call ile işlenir
+- Hata senaryoları: API timeout/hata → kullanıcıya "İşlenemedi, tekrar deneyin" mesajı; tanınmayan görsel → "Bu bir fatura gibi görünmüyor" mesajı
 
 ### 4. SubscriptionMatcherService
 
-- `subscriberNo` ile `PropertySubscription.SubscriptionNo` eşleştirir
+- `subscriberNo` + `billType` ile `PropertySubscription.SubscriptionNo` + `PropertySubscription.Type` eşleştirir (sadece abone no yetmez, tip de eşleşmeli)
 - Eşleşme yoksa kullanıcının erişebildiği mülkleri listeler (IGroupAccessService)
 - Kullanıcı seçim yaptığında `PropertySubscription.SubscriptionNo` güncellenir
 - Sonraki faturalarda otomatik eşleşme sağlanır
@@ -74,6 +78,7 @@ TelegramUserLink
   - TelegramUserId: long
   - TelegramUsername: string (nullable)
   - LinkCode: string (6 haneli)
+  - LinkCodeExpiresAt: DateTime
   - IsLinked: bool
   - LinkedAt: DateTime (nullable)
   - CreatedAt: DateTime
@@ -81,7 +86,8 @@ TelegramUserLink
 
 - Unique index: TelegramUserId
 - Unique index: UserId
-- LinkCode 10 dakika geçerli, tek kullanımlık
+- LinkCode 10 dakika geçerli (`LinkCodeExpiresAt = CreatedAt + 10min`), tek kullanımlık
+- `/start` tekrar gönderilirse mevcut satır güncellenir (yeni kod + yeni expiry)
 
 ## User Linking Akışı
 
@@ -107,7 +113,24 @@ Mülk: Kadıköy Daire
 
 - Kaydet → Bill kaydı oluşturulur, onay mesajı
 - İptal → işlem iptal edilir
-- Düzelt → bot sırayla tutar/tarih/tip sorar, düzeltilmiş haliyle tekrar onay ister
+- Düzelt → bot inline keyboard ile tip seçtirir (5 seçenek), tutar ve tarih için metin girişi bekler (Türkçe decimal format: `XXX,XX`). Düzeltilmiş haliyle tekrar onay ister. Ek Claude API call yapılmaz.
+
+## Konuşma State Yönetimi
+
+Parse edilen fatura verisi, onay/düzeltme/mülk seçimi adımları arasında tutulmalı.
+
+- `ConcurrentDictionary<long, PendingBillState>` (key: TelegramUserId)
+- `PendingBillState`: parsedBill data, propertyId (nullable), adım (AwaitingConfirmation/AwaitingPropertySelection/AwaitingEdit), oluşturulma zamanı
+- 30 dakika TTL, arka plan timer ile temizlenir
+- Her yeni fatura gönderiminde mevcut pending state sıfırlanır
+- DB'ye yazılmaz — restart'ta kaybolması kabul edilebilir (kullanıcı tekrar gönderir)
+
+## Mükerrer Fatura Tespiti
+
+Bill oluşturulmadan önce: aynı `PropertyId + Type + Amount + DueDate` kombinasyonunda mevcut Bill var mı kontrol edilir.
+
+- Eşleşme varsa bot uyarır: "Bu fatura zaten kayıtlı gibi görünüyor. Yine de kaydetmek ister misiniz?" [Evet/Hayır]
+- Kullanıcı onaylarsa yine kaydedilir (aynı tutarda farklı fatura olabilir)
 
 ## Güvenlik
 
@@ -116,6 +139,8 @@ Mülk: Kadıköy Daire
 - Sadece linked kullanıcılar fatura gönderebilir
 - Mülk erişimi mevcut `IGroupAccessService` ile kontrol edilir
 - Claude API key server-side, kullanıcıya açık değil
+- Kullanıcı başına rate limit: saatte 10 fatura (Claude API maliyet koruması)
+- Webhook endpoint `[AllowAnonymous]`, diğer endpoint'ler `[Authorize]`
 
 ## Veritabanı Değişiklikleri
 
