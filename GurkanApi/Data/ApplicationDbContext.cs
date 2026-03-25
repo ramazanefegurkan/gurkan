@@ -15,6 +15,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<GroupMember> GroupMembers => Set<GroupMember>();
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<PropertyNote> PropertyNotes => Set<PropertyNote>();
+    public DbSet<PropertySubscription> PropertySubscriptions => Set<PropertySubscription>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<RentPayment> RentPayments => Set<RentPayment>();
@@ -96,12 +97,6 @@ public class ApplicationDbContext : DbContext
                   .HasMaxLength(10);
             entity.Property(p => p.Description).HasMaxLength(2000);
             entity.Property(p => p.TitleDeedOwner).HasMaxLength(200);
-            entity.Property(p => p.SubscriptionHolder).HasMaxLength(200);
-            entity.Property(p => p.ElectricSubscriptionNo).HasMaxLength(50);
-            entity.Property(p => p.GasSubscriptionNo).HasMaxLength(50);
-            entity.Property(p => p.WaterSubscriptionNo).HasMaxLength(50);
-            entity.Property(p => p.InternetSubscriptionNo).HasMaxLength(50);
-            entity.Property(p => p.DuesSubscriptionNo).HasMaxLength(50);
             entity.Property(p => p.CreatedAt)
                   .HasDefaultValueSql("now() at time zone 'utc'");
 
@@ -133,6 +128,38 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(pn => pn.CreatedBy)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ---------- PropertySubscription ----------
+        modelBuilder.Entity<PropertySubscription>(entity =>
+        {
+            entity.HasKey(ps => ps.Id);
+            entity.Property(ps => ps.Type)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(ps => ps.HolderType)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(ps => ps.SubscriptionNo).HasMaxLength(50);
+            entity.Property(ps => ps.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasIndex(ps => new { ps.PropertyId, ps.Type }).IsUnique();
+
+            entity.HasOne(ps => ps.Property)
+                  .WithMany(p => p.Subscriptions)
+                  .HasForeignKey(ps => ps.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ps => ps.HolderUser)
+                  .WithMany()
+                  .HasForeignKey(ps => ps.HolderUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(ps => ps.AutoPaymentBank)
+                  .WithMany()
+                  .HasForeignKey(ps => ps.AutoPaymentBankId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // ---------- RefreshToken ----------
