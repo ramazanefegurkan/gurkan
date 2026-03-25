@@ -13,6 +13,68 @@ export interface UserInfo {
   role: string;
 }
 
+export interface UserResponse {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  createdAt: string;
+  groupCount: number;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  fullName: string;
+}
+
+export interface UpdateRoleRequest {
+  role: string;
+}
+
+export const UserRole = {
+  SuperAdmin: 'SuperAdmin',
+  User: 'User',
+} as const;
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+
+export const UserRoleLabels: Record<UserRole, string> = {
+  [UserRole.SuperAdmin]: 'SuperAdmin',
+  [UserRole.User]: 'Kullanıcı',
+};
+
+export const GroupMemberRole = {
+  Admin: 'Admin',
+  Member: 'Member',
+} as const;
+
+export type GroupMemberRole = (typeof GroupMemberRole)[keyof typeof GroupMemberRole];
+
+export const GroupMemberRoleLabels: Record<GroupMemberRole, string> = {
+  [GroupMemberRole.Admin]: 'Yönetici',
+  [GroupMemberRole.Member]: 'Üye',
+};
+
+export interface CreateGroupRequest {
+  name: string;
+  description?: string | null;
+}
+
+export interface UpdateGroupRequest {
+  name?: string | null;
+  description?: string | null;
+}
+
+export interface AddMemberRequest {
+  userId: string;
+  role: GroupMemberRole;
+}
+
+export interface AssignPropertyRequest {
+  propertyId: string;
+}
+
 // ── Enums (match backend GurkanApi.Entities.Enums) ───
 // Using const objects instead of enums to comply with erasableSyntaxOnly.
 // Values are strings matching ASP.NET Core JsonStringEnumConverter output.
@@ -593,6 +655,7 @@ export interface GroupMemberResponse {
   fullName: string;
   email: string;
   role: string;
+  joinedAt: string;
 }
 
 // ── Import ────────────────────────────────────────────
