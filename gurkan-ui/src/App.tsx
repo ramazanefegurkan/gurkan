@@ -25,6 +25,7 @@ import GroupDetail from './pages/Admin/GroupDetail';
 import BankList from './pages/Admin/BankList';
 import AllTenantList from './pages/Tenants/AllTenantList';
 import SubscriptionList from './pages/Subscriptions/SubscriptionList';
+import TelegramLink from './pages/Settings/TelegramLink';
 import type { ReactNode } from 'react';
 
 // ── Route guards ─────────────────────────────────────
@@ -101,6 +102,8 @@ function AppRoutes() {
           <Route path="bills/:billId/edit" element={<BillForm />} />
           <Route path="documents" element={<DocumentList />} />
         </Route>
+
+        <Route path="/settings/telegram" element={<TelegramLink />} />
 
         <Route path="/admin/users" element={<SuperAdminRoute><UserList /></SuperAdminRoute>} />
         <Route path="/admin/groups" element={<SuperAdminRoute><GroupList /></SuperAdminRoute>} />

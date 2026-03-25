@@ -48,6 +48,7 @@ import type {
   UpdateGroupRequest,
   AddMemberRequest,
   AssignPropertyRequest,
+  TelegramLinkResponse,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -815,6 +816,22 @@ export async function getAllTenants(active?: boolean): Promise<GlobalTenantListI
 export async function getAllSubscriptions(): Promise<GlobalSubscriptionListItem[]> {
   const { data } = await api.get<GlobalSubscriptionListItem[]>('/subscriptions');
   return data;
+}
+
+// ── Telegram ─────────────────────────────────────────
+
+export async function getTelegramStatus(): Promise<TelegramLinkResponse> {
+  const res = await api.get('/telegram/status');
+  return res.data;
+}
+
+export async function linkTelegram(linkCode: string): Promise<TelegramLinkResponse> {
+  const res = await api.post('/telegram/link', { linkCode });
+  return res.data;
+}
+
+export async function unlinkTelegram(): Promise<void> {
+  await api.delete('/telegram/link');
 }
 
 export default api;

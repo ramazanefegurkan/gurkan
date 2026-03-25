@@ -804,3 +804,12 @@ export interface BankResponse {
 export interface CreateBankRequest {
   name: string;
 }
+
+// ── Telegram ──────────────────────────────────────────
+
+export interface TelegramLinkResponse {
+  isLinked: boolean;
+  telegramUserId: number | null;
+  telegramUsername: string | null;
+  linkedAt: string | null;
+}

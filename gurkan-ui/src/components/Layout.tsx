@@ -168,6 +168,25 @@ export default function Layout() {
             </svg>
             <span>İçe Aktar</span>
           </NavLink>
+          <div className="nav-separator" />
+          <div className="nav-section-label">Ayarlar</div>
+          <NavLink
+            to="/settings/telegram"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? 'nav-item--active' : ''}`
+            }
+          >
+            <svg
+              className="nav-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            >
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+            </svg>
+            <span>Telegram</span>
+          </NavLink>
           {user?.role === 'SuperAdmin' && (
             <>
               <div className="nav-separator" />

@@ -1,0 +1,129 @@
+.telegram-link-page {
+  max-width: 560px;
+}
+
+.telegram-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 32px;
+}
+
+.telegram-status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.telegram-status-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.telegram-status-icon--linked {
+  background: #edf7ed;
+  color: #2e7d32;
+}
+
+.telegram-status-icon--unlinked {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.telegram-linked {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.telegram-linked-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.telegram-linked-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.telegram-linked-username {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+}
+
+.telegram-linked-date {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.telegram-unlinked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.telegram-unlinked-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.telegram-link-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
+.telegram-link-form .form-field {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  padding: 10px 14px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-input);
+  transition: border-color 0.15s ease;
+  letter-spacing: 0.1em;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
