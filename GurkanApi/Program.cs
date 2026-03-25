@@ -73,6 +73,9 @@ builder.Services.AddScoped<IGroupAccessService, GroupAccessService>();
 // ---------- Notification compute service ----------
 builder.Services.AddScoped<INotificationComputeService, NotificationComputeService>();
 
+// ---------- Telegram bot service ----------
+builder.Services.AddSingleton<ITelegramBotService, TelegramBotService>();
+
 // ---------- Push notification service ----------
 builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
 builder.Services.AddHttpClient("ExpoPush", client =>
