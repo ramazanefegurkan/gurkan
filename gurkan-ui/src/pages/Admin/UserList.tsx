@@ -114,7 +114,7 @@ export default function UserList() {
               <th>Ad Soyad</th>
               <th>Email</th>
               <th>Rol</th>
-              <th>Grup</th>
+              <th>Grup Sayısı</th>
               <th>Kayıt Tarihi</th>
               <th></th>
             </tr>

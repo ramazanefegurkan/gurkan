@@ -12,7 +12,8 @@ import {
   unassignPropertyFromGroup,
 } from '../../api/client';
 import type { GroupResponse, UserResponse, PropertyListResponse } from '../../types';
-import { GroupMemberRole, GroupMemberRoleLabels } from '../../types';
+import { GroupMemberRole, GroupMemberRoleLabels, PropertyTypeLabels } from '../../types';
+import type { PropertyType } from '../../types';
 import './Admin.css';
 import '../../styles/shared.css';
 
@@ -210,7 +211,7 @@ export default function GroupDetail() {
               <div key={m.userId} className="member-row">
                 <div className="member-info">
                   <span className="member-name">{m.fullName}</span>
-                  <span className="member-email">{m.email}</span>
+                  <span className="member-email">{m.email} · {new Date(m.joinedAt).toLocaleDateString('tr-TR')}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span className={`member-role-badge member-role-badge--${m.role.toLowerCase()}`}>
@@ -240,7 +241,7 @@ export default function GroupDetail() {
           ) : (
             groupProperties.map((p) => (
               <div key={p.id} className="property-row">
-                <span>{p.name}</span>
+                <span>{p.name} <span className="badge badge-type">{PropertyTypeLabels[p.type as PropertyType] ?? p.type}</span></span>
                 <button
                   className="btn btn-ghost btn-sm"
                   onClick={() => handleUnassignProperty(p.id)}

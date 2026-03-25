@@ -96,11 +96,11 @@ function AppRoutes() {
           <Route path="bills/:billId/edit" element={<BillForm />} />
           <Route path="documents" element={<DocumentList />} />
         </Route>
-      </Route>
 
         <Route path="/admin/users" element={<SuperAdminRoute><UserList /></SuperAdminRoute>} />
         <Route path="/admin/groups" element={<SuperAdminRoute><GroupList /></SuperAdminRoute>} />
         <Route path="/admin/groups/:id" element={<SuperAdminRoute><GroupDetail /></SuperAdminRoute>} />
+      </Route>
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
