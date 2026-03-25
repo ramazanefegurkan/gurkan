@@ -26,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<DeviceToken> DeviceTokens => Set<DeviceToken>();
     public DbSet<DismissedNotification> DismissedNotifications => Set<DismissedNotification>();
     public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
+    public DbSet<Bank> Banks => Set<Bank>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -346,6 +347,16 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(ba => ba.GroupId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- Bank ----------
+        modelBuilder.Entity<Bank>(entity =>
+        {
+            entity.HasKey(b => b.Id);
+            entity.Property(b => b.Name).IsRequired().HasMaxLength(200);
+            entity.HasIndex(b => b.Name).IsUnique();
+            entity.Property(b => b.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
         });
 
         // ---------- DismissedNotification ----------
