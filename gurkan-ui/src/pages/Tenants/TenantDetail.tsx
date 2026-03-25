@@ -91,6 +91,9 @@ export default function TenantDetail() {
   const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([]);
 
   // Terminate confirmation
+  const [paymentPage, setPaymentPage] = useState(0);
+  const paymentsPerPage = 10;
+
   const [showTerminate, setShowTerminate] = useState(false);
   const [terminating, setTerminating] = useState(false);
 
@@ -363,6 +366,7 @@ export default function TenantDetail() {
         {payments.length === 0 ? (
           <div className="notes-empty">Henüz ödeme kaydı yok.</div>
         ) : (
+        <>
           <div className="data-table-wrap">
             <table className="data-table">
               <thead>
@@ -376,7 +380,9 @@ export default function TenantDetail() {
                 </tr>
               </thead>
               <tbody>
-                {payments.map((p) => (
+                {payments
+                  .slice(paymentPage * paymentsPerPage, (paymentPage + 1) * paymentsPerPage)
+                  .map((p) => (
                   <tr key={p.id}>
                     <td className="date">{formatDate(p.dueDate)}</td>
                     <td className="amount">{formatMoney(p.amount, p.currency as Currency)}</td>
@@ -413,6 +419,30 @@ export default function TenantDetail() {
               </tbody>
             </table>
           </div>
+          {payments.length > paymentsPerPage && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderTop: '1px solid var(--border-subtle)', fontSize: '13px' }}>
+              <span style={{ color: 'var(--text-tertiary)' }}>
+                {paymentPage * paymentsPerPage + 1}–{Math.min((paymentPage + 1) * paymentsPerPage, payments.length)} / {payments.length}
+              </span>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={paymentPage === 0}
+                  onClick={() => setPaymentPage((p) => p - 1)}
+                >
+                  ← Önceki
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={(paymentPage + 1) * paymentsPerPage >= payments.length}
+                  onClick={() => setPaymentPage((p) => p + 1)}
+                >
+                  Sonraki →
+                </button>
+              </div>
+            </div>
+          )}
+        </>
         )}
       </div>
 
@@ -574,10 +604,10 @@ export default function TenantDetail() {
 
       {/* ── Renew Lease Modal ── */}
       {showRenew && (
-        <div className="confirm-overlay" onClick={() => !renewing && setShowRenew(false)}>
-          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440 }}>
-            <h2 className="confirm-title">Sözleşmeyi Yenile</h2>
-            <p className="confirm-text" style={{ marginBottom: 16 }}>
+        <div className="modal-overlay" onClick={() => !renewing && setShowRenew(false)}>
+          <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Sözleşmeyi Yenile</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16 }}>
               Mevcut bitiş: <strong>{formatDateLong(tenant.leaseEnd)}</strong> · Mevcut kira: <strong>{formatMoney(tenant.monthlyRent, tenant.currency)}</strong>
             </p>
             {renewError && <div className="error-banner" style={{ marginBottom: 12 }}>{renewError}</div>}
@@ -601,10 +631,14 @@ export default function TenantDetail() {
                   onChange={(e) => {
                     const rate = e.target.value;
                     setRenewRate(rate);
+                    if (rate === '' || rate === '-') {
+                      setRenewRent(String(tenant.monthlyRent));
+                      return;
+                    }
                     const r = parseFloat(rate);
                     if (!isNaN(r)) {
-                      const newAmount = tenant.monthlyRent * (1 + r / 100);
-                      setRenewRent(newAmount.toFixed(2));
+                      const newAmount = Math.round(tenant.monthlyRent * (1 + r / 100) * 100) / 100;
+                      setRenewRent(String(newAmount));
                     }
                   }}
                   step="0.1"
@@ -621,6 +655,10 @@ export default function TenantDetail() {
                   onChange={(e) => {
                     const rent = e.target.value;
                     setRenewRent(rent);
+                    if (rent === '') {
+                      setRenewRate('');
+                      return;
+                    }
                     const r = parseFloat(rent);
                     if (!isNaN(r) && tenant.monthlyRent > 0) {
                       const rate = ((r - tenant.monthlyRent) / tenant.monthlyRent) * 100;
@@ -644,7 +682,7 @@ export default function TenantDetail() {
                 disabled={renewing}
               />
             </div>
-            <div className="confirm-actions">
+            <div className="modal-actions">
               <button
                 className="btn btn-secondary"
                 onClick={() => setShowRenew(false)}
