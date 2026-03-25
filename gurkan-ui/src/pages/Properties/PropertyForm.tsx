@@ -7,17 +7,47 @@ import {
   getGroups,
   getBankAccounts,
   createBankAccount,
+  getBanks,
+  createBank,
+  updatePropertySubscriptions,
+  getGroup,
 } from '../../api/client';
 import {
   PropertyType,
   PropertyTypeLabels,
   Currency,
   CurrencyLabels,
+  SubscriptionType,
+  SubscriptionTypeLabels,
+  SubscriptionHolderType,
+  type SubscriptionResponse,
+  type UpsertSubscriptionRequest,
+  type BankResponse as BankListItem,
   type GroupResponse,
   type BankAccountResponse,
 } from '../../types';
 import '../../styles/shared.css';
 import './Properties.css';
+
+interface SubscriptionFormData {
+  type: SubscriptionType;
+  subscriptionNo: string;
+  holderType: SubscriptionHolderType;
+  holderUserId: string;
+  hasAutoPayment: boolean;
+  autoPaymentBankId: string;
+}
+
+function defaultSubscriptions(): SubscriptionFormData[] {
+  return Object.values(SubscriptionType).map((t) => ({
+    type: t as SubscriptionType,
+    subscriptionNo: '',
+    holderType: SubscriptionHolderType.User,
+    holderUserId: '',
+    hasAutoPayment: false,
+    autoPaymentBankId: '',
+  }));
+}
 
 export default function PropertyForm() {
   const { id } = useParams<{ id: string }>();
@@ -40,13 +70,13 @@ export default function PropertyForm() {
 
   // ── Ownership & subscription ──
   const [titleDeedOwner, setTitleDeedOwner] = useState('');
-  const [subscriptionHolder, setSubscriptionHolder] = useState('');
-  const [electricSubNo, setElectricSubNo] = useState('');
-  const [gasSubNo, setGasSubNo] = useState('');
-  const [waterSubNo, setWaterSubNo] = useState('');
-  const [internetSubNo, setInternetSubNo] = useState('');
-  const [duesSubNo, setDuesSubNo] = useState('');
   const [defaultBankAccountId, setDefaultBankAccountId] = useState('');
+  const [subscriptions, setSubscriptions] = useState<SubscriptionFormData[]>(defaultSubscriptions());
+  const [banks, setBanks] = useState<BankListItem[]>([]);
+  const [groupMembers, setGroupMembers] = useState<{ id: string; fullName: string }[]>([]);
+  const [showNewBank, setShowNewBank] = useState(false);
+  const [newBankName, setNewBankName] = useState('');
+  const [savingBank, setSavingBank] = useState(false);
 
   // ── UI state ──
   const [groups, setGroups] = useState<GroupResponse[]>([]);
@@ -66,9 +96,10 @@ export default function PropertyForm() {
 
     async function loadData() {
       try {
-        const [groupsData, bankAccountsData, propertyData] = await Promise.all([
+        const [groupsData, bankAccountsData, banksData, propertyData] = await Promise.all([
           getGroups(),
           getBankAccounts(),
+          getBanks(),
           isEdit && id ? getProperty(id) : Promise.resolve(null),
         ]);
 
@@ -76,6 +107,7 @@ export default function PropertyForm() {
 
         setGroups(groupsData);
         setBankAccounts(bankAccountsData);
+        setBanks(banksData);
 
         if (propertyData) {
           setName(propertyData.name);
@@ -91,13 +123,29 @@ export default function PropertyForm() {
           setDescription(propertyData.description ?? '');
           setGroupId(propertyData.groupId ?? '');
           setTitleDeedOwner(propertyData.titleDeedOwner ?? '');
-          setSubscriptionHolder(propertyData.subscriptionHolder ?? '');
-          setElectricSubNo(propertyData.electricSubscriptionNo ?? '');
-          setGasSubNo(propertyData.gasSubscriptionNo ?? '');
-          setWaterSubNo(propertyData.waterSubscriptionNo ?? '');
-          setInternetSubNo(propertyData.internetSubscriptionNo ?? '');
-          setDuesSubNo(propertyData.duesSubscriptionNo ?? '');
           setDefaultBankAccountId(propertyData.defaultBankAccountId ?? '');
+
+          if (propertyData.groupId) {
+            const groupDetail = await getGroup(propertyData.groupId);
+            setGroupMembers(groupDetail.members.map((m) => ({ id: m.userId, fullName: m.fullName })));
+          }
+
+          if (propertyData.subscriptions?.length) {
+            setSubscriptions(
+              defaultSubscriptions().map((ds) => {
+                const existing = propertyData.subscriptions.find((s) => s.type === ds.type);
+                if (!existing) return ds;
+                return {
+                  type: existing.type,
+                  subscriptionNo: existing.subscriptionNo ?? '',
+                  holderType: existing.holderType,
+                  holderUserId: existing.holderUserId ?? '',
+                  hasAutoPayment: existing.hasAutoPayment,
+                  autoPaymentBankId: existing.autoPaymentBankId ?? '',
+                };
+              }),
+            );
+          }
         }
       } catch {
         if (!cancelled) setError('Veriler yüklenirken hata oluştu.');
@@ -109,6 +157,18 @@ export default function PropertyForm() {
     loadData();
     return () => { cancelled = true; };
   }, [id, isEdit]);
+
+  useEffect(() => {
+    if (!groupId) {
+      setGroupMembers([]);
+      return;
+    }
+    let cancelled = false;
+    getGroup(groupId).then((g) => {
+      if (!cancelled) setGroupMembers(g.members.map((m) => ({ id: m.userId, fullName: m.fullName })));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [groupId]);
 
   function validate(): boolean {
     const errors: Record<string, string> = {};
@@ -146,14 +206,27 @@ export default function PropertyForm() {
           currency,
           description: description.trim() || null,
           titleDeedOwner: titleDeedOwner.trim() || null,
-          subscriptionHolder: subscriptionHolder.trim() || null,
-          electricSubscriptionNo: electricSubNo.trim() || null,
-          gasSubscriptionNo: gasSubNo.trim() || null,
-          waterSubscriptionNo: waterSubNo.trim() || null,
-          internetSubscriptionNo: internetSubNo.trim() || null,
-          duesSubscriptionNo: duesSubNo.trim() || null,
           defaultBankAccountId: defaultBankAccountId || null,
         });
+
+        const activeSubscriptions = subscriptions.filter(
+          (s) => s.subscriptionNo || s.holderUserId || s.holderType === SubscriptionHolderType.Tenant || s.hasAutoPayment,
+        );
+
+        if (activeSubscriptions.length > 0) {
+          await updatePropertySubscriptions(
+            result.id,
+            activeSubscriptions.map((s) => ({
+              type: s.type,
+              subscriptionNo: s.subscriptionNo.trim() || null,
+              holderType: s.holderType,
+              holderUserId: s.holderType === SubscriptionHolderType.User && s.holderUserId ? s.holderUserId : null,
+              hasAutoPayment: s.hasAutoPayment,
+              autoPaymentBankId: s.hasAutoPayment && s.autoPaymentBankId ? s.autoPaymentBankId : null,
+            })),
+          );
+        }
+
         navigate(`/properties/${result.id}`);
       } else {
         const result = await createProperty({
@@ -169,15 +242,28 @@ export default function PropertyForm() {
           currency,
           description: description.trim() || null,
           titleDeedOwner: titleDeedOwner.trim() || null,
-          subscriptionHolder: subscriptionHolder.trim() || null,
-          electricSubscriptionNo: electricSubNo.trim() || null,
-          gasSubscriptionNo: gasSubNo.trim() || null,
-          waterSubscriptionNo: waterSubNo.trim() || null,
-          internetSubscriptionNo: internetSubNo.trim() || null,
-          duesSubscriptionNo: duesSubNo.trim() || null,
           defaultBankAccountId: defaultBankAccountId || null,
           groupId,
         });
+
+        const activeSubscriptions = subscriptions.filter(
+          (s) => s.subscriptionNo || s.holderUserId || s.holderType === SubscriptionHolderType.Tenant || s.hasAutoPayment,
+        );
+
+        if (activeSubscriptions.length > 0) {
+          await updatePropertySubscriptions(
+            result.id,
+            activeSubscriptions.map((s) => ({
+              type: s.type,
+              subscriptionNo: s.subscriptionNo.trim() || null,
+              holderType: s.holderType,
+              holderUserId: s.holderType === SubscriptionHolderType.User && s.holderUserId ? s.holderUserId : null,
+              hasAutoPayment: s.hasAutoPayment,
+              autoPaymentBankId: s.hasAutoPayment && s.autoPaymentBankId ? s.autoPaymentBankId : null,
+            })),
+          );
+        }
+
         navigate(`/properties/${result.id}`);
       }
     } catch (err: unknown) {
@@ -423,31 +509,17 @@ export default function PropertyForm() {
           <div className="form-section">
             <div className="form-section-title">Sahiplik & Abonelik</div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label className="form-label" htmlFor="titleDeedOwner">Tapu Sahibi</label>
-                <input
-                  id="titleDeedOwner"
-                  className="form-input"
-                  value={titleDeedOwner}
-                  onChange={(e) => setTitleDeedOwner(e.target.value)}
-                  placeholder="Örn: Ahmet Gürkan"
-                  maxLength={200}
-                  disabled={submitting}
-                />
-              </div>
-              <div className="form-field">
-                <label className="form-label" htmlFor="subscriptionHolder">Abonelik Sahibi</label>
-                <input
-                  id="subscriptionHolder"
-                  className="form-input"
-                  value={subscriptionHolder}
-                  onChange={(e) => setSubscriptionHolder(e.target.value)}
-                  placeholder="Örn: Mehmet Gürkan"
-                  maxLength={200}
-                  disabled={submitting}
-                />
-              </div>
+            <div className="form-field">
+              <label className="form-label" htmlFor="titleDeedOwner">Tapu Sahibi</label>
+              <input
+                id="titleDeedOwner"
+                className="form-input"
+                value={titleDeedOwner}
+                onChange={(e) => setTitleDeedOwner(e.target.value)}
+                placeholder="Örn: Ahmet Gürkan"
+                maxLength={200}
+                disabled={submitting}
+              />
             </div>
 
             <div className="form-field">
@@ -562,67 +634,158 @@ export default function PropertyForm() {
               )}
             </div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label className="form-label" htmlFor="electricSubNo">Elektrik Abone No</label>
-                <input
-                  id="electricSubNo"
-                  className="form-input"
-                  value={electricSubNo}
-                  onChange={(e) => setElectricSubNo(e.target.value)}
-                  maxLength={50}
-                  disabled={submitting}
-                />
-              </div>
-              <div className="form-field">
-                <label className="form-label" htmlFor="gasSubNo">Doğalgaz Abone No</label>
-                <input
-                  id="gasSubNo"
-                  className="form-input"
-                  value={gasSubNo}
-                  onChange={(e) => setGasSubNo(e.target.value)}
-                  maxLength={50}
-                  disabled={submitting}
-                />
-              </div>
-            </div>
+            {subscriptions.map((sub, idx) => (
+              <div key={sub.type} style={{
+                padding: '16px',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: '12px',
+                background: 'var(--bg-card)',
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '12px' }}>
+                  {SubscriptionTypeLabels[sub.type]}
+                </div>
 
-            <div className="form-row">
-              <div className="form-field">
-                <label className="form-label" htmlFor="waterSubNo">Su Abone No</label>
-                <input
-                  id="waterSubNo"
-                  className="form-input"
-                  value={waterSubNo}
-                  onChange={(e) => setWaterSubNo(e.target.value)}
-                  maxLength={50}
-                  disabled={submitting}
-                />
-              </div>
-              <div className="form-field">
-                <label className="form-label" htmlFor="internetSubNo">İnternet Abone No</label>
-                <input
-                  id="internetSubNo"
-                  className="form-input"
-                  value={internetSubNo}
-                  onChange={(e) => setInternetSubNo(e.target.value)}
-                  maxLength={50}
-                  disabled={submitting}
-                />
-              </div>
-            </div>
+                <div className="form-row">
+                  <div className="form-field">
+                    <label className="form-label">Abone Sahibi</label>
+                    <select
+                      className="form-select"
+                      value={sub.holderType === SubscriptionHolderType.Tenant ? '__tenant__' : sub.holderUserId}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : {
+                          ...s,
+                          holderType: val === '__tenant__' ? SubscriptionHolderType.Tenant : SubscriptionHolderType.User,
+                          holderUserId: val === '__tenant__' ? '' : val,
+                        }));
+                      }}
+                      disabled={submitting}
+                    >
+                      <option value="">Seçilmemiş</option>
+                      {groupMembers.map((m) => (
+                        <option key={m.id} value={m.id}>{m.fullName}</option>
+                      ))}
+                      <option value="__tenant__">Kiracı</option>
+                    </select>
+                  </div>
 
-            <div className="form-field" style={{ maxWidth: '50%' }}>
-              <label className="form-label" htmlFor="duesSubNo">Aidat Abone No</label>
-              <input
-                id="duesSubNo"
-                className="form-input"
-                value={duesSubNo}
-                onChange={(e) => setDuesSubNo(e.target.value)}
-                maxLength={50}
-                disabled={submitting}
-              />
-            </div>
+                  <div className="form-field">
+                    <label className="form-label">Abone No</label>
+                    <input
+                      className="form-input"
+                      value={sub.subscriptionNo}
+                      onChange={(e) => {
+                        setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : { ...s, subscriptionNo: e.target.value }));
+                      }}
+                      maxLength={50}
+                      disabled={submitting}
+                      placeholder={sub.holderType === SubscriptionHolderType.Tenant ? 'Opsiyonel' : ''}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row" style={{ alignItems: 'center' }}>
+                  <div className="form-field" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      id={`auto-${sub.type}`}
+                      checked={sub.hasAutoPayment}
+                      onChange={(e) => {
+                        setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : {
+                          ...s,
+                          hasAutoPayment: e.target.checked,
+                          autoPaymentBankId: e.target.checked ? s.autoPaymentBankId : '',
+                        }));
+                      }}
+                      disabled={submitting}
+                    />
+                    <label className="form-label" htmlFor={`auto-${sub.type}`} style={{ marginBottom: 0 }}>
+                      Otomatik Ödeme
+                    </label>
+                  </div>
+
+                  {sub.hasAutoPayment && (
+                    <div className="form-field">
+                      <label className="form-label">Banka</label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <select
+                          className="form-select"
+                          value={sub.autoPaymentBankId}
+                          onChange={(e) => {
+                            setSubscriptions((prev) => prev.map((s, i) => i !== idx ? s : { ...s, autoPaymentBankId: e.target.value }));
+                          }}
+                          disabled={submitting}
+                          style={{ flex: 1 }}
+                        >
+                          <option value="">Banka seçin...</option>
+                          {banks.map((b) => (
+                            <option key={b.id} value={b.id}>{b.name}</option>
+                          ))}
+                        </select>
+                        {idx === 0 && (
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+                            onClick={() => setShowNewBank(true)}
+                            disabled={submitting}
+                          >
+                            + Yeni
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {showNewBank && (
+              <div style={{
+                padding: '16px',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-card)',
+                marginBottom: '12px',
+              }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '12px' }}>Yeni Banka</div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    className="form-input"
+                    value={newBankName}
+                    onChange={(e) => setNewBankName(e.target.value)}
+                    placeholder="Banka adı"
+                    maxLength={200}
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={!newBankName.trim() || savingBank}
+                    onClick={async () => {
+                      setSavingBank(true);
+                      try {
+                        const created = await createBank({ name: newBankName.trim() });
+                        setBanks((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+                        setShowNewBank(false);
+                        setNewBankName('');
+                      } catch { /* ignore */ }
+                      finally { setSavingBank(false); }
+                    }}
+                  >
+                    {savingBank ? '...' : 'Kaydet'}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => { setShowNewBank(false); setNewBankName(''); }}
+                  >
+                    İptal
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Actions ── */}
