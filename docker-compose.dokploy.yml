@@ -15,10 +15,11 @@ services:
       - api_uploads:/app/uploads
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`kira.efegur.dev`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.api.entrypoints=websecure"
-      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.api.loadbalancer.server.port=9080"
+      - "traefik.http.routers.gurkan-api.rule=Host(`kira.efegur.dev`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.gurkan-api.entrypoints=websecure"
+      - "traefik.http.routers.gurkan-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.gurkan-api.priority=2"
+      - "traefik.http.services.gurkan-api.loadbalancer.server.port=9080"
     networks:
       - dokploy-network
 
@@ -30,12 +31,11 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`kira.efegur.dev`)"
-      - "traefik.http.routers.web.entrypoints=websecure"
-      - "traefik.http.routers.web.tls.certresolver=letsencrypt"
-      - "traefik.http.services.web.loadbalancer.server.port=80"
-      - "traefik.http.routers.web.priority=1"
-      - "traefik.http.routers.api.priority=2"
+      - "traefik.http.routers.gurkan-web.rule=Host(`kira.efegur.dev`)"
+      - "traefik.http.routers.gurkan-web.entrypoints=websecure"
+      - "traefik.http.routers.gurkan-web.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.gurkan-web.priority=1"
+      - "traefik.http.services.gurkan-web.loadbalancer.server.port=80"
     networks:
       - dokploy-network
 
