@@ -1,0 +1,84 @@
+<h2>Kullanıcılar Sayfası Düzeni</h2>
+<p class="subtitle">Kullanıcı listesi + yeni kullanıcı oluşturma akışı</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Tablo + Modal Form (Recommended)</h3>
+      <p>Kullanıcılar tabloda listelenir. "Yeni Kullanıcı" butonu modal açar. Rol değiştirme satır üzerinden yapılır.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:20px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;">Kullanıcılar</h3>
+            <button class="mock-button" style="font-size:12px;">+ Yeni Kullanıcı</button>
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="border-bottom:2px solid #e0dcd5;text-align:left;">
+                <th style="padding:8px;">Ad Soyad</th>
+                <th style="padding:8px;">Email</th>
+                <th style="padding:8px;">Rol</th>
+                <th style="padding:8px;">Grup Sayısı</th>
+                <th style="padding:8px;">Kayıt Tarihi</th>
+                <th style="padding:8px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #e0dcd5;">
+                <td style="padding:8px;">Ahmet Yılmaz</td>
+                <td style="padding:8px;color:#888;">ahmet@example.com</td>
+                <td style="padding:8px;"><span style="background:#c4653a;color:white;padding:2px 8px;border-radius:12px;font-size:11px;">SuperAdmin</span></td>
+                <td style="padding:8px;">3</td>
+                <td style="padding:8px;color:#888;">12.01.2025</td>
+                <td style="padding:8px;color:#888;">...</td>
+              </tr>
+              <tr style="border-bottom:1px solid #e0dcd5;">
+                <td style="padding:8px;">Fatma Demir</td>
+                <td style="padding:8px;color:#888;">fatma@example.com</td>
+                <td style="padding:8px;"><span style="background:#e0dcd5;padding:2px 8px;border-radius:12px;font-size:11px;">User</span></td>
+                <td style="padding:8px;">1</td>
+                <td style="padding:8px;color:#888;">05.03.2025</td>
+                <td style="padding:8px;color:#888;">...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Tablo + Ayrı Sayfa Form</h3>
+      <p>Kullanıcılar tabloda listelenir. "Yeni Kullanıcı" butonu /admin/users/new sayfasına yönlendirir. Projedeki diğer formlarla (mülk, kiracı) aynı pattern.</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="padding:20px;font-size:13px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;">Yeni Kullanıcı</h3>
+          </div>
+          <div style="max-width:400px;">
+            <div style="margin-bottom:12px;">
+              <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;display:block;margin-bottom:4px;">Ad Soyad</label>
+              <input class="mock-input" style="width:100%;" placeholder="Örn: Ahmet Yılmaz">
+            </div>
+            <div style="margin-bottom:12px;">
+              <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;display:block;margin-bottom:4px;">Email</label>
+              <input class="mock-input" style="width:100%;" placeholder="ornek@email.com">
+            </div>
+            <div style="margin-bottom:12px;">
+              <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;display:block;margin-bottom:4px;">Şifre</label>
+              <input class="mock-input" style="width:100%;" placeholder="••••••••">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;display:block;margin-bottom:4px;">Rol</label>
+              <select class="mock-input" style="width:100%;"><option>User</option></select>
+            </div>
+            <button class="mock-button">Kaydet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

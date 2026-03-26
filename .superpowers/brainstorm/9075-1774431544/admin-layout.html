@@ -1,0 +1,70 @@
+<h2>Sidebar'da "Yönetim" Bölümü Nasıl Görünsün?</h2>
+<p class="subtitle">SuperAdmin rolündeki kullanıcılar için sidebar'da ayrı bir section</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Alt Separator ile Gruplandırma</h3>
+      <p>Mevcut menü öğelerinin altında ince bir çizgi ve "Yönetim" başlığı, ardından Kullanıcılar ve Gruplar linkleri</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="background:#1a1a2e;color:#e0e0e0;padding:16px;border-radius:8px;width:220px;font-size:13px;">
+          <div style="font-weight:700;font-size:16px;margin-bottom:16px;color:#c4653a;">◆ Gürkan</div>
+          <div style="padding:8px 12px;border-radius:6px;background:#2a2a3e;margin-bottom:4px;">Dashboard</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">Mülkler</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">Bildirimler</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">İçe Aktar</div>
+          <div style="border-top:1px solid #3a3a4e;margin:12px 0 8px;"></div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#888;padding:4px 12px;margin-bottom:4px;">Yönetim</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">Kullanıcılar</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">Gruplar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Collapsible Yönetim Paneli</h3>
+      <p>Tıklanarak açılıp kapanan bir "Yönetim" accordion'u — kapalıyken tek satır, açıkken alt menüler görünür</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="background:#1a1a2e;color:#e0e0e0;padding:16px;border-radius:8px;width:220px;font-size:13px;">
+          <div style="font-weight:700;font-size:16px;margin-bottom:16px;color:#c4653a;">◆ Gürkan</div>
+          <div style="padding:8px 12px;border-radius:6px;background:#2a2a3e;margin-bottom:4px;">Dashboard</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">Mülkler</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">Bildirimler</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">İçe Aktar</div>
+          <div style="border-top:1px solid #3a3a4e;margin:12px 0 8px;"></div>
+          <div style="padding:8px 12px;border-radius:6px;background:#2a2a3e;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;cursor:pointer;">
+            <span>Yönetim</span>
+            <span style="font-size:10px;">▼</span>
+          </div>
+          <div style="padding-left:16px;">
+            <div style="padding:6px 12px;border-radius:6px;margin-bottom:2px;color:#c4653a;">Kullanıcılar</div>
+            <div style="padding:6px 12px;border-radius:6px;margin-bottom:2px;">Gruplar</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>İkon ile Düz Liste</h3>
+      <p>Separator olmadan, farklı ikonlarla doğrudan listeleme — basit ve flat</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-body" style="background:#1a1a2e;color:#e0e0e0;padding:16px;border-radius:8px;width:220px;font-size:13px;">
+          <div style="font-weight:700;font-size:16px;margin-bottom:16px;color:#c4653a;">◆ Gürkan</div>
+          <div style="padding:8px 12px;border-radius:6px;background:#2a2a3e;margin-bottom:4px;">📊 Dashboard</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">🏠 Mülkler</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">🔔 Bildirimler</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">📥 İçe Aktar</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">👥 Kullanıcılar</div>
+          <div style="padding:8px 12px;border-radius:6px;margin-bottom:4px;">🏢 Gruplar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
