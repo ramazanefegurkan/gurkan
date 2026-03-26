@@ -5,12 +5,10 @@ services:
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: "Host=host.docker.internal;Port=5432;Database=${POSTGRES_DB:-gurkan};Username=${POSTGRES_USER:-postgres};Password=${DB_PASSWORD}"
+      ConnectionStrings__DefaultConnection: "Host=halilorhondb-ln6nu7;Port=5432;Database=gurkan;Username=keycloak;Password=${DB_PASSWORD}"
       Jwt__Secret: ${JWT_SECRET}
       ASPNETCORE_URLS: "http://+:9080"
       Cors__AllowedOrigins__0: "https://kira.efegur.dev"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
       - api_uploads:/app/uploads
     labels:
