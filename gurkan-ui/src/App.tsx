@@ -25,6 +25,15 @@ import GroupDetail from './pages/Admin/GroupDetail';
 import BankList from './pages/Admin/BankList';
 import AllTenantList from './pages/Tenants/AllTenantList';
 import SubscriptionList from './pages/Subscriptions/SubscriptionList';
+import PaymentsDashboard from './pages/Payments/PaymentsDashboard';
+import CreditCardList from './pages/Payments/CreditCardList';
+import CreditCardForm from './pages/Payments/CreditCardForm';
+import CreditCardDetail from './pages/Payments/CreditCardDetail';
+import StatementForm from './pages/Payments/StatementForm';
+import SpendingForm from './pages/Payments/SpendingForm';
+import BankAccountList from './pages/Payments/BankAccountList';
+import BankAccountDetail from './pages/Payments/BankAccountDetail';
+import BankTransactionForm from './pages/Payments/BankTransactionForm';
 import TelegramLink from './pages/Settings/TelegramLink';
 import type { ReactNode } from 'react';
 
@@ -80,6 +89,17 @@ function AppRoutes() {
         <Route path="/import" element={<ImportPage />} />
         <Route path="/tenants" element={<AllTenantList />} />
         <Route path="/subscriptions" element={<SubscriptionList />} />
+        <Route path="/payments" element={<PaymentsDashboard />} />
+        <Route path="/payments/credit-cards" element={<CreditCardList />} />
+        <Route path="/payments/credit-cards/new" element={<CreditCardForm />} />
+        <Route path="/payments/credit-cards/:id" element={<CreditCardDetail />} />
+        <Route path="/payments/credit-cards/:id/edit" element={<CreditCardForm />} />
+        <Route path="/payments/credit-cards/:id/statements/new" element={<StatementForm />} />
+        <Route path="/payments/credit-cards/:id/spendings/new" element={<SpendingForm />} />
+        <Route path="/payments/bank-accounts" element={<BankAccountList />} />
+        <Route path="/payments/bank-accounts/:id" element={<BankAccountDetail />} />
+        <Route path="/payments/bank-accounts/:id/transactions/new" element={<BankTransactionForm />} />
+        <Route path="/payments/bank-accounts/:id/transactions/:transactionId/edit" element={<BankTransactionForm />} />
         <Route path="/properties" element={<PropertyList />} />
         <Route path="/properties/new" element={<PropertyForm />} />
         <Route path="/properties/:id/edit" element={<PropertyForm />} />
