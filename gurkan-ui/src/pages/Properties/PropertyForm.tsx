@@ -587,6 +587,7 @@ export default function PropertyForm() {
                             holderName: newBaHolder.trim(),
                             bankName: newBaBank.trim(),
                             iban: newBaIban.trim() || null,
+                            currency: currency as Currency,
                           });
                           setBankAccounts((prev) => [...prev, created]);
                           setDefaultBankAccountId(created.id);
