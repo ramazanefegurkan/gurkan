@@ -17,7 +17,7 @@ import '../../styles/shared.css';
 import './Payments.css';
 
 function formatCurrency(amount: number, currency: Currency): string {
-  const symbol = currency === 'TRY' ? '\u20BA' : currency === 'USD' ? '$' : '\u20AC';
+  const symbol = currency === 'TRY' ? '₺' : currency === 'USD' ? '$' : '€';
   return `${symbol}${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
@@ -72,7 +72,7 @@ export default function CreditCardDetail() {
           setSpendings(spendingsData);
         }
       } catch {
-        if (!cancelled) setError('Veriler y\u00FCklenemedi.');
+        if (!cancelled) setError('Veriler yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -91,7 +91,7 @@ export default function CreditCardDetail() {
       const cardData = await getCreditCard(id);
       setCard(cardData);
     } catch {
-      setError('Ekstre \u00F6dendi olarak i\u015Faretlenemedi.');
+      setError('Ekstre ödendi olarak işaretlenemedi.');
     } finally {
       setPayingId(null);
     }
@@ -99,7 +99,7 @@ export default function CreditCardDetail() {
 
   async function handleDeleteSpending(spendingId: string) {
     if (!id) return;
-    if (!window.confirm('Bu harcamay\u0131 silmek istedi\u011Finize emin misiniz?')) return;
+    if (!window.confirm('Bu harcamayı silmek istediğinize emin misiniz?')) return;
 
     setDeletingSpendingId(spendingId);
     try {
@@ -135,9 +135,9 @@ export default function CreditCardDetail() {
   if (!card) {
     return (
       <div className="empty-state">
-        <p className="empty-state-title">Kart bulunamad\u0131</p>
+        <p className="empty-state-title">Kart bulunamadı</p>
         <Link to="/payments/credit-cards" className="btn btn-primary">
-          Kartlara D\u00F6n
+          Kartlara Dön
         </Link>
       </div>
     );
@@ -149,14 +149,14 @@ export default function CreditCardDetail() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Kartlara D\u00F6n
+        Kartlara Dön
       </Link>
 
       <div className="page-header">
         <div>
           <h1 className="page-title">{card.name}</h1>
           <p className="page-subtitle">
-            {card.bankName} &middot; Hesap Kesim: {card.billingDay}. g\u00FCn &middot; Son \u00D6deme: {card.dueDay}. g\u00FCn &middot; {card.currency}
+            {card.bankName} &middot; Hesap Kesim: {card.billingDay}. gün &middot; Son Ödeme: {card.dueDay}. gün &middot; {card.currency}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -179,7 +179,7 @@ export default function CreditCardDetail() {
 
       <div className="payment-summary">
         <div className="payment-summary-item">
-          <span className="payment-summary-label">G\u00FCncel Bor\u00E7</span>
+          <span className="payment-summary-label">Güncel Borç</span>
           <span className="debt-amount">
             {formatCurrency(card.currentDebt, card.currency)}
           </span>
@@ -194,7 +194,7 @@ export default function CreditCardDetail() {
           Harcama Ekle
         </Link>
         <Link to={`/payments/credit-cards/${id}/edit`} className="btn btn-ghost btn-sm">
-          D\u00FCzenle
+          Düzenle
         </Link>
       </div>
 
@@ -207,7 +207,7 @@ export default function CreditCardDetail() {
 
       {statements.length === 0 ? (
         <div className="empty-state" style={{ marginBottom: 32 }}>
-          <p className="empty-state-title">Hen\u00FCz ekstre girilmemi\u015F</p>
+          <p className="empty-state-title">Henüz ekstre girilmemiş</p>
           <Link to={`/payments/credit-cards/${id}/statements/new`} className="btn btn-primary">
             Ekstre Gir
           </Link>
@@ -225,7 +225,7 @@ export default function CreditCardDetail() {
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <span className={`status-badge ${s.isPaid ? 'status-badge--paid' : 'status-badge--pending'}`}>
-                    {s.isPaid ? '\u00D6dendi' : 'Bekliyor'}
+                    {s.isPaid ? 'Ödendi' : 'Bekliyor'}
                   </span>
                   {!s.isPaid && (
                     <button
@@ -233,13 +233,13 @@ export default function CreditCardDetail() {
                       onClick={() => handlePayStatement(s.id)}
                       disabled={payingId === s.id}
                     >
-                      \u00D6dendi \u0130\u015Faretle
+                      Ödendi İşaretle
                     </button>
                   )}
                   <button
                     className="btn btn-ghost btn-sm"
                     onClick={() => toggleStatement(s.id)}
-                    title={expandedStatements.has(s.id) ? 'Daralt' : 'Geni\u015Flet'}
+                    title={expandedStatements.has(s.id) ? 'Daralt' : 'Genişlet'}
                   >
                     <svg style={{ width: 14, height: 14, transform: expandedStatements.has(s.id) ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="6 9 12 15 18 9" />
@@ -278,7 +278,7 @@ export default function CreditCardDetail() {
 
       {spendings.length === 0 ? (
         <div className="empty-state">
-          <p className="empty-state-title">Hen\u00FCz harcama kayd\u0131 yok</p>
+          <p className="empty-state-title">Henüz harcama kaydı yok</p>
           <Link to={`/payments/credit-cards/${id}/spendings/new`} className="btn btn-primary">
             Harcama Ekle
           </Link>
@@ -289,9 +289,9 @@ export default function CreditCardDetail() {
             <thead>
               <tr>
                 <th>Tarih</th>
-                <th>A\u00E7\u0131klama</th>
+                <th>Açıklama</th>
                 <th>Tutar</th>
-                <th>\u0130\u015Flemler</th>
+                <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>

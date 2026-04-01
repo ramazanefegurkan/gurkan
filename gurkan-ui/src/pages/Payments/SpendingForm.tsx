@@ -31,7 +31,7 @@ export default function SpendingForm() {
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? '\u0130\u015Flem ba\u015Far\u0131s\u0131z.';
+          ?.message ?? 'İşlem başarısız.';
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -44,13 +44,13 @@ export default function SpendingForm() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Kart Detay\u0131na D\u00F6n
+        Kart Detayına Dön
       </Link>
 
       <div className="page-header">
         <div>
           <h1 className="page-title">Yeni Harcama</h1>
-          <p className="page-subtitle">Kredi kart\u0131 harcama kayd\u0131 ekleyin</p>
+          <p className="page-subtitle">Kredi kartı harcama kaydı ekleyin</p>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ export default function SpendingForm() {
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label">
-                  A\u00E7\u0131klama <span className="required">*</span>
+                  Açıklama <span className="required">*</span>
                 </label>
                 <input
                   className="form-input"
@@ -81,7 +81,7 @@ export default function SpendingForm() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
-                  placeholder="Harcama a\u00E7\u0131klamas\u0131"
+                  placeholder="Harcama açıklaması"
                 />
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function SpendingForm() {
               to={`/payments/credit-cards/${cardId}`}
               className="btn btn-secondary"
             >
-              \u0130ptal
+              İptal
             </Link>
           </div>
         </div>

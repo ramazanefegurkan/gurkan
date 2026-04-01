@@ -52,7 +52,7 @@ export default function CreditCardForm() {
           setIsActive(cardData.isActive);
         }
       } catch {
-        if (!cancelled) setError('Veriler y\u00FCklenemedi.');
+        if (!cancelled) setError('Veriler yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -91,7 +91,7 @@ export default function CreditCardForm() {
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? '\u0130\u015Flem ba\u015Far\u0131s\u0131z.';
+          ?.message ?? 'İşlem başarısız.';
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -112,16 +112,16 @@ export default function CreditCardForm() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Kartlara D\u00F6n
+        Kartlara Dön
       </Link>
 
       <div className="page-header">
         <div>
           <h1 className="page-title">
-            {isEdit ? 'Kart\u0131 D\u00FCzenle' : 'Yeni Kredi Kart\u0131'}
+            {isEdit ? 'Kartı Düzenle' : 'Yeni Kredi Kartı'}
           </h1>
           <p className="page-subtitle">
-            {isEdit ? 'Kart bilgilerini g\u00FCncelleyin' : 'Yeni kredi kart\u0131 kayd\u0131 ekleyin'}
+            {isEdit ? 'Kart bilgilerini güncelleyin' : 'Yeni kredi kartı kaydı ekleyin'}
           </p>
         </div>
       </div>
@@ -153,12 +153,12 @@ export default function CreditCardForm() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="Kart ad\u0131"
+                  placeholder="Kart adı"
                 />
               </div>
               <div className="form-field">
                 <label className="form-label">
-                  Banka Ad\u0131 <span className="required">*</span>
+                  Banka Adı <span className="required">*</span>
                 </label>
                 <input
                   className="form-input"
@@ -166,7 +166,7 @@ export default function CreditCardForm() {
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
                   required
-                  placeholder="Banka ad\u0131"
+                  placeholder="Banka adı"
                 />
               </div>
             </div>
@@ -174,7 +174,7 @@ export default function CreditCardForm() {
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label">
-                  Hesap Kesim G\u00FCn\u00FC <span className="required">*</span>
+                  Hesap Kesim Günü <span className="required">*</span>
                 </label>
                 <input
                   className="form-input"
@@ -189,7 +189,7 @@ export default function CreditCardForm() {
               </div>
               <div className="form-field">
                 <label className="form-label">
-                  Son \u00D6deme G\u00FCn\u00FC <span className="required">*</span>
+                  Son Ödeme Günü <span className="required">*</span>
                 </label>
                 <input
                   className="form-input"
@@ -231,7 +231,7 @@ export default function CreditCardForm() {
                     onChange={(e) => setGroupId(e.target.value)}
                     required
                   >
-                    <option value="">Grup se\u00E7in</option>
+                    <option value="">Grup seçin</option>
                     {groups.map((g) => (
                       <option key={g.id} value={g.id}>{g.name}</option>
                     ))}
@@ -265,11 +265,11 @@ export default function CreditCardForm() {
               {submitting
                 ? 'Kaydediliyor...'
                 : isEdit
-                  ? 'G\u00FCncelle'
+                  ? 'Güncelle'
                   : 'Kart Ekle'}
             </button>
             <Link to="/payments/credit-cards" className="btn btn-secondary">
-              \u0130ptal
+              İptal
             </Link>
           </div>
         </div>

@@ -6,7 +6,7 @@ import '../../styles/shared.css';
 import './Payments.css';
 
 function formatCurrency(amount: number, currency: Currency): string {
-  const symbol = currency === 'TRY' ? '\u20BA' : currency === 'USD' ? '$' : '\u20AC';
+  const symbol = currency === 'TRY' ? '₺' : currency === 'USD' ? '$' : '€';
   return `${symbol}${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
@@ -24,7 +24,7 @@ export default function CreditCardList() {
         const data = await getCreditCards();
         if (!cancelled) setCards(data);
       } catch {
-        if (!cancelled) setError('Kredi kartlar\u0131 y\u00FCklenemedi.');
+        if (!cancelled) setError('Kredi kartları yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -35,14 +35,14 @@ export default function CreditCardList() {
   }, []);
 
   async function handleDelete(id: string) {
-    if (!window.confirm('Bu kredi kart\u0131n\u0131 silmek istedi\u011Finize emin misiniz?')) return;
+    if (!window.confirm('Bu kredi kartını silmek istediğinize emin misiniz?')) return;
 
     setDeletingId(id);
     try {
       await deleteCreditCard(id);
       setCards((prev) => prev.filter((c) => c.id !== id));
     } catch {
-      setError('Kredi kart\u0131 silinemedi.');
+      setError('Kredi kartı silinemedi.');
     } finally {
       setDeletingId(null);
     }
@@ -65,8 +65,8 @@ export default function CreditCardList() {
     <div>
       <div className="section-header">
         <div>
-          <h2 className="section-title">Kredi Kartlar\u0131</h2>
-          <p className="section-subtitle">{cards.length} kart kayd\u0131</p>
+          <h2 className="section-title">Kredi Kartları</h2>
+          <p className="section-subtitle">{cards.length} kart kaydı</p>
         </div>
         <Link to="/payments/credit-cards/new" className="btn btn-primary btn-sm">
           <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -92,14 +92,14 @@ export default function CreditCardList() {
         <div className="payment-summary">
           {Object.entries(debtByCurrency).map(([cur, amount]) => (
             <div key={cur} className="payment-summary-item">
-              <span className="payment-summary-label">Toplam Bor\u00E7 ({cur})</span>
+              <span className="payment-summary-label">Toplam Borç ({cur})</span>
               <span className="payment-summary-value" style={{ color: 'var(--danger)' }}>
                 {formatCurrency(amount, cur as Currency)}
               </span>
             </div>
           ))}
           <div className="payment-summary-item">
-            <span className="payment-summary-label">Kart Say\u0131s\u0131</span>
+            <span className="payment-summary-label">Kart Sayısı</span>
             <span className="payment-summary-value">{cards.length}</span>
           </div>
         </div>
@@ -111,8 +111,8 @@ export default function CreditCardList() {
             <rect x="2" y="5" width="20" height="14" rx="2" />
             <line x1="2" y1="10" x2="22" y2="10" />
           </svg>
-          <p className="empty-state-title">Hen\u00FCz kredi kart\u0131 kayd\u0131 yok</p>
-          <p className="empty-state-text">Kredi kartlar\u0131n\u0131z\u0131 takip etmek i\u00E7in kay\u0131t ekleyin.</p>
+          <p className="empty-state-title">Henüz kredi kartı kaydı yok</p>
+          <p className="empty-state-text">Kredi kartlarınızı takip etmek için kayıt ekleyin.</p>
           <Link to="/payments/credit-cards/new" className="btn btn-primary">
             Yeni Kart
           </Link>
@@ -125,9 +125,9 @@ export default function CreditCardList() {
                 <th>Ad</th>
                 <th>Banka</th>
                 <th>Para Birimi</th>
-                <th>G\u00FCncel Bor\u00E7</th>
+                <th>Güncel Borç</th>
                 <th>Durum</th>
-                <th>\u0130\u015Flemler</th>
+                <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
@@ -159,7 +159,7 @@ export default function CreditCardList() {
                       <Link
                         to={`/payments/credit-cards/${c.id}/edit`}
                         className="btn btn-ghost btn-sm"
-                        title="D\u00FCzenle"
+                        title="Düzenle"
                       >
                         <svg style={{ width: 14, height: 14 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />

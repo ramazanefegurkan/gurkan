@@ -41,7 +41,7 @@ export default function BankTransactionForm() {
           setDate(t.date.split('T')[0]);
         }
       } catch {
-        if (!cancelled) setError('\u0130\u015Flem bilgileri y\u00FCklenemedi.');
+        if (!cancelled) setError('İşlem bilgileri yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -78,7 +78,7 @@ export default function BankTransactionForm() {
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? '\u0130\u015Flem ba\u015Far\u0131s\u0131z.';
+          ?.message ?? 'İşlem başarısız.';
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -99,16 +99,16 @@ export default function BankTransactionForm() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Hesap Detay\u0131na D\u00F6n
+        Hesap Detayına Dön
       </Link>
 
       <div className="page-header">
         <div>
           <h1 className="page-title">
-            {isEdit ? '\u0130\u015Flemi D\u00FCzenle' : 'Yeni \u0130\u015Flem'}
+            {isEdit ? 'İşlemi Düzenle' : 'Yeni İşlem'}
           </h1>
           <p className="page-subtitle">
-            {isEdit ? '\u0130\u015Flem bilgilerini g\u00FCncelleyin' : 'Banka hesab\u0131na i\u015Flem ekleyin'}
+            {isEdit ? 'İşlem bilgilerini güncelleyin' : 'Banka hesabına işlem ekleyin'}
           </p>
         </div>
       </div>
@@ -127,12 +127,12 @@ export default function BankTransactionForm() {
       <form onSubmit={handleSubmit}>
         <div className="form-card">
           <div className="form-section">
-            <div className="form-section-title">\u0130\u015Flem Bilgileri</div>
+            <div className="form-section-title">İşlem Bilgileri</div>
 
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label">
-                  T\u00FCr <span className="required">*</span>
+                  Tür <span className="required">*</span>
                 </label>
                 <select
                   className="form-select"
@@ -165,7 +165,7 @@ export default function BankTransactionForm() {
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label">
-                  A\u00E7\u0131klama <span className="required">*</span>
+                  Açıklama <span className="required">*</span>
                 </label>
                 <input
                   className="form-input"
@@ -173,7 +173,7 @@ export default function BankTransactionForm() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
-                  placeholder="\u0130\u015Flem a\u00E7\u0131klamas\u0131"
+                  placeholder="İşlem açıklaması"
                 />
               </div>
               <div className="form-field">
@@ -203,14 +203,14 @@ export default function BankTransactionForm() {
               {submitting
                 ? 'Kaydediliyor...'
                 : isEdit
-                  ? 'G\u00FCncelle'
-                  : '\u0130\u015Flem Ekle'}
+                  ? 'Güncelle'
+                  : 'İşlem Ekle'}
             </button>
             <Link
               to={`/payments/bank-accounts/${accountId}`}
               className="btn btn-secondary"
             >
-              \u0130ptal
+              İptal
             </Link>
           </div>
         </div>
