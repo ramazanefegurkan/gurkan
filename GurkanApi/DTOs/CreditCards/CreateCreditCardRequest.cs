@@ -1,26 +1,28 @@
 using System.ComponentModel.DataAnnotations;
 using GurkanApi.Entities;
 
-namespace GurkanApi.DTOs.BankAccounts;
+namespace GurkanApi.DTOs.CreditCards;
 
-public class CreateBankAccountRequest
+public class CreateCreditCardRequest
 {
     [Required]
     public Guid GroupId { get; set; }
 
     [Required]
     [MaxLength(200)]
-    public string HolderName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(200)]
     public string BankName { get; set; } = string.Empty;
 
-    [MaxLength(34)]
-    public string? IBAN { get; set; }
+    [Required]
+    [Range(1, 31)]
+    public int BillingDay { get; set; }
 
-    [MaxLength(500)]
-    public string? Description { get; set; }
+    [Required]
+    [Range(1, 31)]
+    public int DueDay { get; set; }
 
     [Required]
     public Currency Currency { get; set; }

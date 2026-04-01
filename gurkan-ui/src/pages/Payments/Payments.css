@@ -1,0 +1,130 @@
+.payment-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.payment-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.payment-summary-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.payment-summary-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.transaction-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.transaction-type-badge--income {
+  background: #edf7ed;
+  color: #2e7d32;
+}
+
+.transaction-type-badge--expense {
+  background: var(--bg-danger-subtle);
+  color: var(--danger);
+}
+
+.transaction-type-badge--card-payment {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.card-status-badge--active {
+  background: #edf7ed;
+  color: #2e7d32;
+}
+
+.card-status-badge--inactive {
+  background: var(--bg-secondary);
+  color: var(--text-tertiary);
+}
+
+.statement-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+
+.statement-breakdown {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.statement-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.statement-breakdown-general {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-tertiary);
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-subtle);
+  margin-top: 4px;
+}
+
+.debt-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--danger);
+  font-variant-numeric: tabular-nums;
+}
+
+.balance-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2e7d32;
+  font-variant-numeric: tabular-nums;
+}
+
+.balance-amount--negative {
+  color: var(--danger);
+}
+
+@media (max-width: 768px) {
+  .payment-summary {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}

@@ -181,13 +181,19 @@ export default function NotificationList() {
               </div>
               <p className="notification-message">{n.message}</p>
               <div className="notification-meta">
-                <Link to={`/properties/${n.propertyId}`} className="notification-property-link">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
-                  {n.propertyName}
-                </Link>
+                {n.propertyId ? (
+                  <Link to={`/properties/${n.propertyId}`} className="notification-property-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="14" height="14">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    {n.propertyName}
+                  </Link>
+                ) : n.groupName ? (
+                  <span className="notification-property-link" style={{ cursor: 'default' }}>
+                    {n.groupName}
+                  </span>
+                ) : null}
                 <span className="notification-date">{formatDate(n.date)}</span>
               </div>
             </div>

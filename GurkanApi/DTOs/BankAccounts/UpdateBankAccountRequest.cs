@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using GurkanApi.Entities;
 
 namespace GurkanApi.DTOs.BankAccounts;
 
@@ -15,4 +16,6 @@ public class UpdateBankAccountRequest
 
     [MaxLength(500)]
     public string? Description { get; set; }
+
+    public Currency? Currency { get; set; }
 }

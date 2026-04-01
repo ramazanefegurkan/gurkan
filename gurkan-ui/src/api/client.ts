@@ -49,6 +49,20 @@ import type {
   AddMemberRequest,
   AssignPropertyRequest,
   TelegramLinkResponse,
+  CreditCardResponse,
+  CreditCardListResponse,
+  CreateCreditCardRequest,
+  UpdateCreditCardRequest,
+  CreditCardSpendingResponse,
+  CreateCreditCardSpendingRequest,
+  UpdateCreditCardSpendingRequest,
+  CreditCardStatementResponse,
+  CreateStatementRequest,
+  PayStatementRequest,
+  BankTransactionResponse,
+  CreateBankTransactionRequest,
+  UpdateBankTransactionRequest,
+  BankAccountBalanceResponse,
 } from '../types';
 
 // ── Axios instance ───────────────────────────────────
@@ -832,6 +846,107 @@ export async function linkTelegram(linkCode: string): Promise<TelegramLinkRespon
 
 export async function unlinkTelegram(): Promise<void> {
   await api.delete('/telegram/link');
+}
+
+// ── Credit Cards ────────────────────────────────────
+
+export async function getCreditCards(groupId?: string): Promise<CreditCardListResponse[]> {
+  const params = groupId ? { groupId } : {};
+  const { data } = await api.get<CreditCardListResponse[]>('/credit-cards', { params });
+  return data;
+}
+
+export async function getCreditCard(id: string): Promise<CreditCardResponse> {
+  const { data } = await api.get<CreditCardResponse>(`/credit-cards/${id}`);
+  return data;
+}
+
+export async function createCreditCard(payload: CreateCreditCardRequest): Promise<CreditCardResponse> {
+  const { data } = await api.post<CreditCardResponse>('/credit-cards', payload);
+  return data;
+}
+
+export async function updateCreditCard(id: string, payload: UpdateCreditCardRequest): Promise<CreditCardResponse> {
+  const { data } = await api.put<CreditCardResponse>(`/credit-cards/${id}`, payload);
+  return data;
+}
+
+export async function deleteCreditCard(id: string): Promise<void> {
+  await api.delete(`/credit-cards/${id}`);
+}
+
+// ── Credit Card Spendings ───────────────────────────
+
+export async function getCreditCardSpendings(creditCardId: string, from?: string, to?: string): Promise<CreditCardSpendingResponse[]> {
+  const params: Record<string, string> = {};
+  if (from) params.from = from;
+  if (to) params.to = to;
+  const { data } = await api.get<CreditCardSpendingResponse[]>(`/credit-cards/${creditCardId}/spendings`, { params });
+  return data;
+}
+
+export async function createCreditCardSpending(creditCardId: string, payload: CreateCreditCardSpendingRequest): Promise<CreditCardSpendingResponse> {
+  const { data } = await api.post<CreditCardSpendingResponse>(`/credit-cards/${creditCardId}/spendings`, payload);
+  return data;
+}
+
+export async function updateCreditCardSpending(creditCardId: string, spendingId: string, payload: UpdateCreditCardSpendingRequest): Promise<CreditCardSpendingResponse> {
+  const { data } = await api.put<CreditCardSpendingResponse>(`/credit-cards/${creditCardId}/spendings/${spendingId}`, payload);
+  return data;
+}
+
+export async function deleteCreditCardSpending(creditCardId: string, spendingId: string): Promise<void> {
+  await api.delete(`/credit-cards/${creditCardId}/spendings/${spendingId}`);
+}
+
+// ── Credit Card Statements ──────────────────────────
+
+export async function getCreditCardStatements(creditCardId: string): Promise<CreditCardStatementResponse[]> {
+  const { data } = await api.get<CreditCardStatementResponse[]>(`/credit-cards/${creditCardId}/statements`);
+  return data;
+}
+
+export async function createCreditCardStatement(creditCardId: string, payload: CreateStatementRequest): Promise<CreditCardStatementResponse> {
+  const { data } = await api.post<CreditCardStatementResponse>(`/credit-cards/${creditCardId}/statements`, payload);
+  return data;
+}
+
+export async function payStatement(creditCardId: string, statementId: string, payload: PayStatementRequest): Promise<CreditCardStatementResponse> {
+  const { data } = await api.patch<CreditCardStatementResponse>(`/credit-cards/${creditCardId}/statements/${statementId}/pay`, payload);
+  return data;
+}
+
+export async function deleteStatement(creditCardId: string, statementId: string): Promise<void> {
+  await api.delete(`/credit-cards/${creditCardId}/statements/${statementId}`);
+}
+
+// ── Bank Transactions ───────────────────────────────
+
+export async function getBankTransactions(bankAccountId: string, from?: string, to?: string): Promise<BankTransactionResponse[]> {
+  const params: Record<string, string> = {};
+  if (from) params.from = from;
+  if (to) params.to = to;
+  const { data } = await api.get<BankTransactionResponse[]>(`/bank-accounts/${bankAccountId}/transactions`, { params });
+  return data;
+}
+
+export async function getBankAccountBalance(bankAccountId: string): Promise<BankAccountBalanceResponse> {
+  const { data } = await api.get<BankAccountBalanceResponse>(`/bank-accounts/${bankAccountId}/transactions/balance`);
+  return data;
+}
+
+export async function createBankTransaction(bankAccountId: string, payload: CreateBankTransactionRequest): Promise<BankTransactionResponse> {
+  const { data } = await api.post<BankTransactionResponse>(`/bank-accounts/${bankAccountId}/transactions`, payload);
+  return data;
+}
+
+export async function updateBankTransaction(bankAccountId: string, transactionId: string, payload: UpdateBankTransactionRequest): Promise<BankTransactionResponse> {
+  const { data } = await api.put<BankTransactionResponse>(`/bank-accounts/${bankAccountId}/transactions/${transactionId}`, payload);
+  return data;
+}
+
+export async function deleteBankTransaction(bankAccountId: string, transactionId: string): Promise<void> {
+  await api.delete(`/bank-accounts/${bankAccountId}/transactions/${transactionId}`);
 }
 
 export default api;

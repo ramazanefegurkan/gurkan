@@ -100,3 +100,10 @@ public enum DocumentCategory
     Photo,
     Other
 }
+
+public enum BankTransactionType
+{
+    Income,
+    Expense,
+    CreditCardPayment
+}
