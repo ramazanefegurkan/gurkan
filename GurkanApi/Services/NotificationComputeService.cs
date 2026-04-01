@@ -173,6 +173,67 @@ public class NotificationComputeService : INotificationComputeService
             });
         }
 
+        List<Guid> accessibleGroupIds;
+        if (role == UserRole.SuperAdmin)
+            accessibleGroupIds = await _db.Groups.Select(g => g.Id).ToListAsync();
+        else
+            accessibleGroupIds = await _access.GetUserGroupIdsAsync(userId);
+
+        var groupLookup = await _db.Groups
+            .Where(g => accessibleGroupIds.Contains(g.Id))
+            .ToDictionaryAsync(g => g.Id, g => g.Name);
+
+        var activeCards = await _db.CreditCards
+            .Where(cc => accessibleGroupIds.Contains(cc.GroupId) && cc.IsActive)
+            .ToListAsync();
+
+        foreach (var card in activeCards)
+        {
+            var billingDay = Math.Min(card.BillingDay, DateTime.DaysInMonth(now.Year, now.Month));
+            if (now.Day < billingDay) continue;
+
+            var monthKey = $"{now:yyyy-MM}";
+            var hasStatement = await _db.CreditCardStatements
+                .AnyAsync(s => s.CreditCardId == card.Id
+                            && s.StatementDate.Year == now.Year
+                            && s.StatementDate.Month == now.Month);
+
+            if (!hasStatement)
+            {
+                notifications.Add(new NotificationItem
+                {
+                    Key = $"BillingCycleReminder:{card.Id}:{monthKey}",
+                    Type = "BillingCycleReminder",
+                    Severity = "Warning",
+                    Message = $"{card.Name} hesap kesim tarihi geldi, ekstre tutarını girin",
+                    GroupId = card.GroupId,
+                    GroupName = groupLookup.GetValueOrDefault(card.GroupId, ""),
+                    Date = new DateTime(now.Year, now.Month, billingDay, 0, 0, 0, DateTimeKind.Utc),
+                });
+            }
+        }
+
+        var unpaidStatements = await _db.CreditCardStatements
+            .Include(s => s.CreditCard)
+            .Where(s => !s.IsPaid
+                     && accessibleGroupIds.Contains(s.CreditCard.GroupId)
+                     && s.DueDate <= now.AddDays(1))
+            .ToListAsync();
+
+        foreach (var statement in unpaidStatements)
+        {
+            notifications.Add(new NotificationItem
+            {
+                Key = $"CardPaymentDue:{statement.Id}",
+                Type = "CardPaymentDue",
+                Severity = "Critical",
+                Message = $"{statement.CreditCard.Name} son ödeme tarihi yarın, borç: {statement.TotalAmount} {statement.CreditCard.Currency}",
+                GroupId = statement.CreditCard.GroupId,
+                GroupName = groupLookup.GetValueOrDefault(statement.CreditCard.GroupId, ""),
+                Date = statement.DueDate,
+            });
+        }
+
         // --- Filter out dismissed notifications ---
         var allKeys = notifications.Select(n => n.Key).ToList();
         var dismissedKeys = await _db.DismissedNotifications
