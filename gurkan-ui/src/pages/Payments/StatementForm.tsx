@@ -6,17 +6,17 @@ import './Payments.css';
 
 const MONTHS = [
   { value: 1, label: 'Ocak' },
-  { value: 2, label: '\u015Eubat' },
+  { value: 2, label: 'Şubat' },
   { value: 3, label: 'Mart' },
   { value: 4, label: 'Nisan' },
-  { value: 5, label: 'May\u0131s' },
+  { value: 5, label: 'Mayıs' },
   { value: 6, label: 'Haziran' },
   { value: 7, label: 'Temmuz' },
-  { value: 8, label: 'A\u011Fustos' },
-  { value: 9, label: 'Eyl\u00FCl' },
+  { value: 8, label: 'Ağustos' },
+  { value: 9, label: 'Eylül' },
   { value: 10, label: 'Ekim' },
-  { value: 11, label: 'Kas\u0131m' },
-  { value: 12, label: 'Aral\u0131k' },
+  { value: 11, label: 'Kasım' },
+  { value: 12, label: 'Aralık' },
 ];
 
 export default function StatementForm() {
@@ -47,7 +47,7 @@ export default function StatementForm() {
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? '\u0130\u015Flem ba\u015Far\u0131s\u0131z.';
+          ?.message ?? 'İşlem başarısız.';
       setError(msg);
     } finally {
       setSubmitting(false);
@@ -60,13 +60,13 @@ export default function StatementForm() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Kart Detay\u0131na D\u00F6n
+        Kart Detayına Dön
       </Link>
 
       <div className="page-header">
         <div>
           <h1 className="page-title">Yeni Ekstre</h1>
-          <p className="page-subtitle">Kredi kart\u0131 ekstre bilgilerini girin</p>
+          <p className="page-subtitle">Kredi kartı ekstre bilgilerini girin</p>
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export default function StatementForm() {
             <div className="form-row">
               <div className="form-field">
                 <label className="form-label">
-                  Toplam Bor\u00E7 <span className="required">*</span>
+                  Toplam Borç <span className="required">*</span>
                 </label>
                 <input
                   className="form-input"
@@ -118,7 +118,7 @@ export default function StatementForm() {
                 </select>
               </div>
               <div className="form-field">
-                <label className="form-label">Y\u0131l</label>
+                <label className="form-label">Yıl</label>
                 <input
                   className="form-input"
                   type="number"
@@ -143,7 +143,7 @@ export default function StatementForm() {
               to={`/payments/credit-cards/${cardId}`}
               className="btn btn-secondary"
             >
-              \u0130ptal
+              İptal
             </Link>
           </div>
         </div>

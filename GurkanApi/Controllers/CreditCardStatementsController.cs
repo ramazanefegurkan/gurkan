@@ -58,7 +58,7 @@ public class CreditCardStatementsController : ControllerBase
         var year = request.Year ?? now.Year;
 
         var billingDay = Math.Min(card.BillingDay, DateTime.DaysInMonth(year, month));
-        var statementDate = new DateTime(year, month, billingDay);
+        var statementDate = new DateTime(year, month, billingDay, 0, 0, 0, DateTimeKind.Utc);
 
         int dueMonth, dueYear;
         if (card.DueDay < card.BillingDay)
@@ -72,7 +72,7 @@ public class CreditCardStatementsController : ControllerBase
             dueYear = year;
         }
         var dueDay = Math.Min(card.DueDay, DateTime.DaysInMonth(dueYear, dueMonth));
-        var dueDate = new DateTime(dueYear, dueMonth, dueDay);
+        var dueDate = new DateTime(dueYear, dueMonth, dueDay, 0, 0, 0, DateTimeKind.Utc);
 
         var duplicateExists = await _db.CreditCardStatements
             .AnyAsync(s => s.CreditCardId == creditCardId
@@ -113,6 +113,21 @@ public class CreditCardStatementsController : ControllerBase
         };
 
         _db.CreditCardStatements.Add(statement);
+
+        var generalAmount = request.TotalAmount - itemizedTotal;
+        if (generalAmount > 0)
+        {
+            _db.CreditCardSpendings.Add(new CreditCardSpending
+            {
+                Id = Guid.NewGuid(),
+                CreditCardId = creditCardId,
+                Description = "Genel Harcama",
+                Amount = generalAmount,
+                Date = statementDate,
+                CreatedAt = DateTime.UtcNow,
+            });
+        }
+
         await _db.SaveChangesAsync();
 
         _logger.LogInformation("Credit card statement created: Id={Id}, CreditCard={CreditCardId}, By={UserId}",

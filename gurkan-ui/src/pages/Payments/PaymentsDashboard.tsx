@@ -15,7 +15,7 @@ import '../../styles/shared.css';
 import './Payments.css';
 
 function formatCurrency(amount: number, currency: Currency): string {
-  const symbol = currency === 'TRY' ? '\u20BA' : currency === 'USD' ? '$' : '\u20AC';
+  const symbol = currency === 'TRY' ? '₺' : currency === 'USD' ? '$' : '€';
   return `${symbol}${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
@@ -49,7 +49,7 @@ export default function PaymentsDashboard() {
         );
         if (!cancelled) setBalances(balanceResults);
       } catch {
-        if (!cancelled) setError('Veriler y\u00FCklenemedi.');
+        if (!cancelled) setError('Veriler yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -84,8 +84,8 @@ export default function PaymentsDashboard() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">\u00D6demeler</h1>
-          <p className="page-subtitle">Kredi kartlar\u0131 ve banka hesaplar\u0131 \u00F6zeti</p>
+          <h1 className="page-title">Ödemeler</h1>
+          <p className="page-subtitle">Kredi kartları ve banka hesapları özeti</p>
         </div>
       </div>
 
@@ -102,11 +102,11 @@ export default function PaymentsDashboard() {
 
       <div className="section-header">
         <div>
-          <h2 className="section-title">Kredi Kartlar\u0131</h2>
+          <h2 className="section-title">Kredi Kartları</h2>
           <p className="section-subtitle">{cards.length} kart</p>
         </div>
         <Link to="/payments/credit-cards" className="btn btn-ghost btn-sm">
-          T\u00FCm Kartlar
+          Tüm Kartlar
         </Link>
       </div>
 
@@ -114,7 +114,7 @@ export default function PaymentsDashboard() {
         <div className="payment-summary">
           {Object.entries(debtByCurrency).map(([cur, amount]) => (
             <div key={cur} className="payment-summary-item">
-              <span className="payment-summary-label">Toplam Bor\u00E7 ({cur})</span>
+              <span className="payment-summary-label">Toplam Borç ({cur})</span>
               <span className="payment-summary-value" style={{ color: 'var(--danger)' }}>
                 {formatCurrency(amount, cur as Currency)}
               </span>
@@ -125,7 +125,7 @@ export default function PaymentsDashboard() {
 
       {cards.length === 0 ? (
         <div className="empty-state">
-          <p className="empty-state-title">Hen\u00FCz kredi kart\u0131 eklenmemi\u015F</p>
+          <p className="empty-state-title">Henüz kredi kartı eklenmemiş</p>
           <Link to="/payments/credit-cards/new" className="btn btn-primary">
             Yeni Kart
           </Link>
@@ -137,7 +137,7 @@ export default function PaymentsDashboard() {
               <tr>
                 <th>Ad</th>
                 <th>Banka</th>
-                <th>G\u00FCncel Bor\u00E7</th>
+                <th>Güncel Borç</th>
                 <th>Durum</th>
               </tr>
             </thead>
@@ -165,11 +165,11 @@ export default function PaymentsDashboard() {
 
       <div className="section-header">
         <div>
-          <h2 className="section-title">Banka Hesaplar\u0131</h2>
+          <h2 className="section-title">Banka Hesapları</h2>
           <p className="section-subtitle">{accounts.length} hesap</p>
         </div>
         <Link to="/payments/bank-accounts" className="btn btn-ghost btn-sm">
-          T\u00FCm Hesaplar
+          Tüm Hesaplar
         </Link>
       </div>
 
@@ -188,7 +188,7 @@ export default function PaymentsDashboard() {
 
       {accounts.length === 0 ? (
         <div className="empty-state">
-          <p className="empty-state-title">Hen\u00FCz banka hesab\u0131 eklenmemi\u015F</p>
+          <p className="empty-state-title">Henüz banka hesabı eklenmemiş</p>
         </div>
       ) : (
         <div className="data-table-wrap">

@@ -10,7 +10,7 @@ import '../../styles/shared.css';
 import './Payments.css';
 
 function formatCurrency(amount: number, currency: Currency): string {
-  const symbol = currency === 'TRY' ? '\u20BA' : currency === 'USD' ? '$' : '\u20AC';
+  const symbol = currency === 'TRY' ? '₺' : currency === 'USD' ? '$' : '€';
   return `${symbol}${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
@@ -39,7 +39,7 @@ export default function BankAccountList() {
         );
         if (!cancelled) setBalances(balanceResults);
       } catch {
-        if (!cancelled) setError('Banka hesaplar\u0131 y\u00FCklenemedi.');
+        if (!cancelled) setError('Banka hesapları yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -69,9 +69,16 @@ export default function BankAccountList() {
     <div>
       <div className="section-header">
         <div>
-          <h2 className="section-title">Banka Hesaplar\u0131</h2>
-          <p className="section-subtitle">{accounts.length} hesap kayd\u0131</p>
+          <h2 className="section-title">Banka Hesapları</h2>
+          <p className="section-subtitle">{accounts.length} hesap kaydı</p>
         </div>
+        <Link to="/payments/bank-accounts/new" className="btn btn-primary btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16" style={{ marginRight: 4 }}>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Yeni Hesap
+        </Link>
       </div>
 
       {error && (
@@ -96,7 +103,7 @@ export default function BankAccountList() {
             </div>
           ))}
           <div className="payment-summary-item">
-            <span className="payment-summary-label">Hesap Say\u0131s\u0131</span>
+            <span className="payment-summary-label">Hesap Sayısı</span>
             <span className="payment-summary-value">{accounts.length}</span>
           </div>
         </div>
@@ -114,8 +121,8 @@ export default function BankAccountList() {
             <path d="M12 14v4" />
             <path d="M16 14v4" />
           </svg>
-          <p className="empty-state-title">Hen\u00FCz banka hesab\u0131 kayd\u0131 yok</p>
-          <p className="empty-state-text">Banka hesaplar\u0131n\u0131z\u0131 takip etmek i\u00E7in kay\u0131t ekleyin.</p>
+          <p className="empty-state-title">Henüz banka hesabı kaydı yok</p>
+          <p className="empty-state-text">Banka hesaplarınızı takip etmek için kayıt ekleyin.</p>
         </div>
       ) : (
         <div className="data-table-wrap">
@@ -127,7 +134,7 @@ export default function BankAccountList() {
                 <th>IBAN</th>
                 <th>Para Birimi</th>
                 <th>Bakiye</th>
-                <th>\u0130\u015Flemler</th>
+                <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
@@ -138,7 +145,7 @@ export default function BankAccountList() {
                   <tr key={a.id}>
                     <td>{a.holderName}</td>
                     <td>{a.bankName}</td>
-                    <td style={{ fontSize: 12, fontFamily: 'monospace' }}>{a.iban ?? '\u2014'}</td>
+                    <td style={{ fontSize: 12, fontFamily: 'monospace' }}>{a.iban ?? '—'}</td>
                     <td>{a.currency}</td>
                     <td className="amount">
                       <span style={{ color: amount >= 0 ? '#2e7d32' : 'var(--danger)' }}>

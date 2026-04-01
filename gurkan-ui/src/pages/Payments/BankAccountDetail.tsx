@@ -20,7 +20,7 @@ import '../../styles/shared.css';
 import './Payments.css';
 
 function formatCurrency(amount: number, currency: Currency): string {
-  const symbol = currency === 'TRY' ? '\u20BA' : currency === 'USD' ? '$' : '\u20AC';
+  const symbol = currency === 'TRY' ? '₺' : currency === 'USD' ? '$' : '€';
   return `${symbol}${amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
@@ -75,7 +75,7 @@ export default function BankAccountDetail() {
           setTransactions(transactionsData);
         }
       } catch {
-        if (!cancelled) setError('Veriler y\u00FCklenemedi.');
+        if (!cancelled) setError('Veriler yüklenemedi.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -87,7 +87,7 @@ export default function BankAccountDetail() {
 
   async function handleDelete(transactionId: string) {
     if (!id) return;
-    if (!window.confirm('Bu i\u015Flemi silmek istedi\u011Finize emin misiniz?')) return;
+    if (!window.confirm('Bu işlemi silmek istediğinize emin misiniz?')) return;
 
     setDeletingId(transactionId);
     try {
@@ -96,7 +96,7 @@ export default function BankAccountDetail() {
       const balanceData = await getBankAccountBalance(id);
       setBalance(balanceData);
     } catch {
-      setError('\u0130\u015Flem silinemedi.');
+      setError('İşlem silinemedi.');
     } finally {
       setDeletingId(null);
     }
@@ -113,9 +113,9 @@ export default function BankAccountDetail() {
   if (!account) {
     return (
       <div className="empty-state">
-        <p className="empty-state-title">Hesap bulunamad\u0131</p>
+        <p className="empty-state-title">Hesap bulunamadı</p>
         <Link to="/payments/bank-accounts" className="btn btn-primary">
-          Hesaplara D\u00F6n
+          Hesaplara Dön
         </Link>
       </div>
     );
@@ -129,7 +129,7 @@ export default function BankAccountDetail() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Hesaplara D\u00F6n
+        Hesaplara Dön
       </Link>
 
       <div className="page-header">
@@ -137,8 +137,8 @@ export default function BankAccountDetail() {
           <h1 className="page-title">{account.holderName}</h1>
           <p className="page-subtitle">
             {account.bankName}
-            {account.iban ? ` \u00B7 ${account.iban}` : ''}
-            {` \u00B7 ${account.currency}`}
+            {account.iban ? ` · ${account.iban}` : ''}
+            {` · ${account.currency}`}
           </p>
         </div>
       </div>
@@ -165,22 +165,22 @@ export default function BankAccountDetail() {
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <Link to={`/payments/bank-accounts/${id}/transactions/new`} className="btn btn-primary btn-sm">
-          \u0130\u015Flem Ekle
+          İşlem Ekle
         </Link>
       </div>
 
       <div className="section-header">
         <div>
-          <h2 className="section-title">\u0130\u015Flemler</h2>
-          <p className="section-subtitle">{transactions.length} i\u015Flem</p>
+          <h2 className="section-title">İşlemler</h2>
+          <p className="section-subtitle">{transactions.length} işlem</p>
         </div>
       </div>
 
       {transactions.length === 0 ? (
         <div className="empty-state">
-          <p className="empty-state-title">Hen\u00FCz i\u015Flem kayd\u0131 yok</p>
+          <p className="empty-state-title">Henüz işlem kaydı yok</p>
           <Link to={`/payments/bank-accounts/${id}/transactions/new`} className="btn btn-primary">
-            \u0130\u015Flem Ekle
+            İşlem Ekle
           </Link>
         </div>
       ) : (
@@ -189,10 +189,10 @@ export default function BankAccountDetail() {
             <thead>
               <tr>
                 <th>Tarih</th>
-                <th>T\u00FCr</th>
-                <th>A\u00E7\u0131klama</th>
+                <th>Tür</th>
+                <th>Açıklama</th>
                 <th>Tutar</th>
-                <th>\u0130\u015Flemler</th>
+                <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
@@ -215,7 +215,7 @@ export default function BankAccountDetail() {
                             <Link
                               to={`/payments/bank-accounts/${id}/transactions/${t.id}/edit`}
                               className="btn btn-ghost btn-sm"
-                              title="D\u00FCzenle"
+                              title="Düzenle"
                             >
                               <svg style={{ width: 14, height: 14 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
