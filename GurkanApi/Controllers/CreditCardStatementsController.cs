@@ -113,6 +113,21 @@ public class CreditCardStatementsController : ControllerBase
         };
 
         _db.CreditCardStatements.Add(statement);
+
+        var generalAmount = request.TotalAmount - itemizedTotal;
+        if (generalAmount > 0)
+        {
+            _db.CreditCardSpendings.Add(new CreditCardSpending
+            {
+                Id = Guid.NewGuid(),
+                CreditCardId = creditCardId,
+                Description = "Genel Harcama",
+                Amount = generalAmount,
+                Date = statementDate,
+                CreatedAt = DateTime.UtcNow,
+            });
+        }
+
         await _db.SaveChangesAsync();
 
         _logger.LogInformation("Credit card statement created: Id={Id}, CreditCard={CreditCardId}, By={UserId}",
