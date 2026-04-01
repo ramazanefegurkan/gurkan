@@ -95,6 +95,7 @@ public class BankAccountsController : ControllerBase
             BankName = request.BankName,
             IBAN = request.IBAN,
             Description = request.Description,
+            Currency = request.Currency,
             CreatedAt = DateTime.UtcNow,
         };
 
@@ -127,6 +128,7 @@ public class BankAccountsController : ControllerBase
         if (request.BankName is not null) account.BankName = request.BankName;
         if (request.IBAN is not null) account.IBAN = request.IBAN;
         if (request.Description is not null) account.Description = request.Description;
+        if (request.Currency.HasValue) account.Currency = request.Currency.Value;
 
         await _db.SaveChangesAsync();
 
@@ -172,6 +174,7 @@ public class BankAccountsController : ControllerBase
         BankName = ba.BankName,
         IBAN = ba.IBAN,
         Description = ba.Description,
+        Currency = ba.Currency,
         CreatedAt = ba.CreatedAt,
     };
 }
