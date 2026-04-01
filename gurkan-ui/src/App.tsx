@@ -34,6 +34,7 @@ import SpendingForm from './pages/Payments/SpendingForm';
 import BankAccountList from './pages/Payments/BankAccountList';
 import BankAccountDetail from './pages/Payments/BankAccountDetail';
 import BankTransactionForm from './pages/Payments/BankTransactionForm';
+import BankAccountForm from './pages/Payments/BankAccountForm';
 import TelegramLink from './pages/Settings/TelegramLink';
 import type { ReactNode } from 'react';
 
@@ -97,6 +98,7 @@ function AppRoutes() {
         <Route path="/payments/credit-cards/:id/statements/new" element={<StatementForm />} />
         <Route path="/payments/credit-cards/:id/spendings/new" element={<SpendingForm />} />
         <Route path="/payments/bank-accounts" element={<BankAccountList />} />
+        <Route path="/payments/bank-accounts/new" element={<BankAccountForm />} />
         <Route path="/payments/bank-accounts/:id" element={<BankAccountDetail />} />
         <Route path="/payments/bank-accounts/:id/transactions/new" element={<BankTransactionForm />} />
         <Route path="/payments/bank-accounts/:id/transactions/:transactionId/edit" element={<BankTransactionForm />} />
