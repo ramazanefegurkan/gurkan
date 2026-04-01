@@ -29,6 +29,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<BankAccount> BankAccounts => Set<BankAccount>();
     public DbSet<Bank> Banks => Set<Bank>();
     public DbSet<TelegramUserLink> TelegramUserLinks => Set<TelegramUserLink>();
+    public DbSet<CreditCard> CreditCards => Set<CreditCard>();
+    public DbSet<CreditCardSpending> CreditCardSpendings => Set<CreditCardSpending>();
+    public DbSet<CreditCardStatement> CreditCardStatements => Set<CreditCardStatement>();
+    public DbSet<BankTransaction> BankTransactions => Set<BankTransaction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -368,6 +372,10 @@ public class ApplicationDbContext : DbContext
             entity.Property(ba => ba.BankName).IsRequired().HasMaxLength(200);
             entity.Property(ba => ba.IBAN).HasMaxLength(34);
             entity.Property(ba => ba.Description).HasMaxLength(500);
+            entity.Property(ba => ba.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10)
+                  .HasDefaultValue(Currency.TRY);
             entity.Property(ba => ba.CreatedAt)
                   .HasDefaultValueSql("now() at time zone 'utc'");
 
@@ -420,6 +428,83 @@ public class ApplicationDbContext : DbContext
                   .HasForeignKey<TelegramUserLink>(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade)
                   .IsRequired(false);
+        });
+
+        // ---------- CreditCard ----------
+        modelBuilder.Entity<CreditCard>(entity =>
+        {
+            entity.HasKey(cc => cc.Id);
+            entity.Property(cc => cc.Name).IsRequired().HasMaxLength(200);
+            entity.Property(cc => cc.BankName).IsRequired().HasMaxLength(200);
+            entity.Property(cc => cc.Currency)
+                  .HasConversion<string>()
+                  .HasMaxLength(10);
+            entity.Property(cc => cc.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(cc => cc.Group)
+                  .WithMany()
+                  .HasForeignKey(cc => cc.GroupId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- CreditCardSpending ----------
+        modelBuilder.Entity<CreditCardSpending>(entity =>
+        {
+            entity.HasKey(cs => cs.Id);
+            entity.Property(cs => cs.Description).IsRequired().HasMaxLength(500);
+            entity.Property(cs => cs.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(cs => cs.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(cs => cs.CreditCard)
+                  .WithMany()
+                  .HasForeignKey(cs => cs.CreditCardId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- CreditCardStatement ----------
+        modelBuilder.Entity<CreditCardStatement>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.Property(s => s.TotalAmount).HasColumnType("decimal(18,2)");
+            entity.Property(s => s.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasIndex(s => new { s.CreditCardId, s.StatementDate }).IsUnique();
+
+            entity.HasOne(s => s.CreditCard)
+                  .WithMany()
+                  .HasForeignKey(s => s.CreditCardId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(s => s.PaidFromBankAccount)
+                  .WithMany()
+                  .HasForeignKey(s => s.PaidFromBankAccountId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ---------- BankTransaction ----------
+        modelBuilder.Entity<BankTransaction>(entity =>
+        {
+            entity.HasKey(bt => bt.Id);
+            entity.Property(bt => bt.Description).IsRequired().HasMaxLength(500);
+            entity.Property(bt => bt.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(bt => bt.Type)
+                  .HasConversion<string>()
+                  .HasMaxLength(50);
+            entity.Property(bt => bt.CreatedAt)
+                  .HasDefaultValueSql("now() at time zone 'utc'");
+
+            entity.HasOne(bt => bt.BankAccount)
+                  .WithMany()
+                  .HasForeignKey(bt => bt.BankAccountId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(bt => bt.RelatedStatement)
+                  .WithMany()
+                  .HasForeignKey(bt => bt.RelatedStatementId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
