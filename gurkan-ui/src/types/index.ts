@@ -459,6 +459,20 @@ export const BillPaymentStatusLabels: Record<BillPaymentStatus, string> = {
   [BillPaymentStatus.Overdue]: 'Gecikmiş',
 };
 
+export const BankTransactionType = {
+  Income: 'Income',
+  Expense: 'Expense',
+  CreditCardPayment: 'CreditCardPayment',
+} as const;
+
+export type BankTransactionType = (typeof BankTransactionType)[keyof typeof BankTransactionType];
+
+export const BankTransactionTypeLabels: Record<BankTransactionType, string> = {
+  [BankTransactionType.Income]: 'Gelir',
+  [BankTransactionType.Expense]: 'Gider',
+  [BankTransactionType.CreditCardPayment]: 'Kart Ödemesi',
+};
+
 // ── Subscriptions ────────────────────────────────────
 
 export const SubscriptionType = {
@@ -645,6 +659,8 @@ export const NotificationType = {
   UpcomingBill: 'UpcomingBill',
   LeaseExpiry: 'LeaseExpiry',
   RentIncrease: 'RentIncrease',
+  BillingCycleReminder: 'BillingCycleReminder',
+  CardPaymentDue: 'CardPaymentDue',
 } as const;
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
@@ -654,6 +670,8 @@ export const NotificationTypeLabels: Record<NotificationType, string> = {
   [NotificationType.UpcomingBill]: 'Fatura Hatırlatması',
   [NotificationType.LeaseExpiry]: 'Sözleşme Bitişi',
   [NotificationType.RentIncrease]: 'Kira Artışı',
+  [NotificationType.BillingCycleReminder]: 'Hesap Kesim Hatırlatma',
+  [NotificationType.CardPaymentDue]: 'Kart Ödemesi',
 };
 
 export const NotificationSeverity = {
@@ -669,8 +687,10 @@ export interface NotificationItem {
   type: NotificationType;
   severity: NotificationSeverity;
   message: string;
-  propertyId: string;
-  propertyName: string;
+  propertyId: string | null;
+  propertyName: string | null;
+  groupId: string | null;
+  groupName: string | null;
   relatedEntityId: string | null;
   date: string;
 }
@@ -775,6 +795,7 @@ export interface BankAccountResponse {
   bankName: string;
   iban: string | null;
   description: string | null;
+  currency: Currency;
   createdAt: string;
 }
 
@@ -784,6 +805,7 @@ export interface CreateBankAccountRequest {
   bankName: string;
   iban?: string | null;
   description?: string | null;
+  currency: Currency;
 }
 
 export interface UpdateBankAccountRequest {
@@ -803,6 +825,131 @@ export interface BankResponse {
 
 export interface CreateBankRequest {
   name: string;
+}
+
+// ── Credit Cards ────────────────────────────────────
+
+export interface CreditCardResponse {
+  id: string;
+  groupId: string;
+  name: string;
+  bankName: string;
+  billingDay: number;
+  dueDay: number;
+  currency: Currency;
+  isActive: boolean;
+  currentDebt: number;
+  createdAt: string;
+}
+
+export interface CreditCardListResponse {
+  id: string;
+  name: string;
+  bankName: string;
+  currency: Currency;
+  isActive: boolean;
+  currentDebt: number;
+}
+
+export interface CreateCreditCardRequest {
+  groupId: string;
+  name: string;
+  bankName: string;
+  billingDay: number;
+  dueDay: number;
+  currency: Currency;
+}
+
+export interface UpdateCreditCardRequest {
+  name?: string;
+  bankName?: string;
+  billingDay?: number;
+  dueDay?: number;
+  currency?: Currency;
+  isActive?: boolean;
+}
+
+// ── Credit Card Spendings ───────────────────────────
+
+export interface CreditCardSpendingResponse {
+  id: string;
+  creditCardId: string;
+  description: string;
+  amount: number;
+  date: string;
+  createdAt: string;
+}
+
+export interface CreateCreditCardSpendingRequest {
+  description: string;
+  amount: number;
+  date: string;
+}
+
+export interface UpdateCreditCardSpendingRequest {
+  description?: string;
+  amount?: number;
+  date?: string;
+}
+
+// ── Credit Card Statements ──────────────────────────
+
+export interface CreditCardStatementResponse {
+  id: string;
+  creditCardId: string;
+  statementDate: string;
+  dueDate: string;
+  totalAmount: number;
+  isPaid: boolean;
+  paidDate: string | null;
+  paidFromBankAccountId: string | null;
+  itemizedTotal: number;
+  generalAmount: number;
+  itemizedSpendings: CreditCardSpendingResponse[];
+  createdAt: string;
+}
+
+export interface CreateStatementRequest {
+  totalAmount: number;
+  month?: number;
+  year?: number;
+}
+
+export interface PayStatementRequest {
+  bankAccountId?: string | null;
+}
+
+// ── Bank Transactions ───────────────────────────────
+
+export interface BankTransactionResponse {
+  id: string;
+  bankAccountId: string;
+  type: BankTransactionType;
+  description: string;
+  amount: number;
+  date: string;
+  relatedStatementId: string | null;
+  createdAt: string;
+}
+
+export interface CreateBankTransactionRequest {
+  type: BankTransactionType;
+  description: string;
+  amount: number;
+  date: string;
+}
+
+export interface UpdateBankTransactionRequest {
+  type?: BankTransactionType;
+  description?: string;
+  amount?: number;
+  date?: string;
+}
+
+export interface BankAccountBalanceResponse {
+  bankAccountId: string;
+  balance: number;
+  currency: Currency;
 }
 
 // ── Telegram ──────────────────────────────────────────
